@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Master Build Plan — EU Regulatory Intelligence Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Familjen+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #0e1117;
+  --bg2:     #131720;
+  --surface: #171d2b;
+  --surf2:   #1d2436;
+  --border:  rgba(255,255,255,0.07);
+  --text:    #c8d4e8;
+  --muted:   #4a5a7a;
+  --dim:     #232f45;
+
+  --cyan:    #00d4ff;
+  --orange:  #ff6b35;
+  --gold:    #f5c842;
+  --green:   #3ddc84;
+  --red:     #ff4757;
+  --purple:  #9b72ff;
+  --pink:    #ff6b9d;
+  --teal:    #1de9b6;
+
+  /* phase colors */
+  --p0: #00d4ff;
+  --p1: #3ddc84;
+  --p2: #f5c842;
+  --p3: #ff6b35;
+  --p4: #9b72ff;
+  --p5: #ff6b9d;
+  --p6: #1de9b6;
+  --p7: #60a5fa;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Familjen Grotesk',sans-serif;
+  font-weight:400;
+  line-height:1.65;
+  overflow-x:hidden;
+}
+
+/* Blueprint grid */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,0.02) 1px,transparent 1px),
+    linear-gradient(rgba(0,212,255,0.005) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,0.005) 1px,transparent 1px);
+  background-size:80px 80px,80px 80px,16px 16px,16px 16px;
+  pointer-events:none;z-index:0;
+}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
+
+/* ── NAV BAR ── */
+.nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(14,17,23,0.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;
+  display:flex;align-items:center;gap:0;
+  height:48px;
+  overflow-x:auto;
+}
+.nav a{
+  display:flex;align-items:center;gap:6px;
+  padding:0 18px;height:48px;
+  font-family:'Fira Code',monospace;
+  font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  border-right:1px solid var(--border);
+  white-space:nowrap;
+  transition:color .15s,background .15s;
+}
+.nav a:hover{color:var(--cyan);background:rgba(0,212,255,0.04);}
+.nav a .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* ── HERO ── */
+.hero{
+  padding:80px 0 60px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+
+.hero-bg-text{
+  position:absolute;right:-20px;top:20px;
+  font-family:'Instrument Serif',serif;
+  font-size:280px;line-height:1;
+  color:rgba(255,255,255,0.018);
+  pointer-events:none;user-select:none;
+  letter-spacing:-.02em;
+}
+
+.hero-kicker{
+  font-family:'Fira Code',monospace;
+  font-size:10px;letter-spacing:.4em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+}
+.hero-kicker::before{
+  content:'';width:40px;height:1px;background:var(--cyan);
+}
+
+.hero h1{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(42px,6.5vw,88px);
+  line-height:1.0;
+  color:#fff;
+  margin-bottom:24px;
+  font-weight:400;
+}
+.hero h1 em{color:var(--cyan);font-style:italic;}
+.hero h1 .sub{display:block;font-size:clamp(28px,4vw,54px);color:var(--muted);}
+
+.hero-desc{
+  font-size:14px;color:var(--muted);
+  max-width:580px;line-height:1.8;
+  margin-bottom:36px;
+}
+
+/* stat row */
+.stats{
+  display:flex;flex-wrap:wrap;gap:0;
+  border:1px solid var(--border);
+  margin-bottom:0;
+}
+.stat{
+  flex:1;min-width:110px;
+  padding:16px 20px;
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;gap:3px;
+}
+.stat:last-child{border-right:none;}
+.stat-n{
+  font-family:'Instrument Serif',serif;
+  font-size:38px;line-height:1;
+  color:#fff;
+}
+.stat-l{
+  font-family:'Fira Code',monospace;
+  font-size:8.5px;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--muted);
+}
+
+/* ── SECTION HEADER ── */
+.sh{
+  display:grid;
+  grid-template-columns:60px 1fr auto;
+  align-items:center;gap:16px;
+  padding:48px 0 20px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:28px;
+}
+.sh-n{
+  font-family:'Fira Code',monospace;
+  font-size:9px;letter-spacing:.35em;
+  color:var(--muted);text-transform:uppercase;
+}
+.sh-t{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(22px,3vw,38px);
+  color:#fff;line-height:1.1;
+}
+.sh-c{
+  font-family:'Fira Code',monospace;
+  font-size:9px;color:var(--muted);
+  letter-spacing:.2em;text-transform:uppercase;
+}
+
+/* ══════════════════════════════════════
+   WORKFLOW TREE DIAGRAM
+══════════════════════════════════════ */
+.tree-container{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:40px 20px;
+  margin-bottom:16px;
+  overflow-x:auto;
+}
+
+.tree-svg{
+  display:block;
+  margin:0 auto;
+  min-width:900px;
+}
+
+/* ══════════════════════════════════════
+   PHASES
+══════════════════════════════════════ */
+.phases{display:flex;flex-direction:column;gap:0;margin-bottom:60px;}
+
+.phase{
+  display:grid;
+  grid-template-columns:200px 1fr;
+  border:1px solid var(--border);
+  border-bottom:none;
+  opacity:0;transform:translateY(20px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.phase:first-child{border-radius:10px 10px 0 0;}
+.phase:last-child{border-bottom:1px solid var(--border);border-radius:0 0 10px 10px;}
+.phase.vis{opacity:1;transform:translateY(0);}
+
+.ph-left{
+  padding:28px 22px;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;gap:6px;
+  position:relative;overflow:hidden;
+}
+.ph-left::before{
+  content:'';
+  position:absolute;top:0;left:0;bottom:0;width:3px;
+}
+.ph-week{
+  font-family:'Fira Code',monospace;
+  font-size:8.5px;letter-spacing:.35em;
+  text-transform:uppercase;color:var(--muted);
+}
+.ph-num{
+  font-family:'Instrument Serif',serif;
+  font-size:64px;line-height:1;
+  margin:4px 0;
+}
+.ph-name{font-size:13px;font-weight:600;color:#fff;line-height:1.35;}
+.ph-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:6px;padding:3px 9px;
+  font-family:'Fira Code',monospace;
+  font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid;border-radius:3px;
+  width:fit-content;
+}
+
+/* EU badge */
+.eu-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:4px;padding:2px 8px;
+  font-family:'Fira Code',monospace;
+  font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(0,212,255,0.08);
+  border:1px solid rgba(0,212,255,0.25);
+  color:var(--cyan);border-radius:2px;
+  width:fit-content;
+}
+
+.ph-right{
+  padding:24px 28px;
+  background:var(--bg2);
+}
+.ph-goal{
+  font-family:'Fira Code',monospace;
+  font-size:11px;color:var(--muted);
+  margin-bottom:16px;padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+  line-height:1.6;letter-spacing:.02em;
+}
+.ph-goal span{color:var(--gold);}
+
+/* tasks */
+.tasks{display:flex;flex-direction:column;gap:10px;}
+.task{
+  display:grid;
+  grid-template-columns:32px 1fr;
+  gap:8px;align-items:flex-start;
+}
+.task-i{
+  font-family:'Fira Code',monospace;
+  font-size:9.5px;color:var(--muted);
+  margin-top:3px;
+}
+.task-title{
+  font-size:13px;font-weight:600;
+  color:var(--text);margin-bottom:3px;line-height:1.4;
+}
+.task-desc{
+  font-size:12px;color:var(--muted);line-height:1.65;
+}
+.task-desc code{
+  font-family:'Fira Code',monospace;font-size:10.5px;
+  background:var(--surf2);padding:1px 6px;border-radius:2px;
+}
+
+/* eu upgrade task */
+.task.eu-task .task-title::before{
+  content:'🇪🇺 ';
+}
+.task.gdpr-task .task-title::before{content:'🔒 ';}
+.task.xai-task .task-title::before{content:'🔍 ';}
+.task.lang-task .task-title::before{content:'🌍 ';}
+
+.note{
+  margin-top:14px;padding:12px 16px;
+  border-radius:0 6px 6px 0;
+  font-size:12px;line-height:1.65;color:var(--muted);
+}
+.note strong{
+  display:block;font-family:'Fira Code',monospace;
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  margin-bottom:4px;
+}
+
+.code-block{
+  margin-top:8px;padding:10px 14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:5px;
+  font-family:'Fira Code',monospace;
+  font-size:10px;color:#7dd3b0;line-height:1.9;
+  white-space:pre;overflow-x:auto;
+}
+
+/* sub-tasks for upgraded sections */
+.subtask-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:8px;margin-top:8px;
+}
+@media(max-width:640px){.subtask-grid{grid-template-columns:1fr;}}
+
+.subtask{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px 14px;
+  font-size:11.5px;
+  line-height:1.6;
+}
+.subtask strong{display:block;font-size:12px;color:var(--text);margin-bottom:3px;}
+.subtask span{color:var(--muted);}
+
+/* ══════════════════════════════════════
+   CHECKLIST
+══════════════════════════════════════ */
+.cl-wrap{margin-bottom:80px;}
+
+.cl-phase-header{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 0 10px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:10px;
+  margin-top:28px;
+}
+.cl-ph-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.cl-ph-name{
+  font-family:'Instrument Serif',serif;
+  font-size:18px;color:#fff;
+}
+.cl-ph-week{
+  font-family:'Fira Code',monospace;
+  font-size:9px;letter-spacing:.2em;color:var(--muted);
+  text-transform:uppercase;margin-left:auto;
+}
+
+.cl-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-bottom:8px;
+}
+@media(max-width:600px){.cl-grid{grid-template-columns:1fr;}}
+
+.cl{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:10px 14px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:6px;
+  cursor:pointer;
+  transition:border-color .15s,background .15s;
+  user-select:none;
+}
+.cl:hover{border-color:rgba(255,255,255,0.12);}
+.cl.done{
+  background:rgba(61,220,132,0.04);
+  border-color:rgba(61,220,132,0.2);
+}
+.cl.eu-cl{border-left:2px solid rgba(0,212,255,0.4);}
+.cl.done.eu-cl{border-left-color:var(--cyan);}
+
+.cl-box{
+  width:17px;height:17px;flex-shrink:0;margin-top:1px;
+  border:1.5px solid var(--muted);border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;transition:all .15s;
+}
+.cl.done .cl-box{background:var(--green);border-color:var(--green);color:#000;font-weight:700;}
+
+.cl-text{font-size:12.5px;color:var(--text);line-height:1.5;}
+.cl-text .sub{
+  font-family:'Fira Code',monospace;
+  font-size:9px;color:var(--muted);
+  display:block;margin-top:2px;
+}
+.cl-text .eu-tag{
+  display:inline-block;
+  font-family:'Fira Code',monospace;
+  font-size:8px;color:var(--cyan);
+  background:rgba(0,212,255,0.08);
+  border:1px solid rgba(0,212,255,0.2);
+  padding:1px 5px;margin-left:6px;
+  border-radius:2px;vertical-align:middle;
+}
+
+/* progress bar */
+.progress-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:20px 24px;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:20px;
+}
+.prog-label{
+  font-family:'Fira Code',monospace;
+  font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);
+  flex-shrink:0;
+}
+.prog-bar{
+  flex:1;height:6px;
+  background:var(--dim);border-radius:3px;
+  overflow:hidden;
+}
+.prog-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--cyan),var(--teal));
+  width:0%;transition:width .4s ease;
+}
+.prog-pct{
+  font-family:'Instrument Serif',serif;
+  font-size:22px;color:#fff;flex-shrink:0;min-width:50px;text-align:right;
+}
+
+footer{
+  border-top:1px solid var(--border);
+  padding:28px 0 48px;
+  font-family:'Fira Code',monospace;
+  font-size:9px;color:var(--muted);
+  letter-spacing:.25em;
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+@media(max-width:640px){
+  .phase{grid-template-columns:1fr;}
+  .ph-left{border-right:none;border-bottom:1px solid var(--border);}
+  .sh{grid-template-columns:40px 1fr;}
+  .sh-c{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#diagram"><span class="dot" style="background:var(--cyan)"></span>Workflow Diagram</a>
+  <a href="#phases"><span class="dot" style="background:var(--gold)"></span>Build Phases</a>
+  <a href="#checklist"><span class="dot" style="background:var(--green)"></span>Checklist</a>
+</nav>
+
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-text">BUILD</div>
+  <div class="hero-kicker">Master Build Plan · EU Regulatory Intelligence Agent · 2026</div>
+  <h1>
+    The Complete<br/>
+    <em>Build Plan.</em>
+    <span class="sub">Updated. Europe-Ready.</span>
+  </h1>
+  <p class="hero-desc">
+    8 phases. Every task sequenced. EU AI Act compliance, GDPR, Explainable AI, and multilingual NLP woven in at exactly the right moment — not bolted on at the end.
+  </p>
+  <div class="stats">
+    <div class="stat"><span class="stat-n" style="color:var(--cyan)">8</span><span class="stat-l">Build Phases</span></div>
+    <div class="stat"><span class="stat-n" style="color:var(--gold)">6</span><span class="stat-l">Weeks Total</span></div>
+    <div class="stat"><span class="stat-n" style="color:var(--green)">52</span><span class="stat-l">Total Tasks</span></div>
+    <div class="stat"><span class="stat-n" style="color:var(--orange)">4</span><span class="stat-l">EU Upgrades</span></div>
+    <div class="stat"><span class="stat-n" style="color:var(--purple)">6</span><span class="stat-l">Streamlit Pages</span></div>
+    <div class="stat"><span class="stat-n" style="color:var(--teal)">5</span><span class="stat-l">AI Agents</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 1: WORKFLOW DIAGRAM
+══════════════════════════════════════ -->
+<div class="sh" id="diagram">
+  <span class="sh-n">01 ——</span>
+  <span class="sh-t">Project Workflow Tree</span>
+  <span class="sh-c">Full Architecture</span>
+</div>
+
+<div class="tree-container">
+<svg class="tree-svg" viewBox="0 0 1000 820" xmlns="http://www.w3.org/2000/svg" font-family="Fira Code, monospace">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,255,255,0.2)"/>
+    </marker>
+    <marker id="arr-cyan" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#00d4ff"/>
+    </marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#3ddc84"/>
+    </marker>
+    <marker id="arr-orange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ff6b35"/>
+    </marker>
+    <marker id="arr-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#9b72ff"/>
+    </marker>
+    <marker id="arr-gold" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#f5c842"/>
+    </marker>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ── BACKGROUND LANES ── -->
+  <rect x="0" y="0" width="1000" height="820" fill="#131720"/>
+
+  <!-- Lane labels -->
+  <text x="14" y="40" font-size="8" fill="#1d2436" letter-spacing="3" text-anchor="start" transform="rotate(0)">USER</text>
+  <text x="14" y="200" font-size="8" fill="#1d2436" letter-spacing="3">DATA</text>
+  <text x="14" y="380" font-size="8" fill="#1d2436" letter-spacing="3">AGENTS</text>
+  <text x="14" y="560" font-size="8" fill="#1d2436" letter-spacing="3">STORAGE</text>
+  <text x="14" y="710" font-size="8" fill="#1d2436" letter-spacing="3">OUTPUT</text>
+
+  <!-- Lane dividers -->
+  <line x1="55" y1="155" x2="990" y2="155" stroke="#1d2436" stroke-width="1" stroke-dasharray="4,8"/>
+  <line x1="55" y1="320" x2="990" y2="320" stroke="#1d2436" stroke-width="1" stroke-dasharray="4,8"/>
+  <line x1="55" y1="490" x2="990" y2="490" stroke="#1d2436" stroke-width="1" stroke-dasharray="4,8"/>
+  <line x1="55" y1="650" x2="990" y2="650" stroke="#1d2436" stroke-width="1" stroke-dasharray="4,8"/>
+
+  <!-- ══ ROW 1: USER INPUT ══ -->
+
+  <!-- Streamlit UI -->
+  <rect x="65" y="30" width="130" height="56" rx="6" fill="#171d2b" stroke="#ff6b9d" stroke-width="1.5"/>
+  <text x="130" y="52" font-size="10" fill="#ff6b9d" text-anchor="middle" font-weight="bold">🎈 Streamlit UI</text>
+  <text x="130" y="67" font-size="8" fill="#4a5a7a" text-anchor="middle">6 Pages · Auth</text>
+  <text x="130" y="79" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Research Goal Input</text>
+
+  <!-- Arrow: Streamlit → FastAPI -->
+  <path d="M195,58 L255,58" stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#arr-cyan)"/>
+
+  <!-- FastAPI -->
+  <rect x="260" y="30" width="120" height="56" rx="6" fill="#171d2b" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="320" y="52" font-size="10" fill="#60a5fa" text-anchor="middle" font-weight="bold">🚀 FastAPI</text>
+  <text x="320" y="67" font-size="8" fill="#4a5a7a" text-anchor="middle">Async Endpoints</text>
+  <text x="320" y="79" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Task Queue</text>
+
+  <!-- Arrow: FastAPI → LangGraph -->
+  <path d="M380,58 L440,58" stroke="#00d4ff" stroke-width="1.5" fill="none" marker-end="url(#arr-cyan)"/>
+
+  <!-- LangGraph Orchestrator -->
+  <rect x="445" y="20" width="150" height="76" rx="6" fill="#171d2b" stroke="#f5c842" stroke-width="2"/>
+  <text x="520" y="44" font-size="10" fill="#f5c842" text-anchor="middle" font-weight="bold">🧠 LangGraph</text>
+  <text x="520" y="58" font-size="8" fill="#f5c842" text-anchor="middle">StateGraph Orchestrator</text>
+  <text x="520" y="72" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Parallel · Conditional · A2A</text>
+  <text x="520" y="85" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Checkpointing</text>
+
+  <!-- Arrow: LangGraph → LangSmith -->
+  <path d="M595,58 L655,58" stroke="#f5c842" stroke-width="1.5" fill="none" marker-end="url(#arr-gold)"/>
+
+  <!-- LangSmith -->
+  <rect x="660" y="30" width="120" height="56" rx="6" fill="#171d2b" stroke="#1de9b6" stroke-width="1.5"/>
+  <text x="720" y="52" font-size="10" fill="#1de9b6" text-anchor="middle" font-weight="bold">📊 LangSmith</text>
+  <text x="720" y="67" font-size="8" fill="#4a5a7a" text-anchor="middle">Traces · Evals</text>
+  <text x="720" y="79" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Every LLM Call Logged</text>
+
+  <!-- EU Compliance -->
+  <rect x="830" y="30" width="145" height="56" rx="6" fill="#171d2b" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="903" y="50" font-size="9.5" fill="#00d4ff" text-anchor="middle" font-weight="bold">🇪🇺 EU Compliance</text>
+  <text x="903" y="64" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Risk Classifier · Audit Log</text>
+  <text x="903" y="76" font-size="7.5" fill="#4a5a7a" text-anchor="middle">GDPR Layer · XAI Traces</text>
+
+  <!-- ══ ROW 2: DATA INGESTION ══ -->
+
+  <!-- PDF/Doc Upload -->
+  <rect x="65" y="175" width="130" height="56" rx="6" fill="#171d2b" stroke="#ff6b35" stroke-width="1.5"/>
+  <text x="130" y="197" font-size="10" fill="#ff6b35" text-anchor="middle" font-weight="bold">📄 Documents</text>
+  <text x="130" y="211" font-size="7.5" fill="#4a5a7a" text-anchor="middle">PDF · TXT · Web URLs</text>
+  <text x="130" y="223" font-size="7.5" fill="#4a5a7a" text-anchor="middle">EU AI Act · GDPR · DIGG</text>
+
+  <!-- Arrow Doc → Ingest -->
+  <path d="M195,203 L255,203" stroke="#ff6b35" stroke-width="1.5" fill="none" marker-end="url(#arr-orange)"/>
+
+  <!-- Ingest Pipeline -->
+  <rect x="260" y="168" width="150" height="70" rx="6" fill="#171d2b" stroke="#ff6b35" stroke-width="1.5"/>
+  <text x="335" y="190" font-size="9.5" fill="#ff6b35" text-anchor="middle" font-weight="bold">⚙️ Ingest Pipeline</text>
+  <text x="335" y="204" font-size="7.5" fill="#4a5a7a" text-anchor="middle">PyPDF · WebBaseLoader</text>
+  <text x="335" y="216" font-size="7.5" fill="#4a5a7a" text-anchor="middle">SemanticChunker</text>
+  <text x="335" y="228" font-size="7.5" fill="#00d4ff" text-anchor="middle">PII Scrubber (GDPR)</text>
+
+  <!-- Arrow Ingest → Embeddings -->
+  <path d="M410,203 L455,203" stroke="#ff6b35" stroke-width="1.5" fill="none" marker-end="url(#arr-orange)"/>
+
+  <!-- Embeddings -->
+  <rect x="460" y="168" width="155" height="70" rx="6" fill="#171d2b" stroke="#9b72ff" stroke-width="1.5"/>
+  <text x="537" y="190" font-size="9.5" fill="#9b72ff" text-anchor="middle" font-weight="bold">🧬 Embeddings</text>
+  <text x="537" y="204" font-size="7.5" fill="#4a5a7a" text-anchor="middle">multilingual-e5-large</text>
+  <text x="537" y="216" font-size="7.5" fill="#4a5a7a" text-anchor="middle">1024-dim vectors</text>
+  <text x="537" y="228" font-size="7.5" fill="#00d4ff" text-anchor="middle">SV + DE + EN support</text>
+
+  <!-- Arrow Embed → pgvector -->
+  <path d="M615,203 L660,203" stroke="#9b72ff" stroke-width="1.5" fill="none" marker-end="url(#arr-purple)"/>
+
+  <!-- pgvector -->
+  <rect x="665" y="175" width="130" height="56" rx="6" fill="#171d2b" stroke="#3ddc84" stroke-width="1.5"/>
+  <text x="730" y="197" font-size="9.5" fill="#3ddc84" text-anchor="middle" font-weight="bold">⚡ pgvector</text>
+  <text x="730" y="211" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Supabase · Frankfurt</text>
+  <text x="730" y="223" font-size="7.5" fill="#00d4ff" text-anchor="middle">EU Data Residency ✓</text>
+
+  <!-- Hybrid Retriever -->
+  <rect x="840" y="175" width="135" height="56" rx="6" fill="#171d2b" stroke="#3ddc84" stroke-width="1.5"/>
+  <text x="907" y="195" font-size="9.5" fill="#3ddc84" text-anchor="middle" font-weight="bold">🔀 Hybrid Retriever</text>
+  <text x="907" y="209" font-size="7.5" fill="#4a5a7a" text-anchor="middle">pgvector + BM25</text>
+  <text x="907" y="221" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Language-Aware Routing</text>
+
+  <!-- pgvector → Hybrid -->
+  <path d="M795,203 L838,203" stroke="#3ddc84" stroke-width="1.5" fill="none" marker-end="url(#arr-green)"/>
+
+  <!-- ══ ROW 3: AGENTS ══ -->
+
+  <!-- Planner Agent -->
+  <rect x="65" y="340" width="130" height="64" rx="6" fill="#171d2b" stroke="#f5c842" stroke-width="1.5"/>
+  <text x="130" y="362" font-size="9.5" fill="#f5c842" text-anchor="middle" font-weight="bold">🗂 Planner</text>
+  <text x="130" y="376" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Claude Opus</text>
+  <text x="130" y="388" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Decomposes Goals</text>
+  <text x="130" y="398" font-size="7.5" fill="#00d4ff" text-anchor="middle">Risk Classification</text>
+
+  <!-- Researcher Agent -->
+  <rect x="245" y="340" width="130" height="64" rx="6" fill="#171d2b" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="310" y="362" font-size="9.5" fill="#60a5fa" text-anchor="middle" font-weight="bold">🔍 Researcher</text>
+  <text x="310" y="376" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Claude Sonnet</text>
+  <text x="310" y="388" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Brave + RAG + Scraper</text>
+  <text x="310" y="398" font-size="7.5" fill="#4a5a7a" text-anchor="middle">MCP Tools</text>
+
+  <!-- Analyst Agent -->
+  <rect x="425" y="340" width="130" height="64" rx="6" fill="#171d2b" stroke="#ff6b35" stroke-width="1.5"/>
+  <text x="490" y="362" font-size="9.5" fill="#ff6b35" text-anchor="middle" font-weight="bold">📊 Analyst</text>
+  <text x="490" y="376" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Claude Sonnet</text>
+  <text x="490" y="388" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Python REPL MCP</text>
+  <text x="490" y="398" font-size="7.5" fill="#00d4ff" text-anchor="middle">XAI Decision Traces</text>
+
+  <!-- Critic Agent -->
+  <rect x="605" y="340" width="130" height="64" rx="6" fill="#171d2b" stroke="#ff4757" stroke-width="1.5"/>
+  <text x="670" y="362" font-size="9.5" fill="#ff4757" text-anchor="middle" font-weight="bold">⚖️ Critic</text>
+  <text x="670" y="376" font-size="7.5" fill="#4a5a7a" text-anchor="middle">GPT-4o Judge</text>
+  <text x="670" y="388" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Confidence Scoring</text>
+  <text x="670" y="398" font-size="7.5" fill="#00d4ff" text-anchor="middle">Counterfactual Analysis</text>
+
+  <!-- Synthesizer Agent -->
+  <rect x="785" y="340" width="130" height="64" rx="6" fill="#171d2b" stroke="#1de9b6" stroke-width="1.5"/>
+  <text x="850" y="362" font-size="9.5" fill="#1de9b6" text-anchor="middle" font-weight="bold">✍️ Synthesizer</text>
+  <text x="850" y="376" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Claude Sonnet</text>
+  <text x="850" y="388" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Jinja2 · Citations</text>
+  <text x="850" y="398" font-size="7.5" fill="#00d4ff" text-anchor="middle">Transparency Notice</text>
+
+  <!-- Agent arrows (A2A Protocol) -->
+  <path d="M195,372 L243,372" stroke="#f5c842" stroke-width="1.5" fill="none" marker-end="url(#arr-gold)"/>
+  <path d="M375,372 L423,372" stroke="#60a5fa" stroke-width="1.5" fill="none" marker-end="url(#arr-cyan)"/>
+  <path d="M555,372 L603,372" stroke="#ff6b35" stroke-width="1.5" fill="none" marker-end="url(#arr-orange)"/>
+  <path d="M735,372 L783,372" stroke="#ff4757" stroke-width="1.5" fill="none" marker-end="url(#arr-orange)"/>
+
+  <!-- A2A label -->
+  <text x="440" y="427" font-size="8" fill="#4a5a7a" text-anchor="middle" font-style="italic">← A2A Protocol →</text>
+  <line x1="120" y1="432" x2="920" y2="432" stroke="#1d2436" stroke-width="1" stroke-dasharray="3,6"/>
+
+  <!-- ══ ROW 4: STORAGE / SERVICES ══ -->
+
+  <!-- Supabase DB -->
+  <rect x="65" y="510" width="140" height="64" rx="6" fill="#171d2b" stroke="#3ddc84" stroke-width="1.5"/>
+  <text x="135" y="530" font-size="9.5" fill="#3ddc84" text-anchor="middle" font-weight="bold">⚡ Supabase DB</text>
+  <text x="135" y="544" font-size="7.5" fill="#4a5a7a" text-anchor="middle">research_runs · agent_tasks</text>
+  <text x="135" y="556" font-size="7.5" fill="#4a5a7a" text-anchor="middle">consent_records · audit_events</text>
+  <text x="135" y="568" font-size="7.5" fill="#00d4ff" text-anchor="middle">Frankfurt · GDPR ✓</text>
+
+  <!-- Supabase Storage -->
+  <rect x="255" y="510" width="140" height="64" rx="6" fill="#171d2b" stroke="#3ddc84" stroke-width="1.5"/>
+  <text x="325" y="530" font-size="9.5" fill="#3ddc84" text-anchor="middle" font-weight="bold">🗃 Storage</text>
+  <text x="325" y="544" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Reports · Charts</text>
+  <text x="325" y="556" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Uploaded Documents</text>
+  <text x="325" y="568" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Signed URLs</text>
+
+  <!-- MCP Servers -->
+  <rect x="445" y="510" width="155" height="64" rx="6" fill="#171d2b" stroke="#9b72ff" stroke-width="1.5"/>
+  <text x="522" y="530" font-size="9.5" fill="#9b72ff" text-anchor="middle" font-weight="bold">🔧 MCP Servers</text>
+  <text x="522" y="544" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Brave Search (official)</text>
+  <text x="522" y="556" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Web Scraper (custom)</text>
+  <text x="522" y="568" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Citation Formatter (custom)</text>
+
+  <!-- RAGAS Eval -->
+  <rect x="650" y="510" width="140" height="64" rx="6" fill="#171d2b" stroke="#1de9b6" stroke-width="1.5"/>
+  <text x="720" y="530" font-size="9.5" fill="#1de9b6" text-anchor="middle" font-weight="bold">🧪 RAGAS + Evals</text>
+  <text x="720" y="544" font-size="7.5" fill="#4a5a7a" text-anchor="middle">40+ Q&amp;A Pairs</text>
+  <text x="720" y="556" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Faithfulness · Relevancy</text>
+  <text x="720" y="568" font-size="7.5" fill="#4a5a7a" text-anchor="middle">LLM-as-Judge</text>
+
+  <!-- Audit Log -->
+  <rect x="840" y="510" width="135" height="64" rx="6" fill="#171d2b" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="907" y="530" font-size="9.5" fill="#00d4ff" text-anchor="middle" font-weight="bold">📋 Audit Trail</text>
+  <text x="907" y="544" font-size="7.5" fill="#4a5a7a" text-anchor="middle">SHA-256 Hash Chain</text>
+  <text x="907" y="556" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Append-Only Log</text>
+  <text x="907" y="568" font-size="7.5" fill="#00d4ff" text-anchor="middle">EU AI Act Art. 12 ✓</text>
+
+  <!-- ══ ROW 5: OUTPUTS ══ -->
+
+  <!-- Report -->
+  <rect x="100" y="675" width="135" height="56" rx="6" fill="#171d2b" stroke="#f5c842" stroke-width="1.5"/>
+  <text x="168" y="697" font-size="9.5" fill="#f5c842" text-anchor="middle" font-weight="bold">📋 Research Report</text>
+  <text x="168" y="711" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Markdown · PDF Export</text>
+  <text x="168" y="723" font-size="7.5" fill="#00d4ff" text-anchor="middle">Transparency Notice</text>
+
+  <!-- Live Progress -->
+  <rect x="285" y="675" width="135" height="56" rx="6" fill="#171d2b" stroke="#ff6b9d" stroke-width="1.5"/>
+  <text x="352" y="697" font-size="9.5" fill="#ff6b9d" text-anchor="middle" font-weight="bold">⚡ Live Progress</text>
+  <text x="352" y="711" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Agent Status Badges</text>
+  <text x="352" y="723" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Supabase Polling 2s</text>
+
+  <!-- Eval Dashboard -->
+  <rect x="470" y="675" width="135" height="56" rx="6" fill="#171d2b" stroke="#1de9b6" stroke-width="1.5"/>
+  <text x="537" y="697" font-size="9.5" fill="#1de9b6" text-anchor="middle" font-weight="bold">📊 Eval Dashboard</text>
+  <text x="537" y="711" font-size="7.5" fill="#4a5a7a" text-anchor="middle">RAGAS Scores · Cost</text>
+  <text x="537" y="723" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Latency Trends</text>
+
+  <!-- XAI Explorer -->
+  <rect x="655" y="675" width="135" height="56" rx="6" fill="#171d2b" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="722" y="695" font-size="9.5" fill="#00d4ff" text-anchor="middle" font-weight="bold">🔍 XAI Explorer</text>
+  <text x="722" y="709" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Decision Traces</text>
+  <text x="722" y="721" font-size="7.5" fill="#00d4ff" text-anchor="middle">EU AI Act Art. 13 ✓</text>
+
+  <!-- Compliance Page -->
+  <rect x="840" y="675" width="135" height="56" rx="6" fill="#171d2b" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="907" y="695" font-size="9.5" fill="#00d4ff" text-anchor="middle" font-weight="bold">🇪🇺 Compliance</text>
+  <text x="907" y="709" font-size="7.5" fill="#4a5a7a" text-anchor="middle">Risk Level · Score</text>
+  <text x="907" y="721" font-size="7.5" fill="#00d4ff" text-anchor="middle">EU AI Act Dashboard</text>
+
+  <!-- ══ VERTICAL CONNECTOR LINES ══ -->
+
+  <!-- LangGraph → Planner -->
+  <path d="M520,96 L520,130 L130,130 L130,338" stroke="#f5c842" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-gold)"/>
+
+  <!-- LangGraph → Researcher -->
+  <path d="M520,96 L520,130 L310,130 L310,338" stroke="#60a5fa" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-cyan)"/>
+
+  <!-- LangGraph → Analyst -->
+  <path d="M520,96 L490,96 L490,338" stroke="#ff6b35" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-orange)"/>
+
+  <!-- LangGraph → Critic -->
+  <path d="M520,96 L520,130 L670,130 L670,338" stroke="#ff4757" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-orange)"/>
+
+  <!-- LangGraph → Synthesizer -->
+  <path d="M520,96 L520,130 L850,130 L850,338" stroke="#1de9b6" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-green)"/>
+
+  <!-- Hybrid Retriever → Researcher -->
+  <path d="M907,231 L907,260 L310,260 L310,338" stroke="#3ddc84" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-green)"/>
+
+  <!-- Agents → Supabase DB -->
+  <path d="M130,404 L130,508" stroke="#3ddc84" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-green)"/>
+  <path d="M310,404 L310,500 L255,500 L255,508" stroke="#3ddc84" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-green)"/>
+
+  <!-- Researcher → MCP -->
+  <path d="M310,404 L310,450 L522,450 L522,508" stroke="#9b72ff" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-purple)"/>
+
+  <!-- Analyst → MCP -->
+  <path d="M490,404 L490,450 L522,450 L522,508" stroke="#9b72ff" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-purple)"/>
+
+  <!-- Critic → RAGAS -->
+  <path d="M670,404 L670,450 L720,450 L720,508" stroke="#1de9b6" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-green)"/>
+
+  <!-- Synthesizer → Storage -->
+  <path d="M850,404 L850,490 L395,490 L395,508" stroke="#3ddc84" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-green)"/>
+
+  <!-- Analyst → Audit -->
+  <path d="M490,404 L490,450 L907,450 L907,508" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-cyan)"/>
+
+  <!-- Storage → Report output -->
+  <path d="M325,574 L325,620 L168,620 L168,673" stroke="#f5c842" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-gold)"/>
+
+  <!-- DB → Live Progress -->
+  <path d="M135,574 L135,610 L352,610 L352,673" stroke="#ff6b9d" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-orange)"/>
+
+  <!-- RAGAS → Eval Dash -->
+  <path d="M720,574 L720,620 L537,620 L537,673" stroke="#1de9b6" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-green)"/>
+
+  <!-- Audit → Compliance Page -->
+  <path d="M907,574 L907,620 L907,620 L907,673" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-cyan)"/>
+
+  <!-- Audit → XAI -->
+  <path d="M907,574 L907,620 L722,620 L722,673" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3,5" fill="none" marker-end="url(#arr-cyan)"/>
+
+  <!-- EU Compliance box → Planner -->
+  <path d="M903,86 L903,110 L130,110 L130,130" stroke="#00d4ff" stroke-width="1" stroke-dasharray="2,4" fill="none" marker-end="url(#arr-cyan)"/>
+
+  <!-- ══ LEGEND ══ -->
+  <rect x="65" y="790" width="900" height="22" rx="4" fill="#171d2b"/>
+  <circle cx="90" cy="801" r="3" fill="#00d4ff"/>
+  <text x="98" y="805" font-size="8" fill="#4a5a7a">EU/GDPR Layer</text>
+  <circle cx="200" cy="801" r="3" fill="#f5c842"/>
+  <text x="208" y="805" font-size="8" fill="#4a5a7a">Core Orchestration</text>
+  <circle cx="330" cy="801" r="3" fill="#3ddc84"/>
+  <text x="338" y="805" font-size="8" fill="#4a5a7a">Data / Storage</text>
+  <circle cx="440" cy="801" r="3" fill="#9b72ff"/>
+  <text x="448" y="805" font-size="8" fill="#4a5a7a">Tools / MCP</text>
+  <circle cx="530" cy="801" r="3" fill="#1de9b6"/>
+  <text x="538" y="805" font-size="8" fill="#4a5a7a">Eval / Observability</text>
+  <line x1="650" y1="801" x2="670" y2="801" stroke="#4a5a7a" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="676" y="805" font-size="8" fill="#4a5a7a">EU Upgrade (dashed border)</text>
+  <line x1="830" y1="801" x2="850" y2="801" stroke="#4a5a7a" stroke-width="1"/>
+  <text x="856" y="805" font-size="8" fill="#4a5a7a">Data Flow</text>
+</svg>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 2: BUILD PHASES
+══════════════════════════════════════ -->
+<div class="sh" id="phases">
+  <span class="sh-n">02 ——</span>
+  <span class="sh-t">8 Build Phases — Complete Sequence</span>
+  <span class="sh-c">Wk 0 → Wk 6</span>
+</div>
+
+<div class="phases">
+
+<!-- ─── PHASE 0 ─── -->
+<div class="phase" id="ph0" style="--col:var(--p0)">
+  <div class="ph-left" style="background:rgba(0,212,255,0.04)">
+    <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--p0)"></div>
+    <div class="ph-week">Day 1 · Before Any Code</div>
+    <div class="ph-num" style="color:var(--p0)">00</div>
+    <div class="ph-name">Setup & Data Collection</div>
+    <div class="ph-tag" style="color:var(--p0);border-color:rgba(0,212,255,0.3)">⚡ Foundation</div>
+    <div class="eu-badge">🇪🇺 Sets GDPR Region</div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-goal">Goal: <span>Everything installed, all accounts created, all data downloaded. Never blocked on missing credentials again.</span></div>
+    <div class="tasks">
+      <div class="task">
+        <span class="task-i">0.1</span>
+        <div>
+          <div class="task-title">Create virtual environment and install all dependencies in one shot</div>
+          <div class="task-desc">Run once: <code>pip install langchain langchain-community langchain-anthropic langchain-openai langchain-experimental langgraph supabase streamlit fastapi uvicorn python-dotenv langsmith ragas a2a-sdk mcp pypdf unstructured sentence-transformers langdetect httpx beautifulsoup4 jinja2</code>. Freeze immediately: <code>pip freeze > requirements.txt</code>.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">0.2</span>
+        <div>
+          <div class="task-title">Create 5 accounts and populate .env file completely</div>
+          <div class="task-desc">Supabase (Frankfurt region — cannot change later), Anthropic Console, Brave Search API, LangSmith, Railway. Write every key into <code>.env</code> now. Add <code>.env</code> to <code>.gitignore</code> immediately. This 30-minute step prevents days of blocked progress later.</div>
+        </div>
+      </div>
+      <div class="task gdpr-task">
+        <span class="task-i">0.3</span>
+        <div>
+          <div class="task-title">Create Supabase project — MUST select Frankfurt (eu-central-1) region</div>
+          <div class="task-desc">This is your GDPR data residency requirement and cannot be changed post-creation. Go to supabase.com → New Project → Region: EU West (Frankfurt). Enable pgvector: <code>CREATE EXTENSION IF NOT EXISTS vector;</code> Run the full schema SQL for all 8 tables including <code>consent_records</code>, <code>audit_events</code>, and <code>data_subjects</code>.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">0.4</span>
+        <div>
+          <div class="task-title">Download all regulatory documents into /data/ folder</div>
+          <div class="task-desc">EU AI Act PDF (EN + SV versions from eur-lex.europa.eu), GDPR PDF, Annex III as JSON (manually copy 8 categories from artificialintelligenceact.eu/annex/3/), DIGG Swedish AI report, German KI-Strategie. All in place before writing a single ingest line.</div>
+        </div>
+      </div>
+      <div class="task lang-task">
+        <span class="task-i">0.5</span>
+        <div>
+          <div class="task-title">Verify multilingual-e5-large downloads and runs locally</div>
+          <div class="task-desc">Run: <code>from langchain_community.embeddings import HuggingFaceEmbeddings; e = HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large"); print(len(e.embed_query("test")))</code> — should print 1024. First download is ~560MB. Subsequent loads are instant from cache.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">0.6</span>
+        <div>
+          <div class="task-title">Create project folder structure from day one</div>
+          <div class="task-desc code-block">eu-regulatory-intelligence-agent/
+├── agents/        # Planner, Researcher, Analyst, Critic, Synth
+├── compliance/    # risk_classifier.py, gdpr_middleware.py, xai_traces.py
+├── tools/         # scraper_mcp.py, citation_mcp.py
+├── rag/           # ingest.py, retriever.py, chunker.py
+├── streamlit_app/ # pages/ + state.py
+├── api/           # FastAPI routes
+├── db/            # Supabase client + queries
+├── evals/         # RAGAS + LangSmith eval code + qa_pairs.json
+├── data/          # regulatory/ + swedish/ + german/ + test_docs/
+├── .env           # all API keys
+└── requirements.txt</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="border-left:2px solid var(--p0);background:rgba(0,212,255,0.04)">
+      <strong>✓ Phase 0 Complete When:</strong>
+      <code>pip list</code> shows all packages installed. <code>.env</code> has 9+ keys. Frankfurt Supabase project exists with pgvector enabled. multilingual-e5-large returns 1024-dim vectors. All 7 PDFs are in /data/. You can start coding immediately without waiting for anything.
+    </div>
+  </div>
+</div>
+
+<!-- ─── PHASE 1 ─── -->
+<div class="phase" id="ph1">
+  <div class="ph-left">
+    <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--p1)"></div>
+    <div class="ph-week">Week 1</div>
+    <div class="ph-num" style="color:var(--p1)">01</div>
+    <div class="ph-name">Core Agent + Supabase + Streamlit Shell</div>
+    <div class="ph-tag" style="color:var(--p1);border-color:rgba(61,220,132,0.3)">🏗 Core Wiring</div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-goal">Goal: <span>One working LangGraph agent hitting live web search. Every run logged to Supabase. Basic Streamlit input wired up.</span></div>
+    <div class="tasks">
+      <div class="task">
+        <span class="task-i">1.1</span>
+        <div>
+          <div class="task-title">Build Supabase client singleton in db/client.py</div>
+          <div class="task-desc">Single <code>get_supabase_client()</code> function reading from <code>.env</code>. Import this everywhere — never instantiate more than once. Also build <code>db/queries.py</code> with typed helper functions for every table operation you'll use throughout the project.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">1.2</span>
+        <div>
+          <div class="task-title">Build first LangGraph agent — single Researcher node + Brave Search tool</div>
+          <div class="task-desc">In <code>agents/researcher.py</code>: minimal <code>StateGraph</code> with one node. Give it one tool: Brave Search via direct HTTP (not MCP yet). Confirm it returns a real live web result before adding complexity. Keep this ugly — correctness first, architecture second.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">1.3</span>
+        <div>
+          <div class="task-title">Log every agent run to Supabase research_runs — from the very first run</div>
+          <div class="task-desc">Before agent: <code>INSERT INTO research_runs (goal, status, user_id)</code>. After agent: <code>UPDATE SET status='completed', total_tokens=N, cost_usd=N</code>. Token count from LLM response metadata. This habit from run #1 means your audit trail is complete for the entire project with zero retrofitting.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">1.4</span>
+        <div>
+          <div class="task-title">Set up LangSmith tracing — verify it's capturing on first run</div>
+          <div class="task-desc">Add to <code>.env</code>: <code>LANGCHAIN_TRACING_V2=true</code>, <code>LANGCHAIN_PROJECT=eu-reg-agent</code>, <code>LANGCHAIN_API_KEY=ls__...</code>. Open smith.langchain.com after your first agent run — you should see the trace automatically. If you don't see it, fix it now before adding more agents.</div>
+        </div>
+      </div>
+      <div class="task gdpr-task">
+        <span class="task-i">1.5</span>
+        <div>
+          <div class="task-title">Build GDPR middleware in compliance/gdpr_middleware.py</div>
+          <div class="task-desc">Three functions: <code>record_consent(user_id, purpose)</code> that inserts to <code>consent_records</code>, <code>scrub_pii(text)</code> that strips email/phone/EU-ID patterns before ingestion, and <code>request_erasure(user_id)</code> that anonymizes all user data. Wire <code>record_consent</code> to the Streamlit login flow now — even before auth is built, call it on session start.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">1.6</span>
+        <div>
+          <div class="task-title">Build Streamlit shell — Page 1 (Home) with research input</div>
+          <div class="task-desc">One <code>st.text_area</code> for goal, one <code>st.button("Run Research")</code>. On click: call agent directly (no FastAPI yet), show <code>st.spinner()</code>, display result with <code>st.write()</code>. Keep it ugly. The point is end-to-end wiring: UI → Agent → Supabase → UI.</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="border-left:2px solid var(--p1);background:rgba(61,220,132,0.04)">
+      <strong>✓ Phase 1 Complete When:</strong>
+      You type a research goal, click Run, see a real LLM response with live web search results, see a new row in Supabase <code>research_runs</code> with token count and cost, and see the trace in LangSmith. The GDPR consent record is also written.
+    </div>
+  </div>
+</div>
+
+<!-- ─── PHASE 2 ─── -->
+<div class="phase" id="ph2">
+  <div class="ph-left">
+    <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--p2)"></div>
+    <div class="ph-week">Week 1–2</div>
+    <div class="ph-num" style="color:var(--p2)">02</div>
+    <div class="ph-name">RAG Pipeline + Multilingual Embeddings</div>
+    <div class="ph-tag" style="color:var(--p2);border-color:rgba(245,200,66,0.3)">📚 RAG + NLP</div>
+    <div class="eu-badge">🌍 Swedish + German</div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-goal">Goal: <span>EU AI Act PDF ingested, retrievable in English, Swedish, and German. First RAGAS baseline score recorded.</span></div>
+    <div class="tasks">
+      <div class="task">
+        <span class="task-i">2.1</span>
+        <div>
+          <div class="task-title">Build ingestion pipeline in rag/ingest.py with PII scrubbing</div>
+          <div class="task-desc">PyPDFLoader for PDFs, WebBaseLoader for URLs. Run each doc through <code>scrub_pii()</code> before chunking. Use <code>SemanticChunker(HuggingFaceEmbeddings("intfloat/multilingual-e5-large"))</code> — splits by meaning, not character count. Significant quality difference. Test manually on EU AI Act PDF before moving on.</div>
+        </div>
+      </div>
+      <div class="task lang-task">
+        <span class="task-i">2.2</span>
+        <div>
+          <div class="task-title">Add language detection to ingestion — route to correct embedding model</div>
+          <div class="task-desc">After loading each document: <code>from langdetect import detect; lang = detect(doc.page_content[:500])</code>. Store as <code>metadata["language"]</code> on each chunk. Add language column to <code>document_chunks</code> table. When the query is in Swedish, prioritise Swedish chunks. When German, prioritise German. This 20-line addition is your multilingual differentiator.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">2.3</span>
+        <div>
+          <div class="task-title">Write chunks to Supabase pgvector with SupabaseVectorStore</div>
+          <div class="task-desc"><code>SupabaseVectorStore.from_documents(chunks, HuggingFaceEmbeddings("intfloat/multilingual-e5-large"), client=supabase, table_name='document_chunks', query_name='match_chunks')</code>. Note: update your pgvector column to <code>vector(1024)</code> since multilingual-e5-large is 1024-dim (not 1536 like OpenAI). Verify rows in Supabase after each document.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">2.4</span>
+        <div>
+          <div class="task-title">Build hybrid retriever in rag/retriever.py (pgvector + BM25)</div>
+          <div class="task-desc">Subclass <code>BaseRetriever</code>. Run pgvector similarity search AND Postgres full-text search in parallel. Merge and deduplicate by source. Add language filter: if <code>detect(query) == 'sv'</code>, boost chunks where <code>language='sv'</code>. This language-aware retrieval is your key multilingual feature — test it by querying in Swedish.</div>
+        </div>
+      </div>
+      <div class="task lang-task">
+        <span class="task-i">2.5</span>
+        <div>
+          <div class="task-title">Test multilingual retrieval on Swedish DIGG PDF — screenshot this</div>
+          <div class="task-desc">Upload <code>digg_ai_vagledning_sv.pdf</code> via Streamlit. Query: "Vad säger DIGG om AI-reglering?" — verify you get Swedish chunks back. Then query the same topic in English — verify you get both languages. Screenshot both results. This screenshot goes on LinkedIn when you announce the project. It's your most visible Sweden-specific proof point.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">2.6</span>
+        <div>
+          <div class="task-title">Run first RAGAS baseline evaluation — record the number</div>
+          <div class="task-desc">Write 10 EU AI Act Q&A pairs manually in <code>evals/qa_pairs_manual.json</code>. Run <code>evaluate(dataset, metrics=[faithfulness, answer_relevancy, context_precision])</code>. Store scores in Supabase <code>eval_scores</code>. This number is your baseline — it doesn't need to be high, it just needs to exist. You'll reference it as the "before" in your before/after comparison.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">2.7</span>
+        <div>
+          <div class="task-title">Build Streamlit Page 2 — Document Upload with language indicator</div>
+          <div class="task-desc"><code>st.file_uploader(accept_multiple_files=True, type=['pdf','txt'])</code>. On upload: save to Supabase Storage, ingest pipeline runs, show language detected as <code>st.success("Detected: Swedish 🇸🇪")</code>. Add <code>st.progress()</code> for ingestion progress. This page is demo-ready now.</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="border-left:2px solid var(--p2);background:rgba(245,200,66,0.04)">
+      <strong>✓ Phase 2 Complete When:</strong>
+      You upload a Swedish PDF and query it in both Swedish and English, getting relevant chunks in both cases. RAGAS baseline score is stored in Supabase. LangSmith shows the retrieval steps in every trace.
+    </div>
+  </div>
+</div>
+
+<!-- ─── PHASE 3 ─── -->
+<div class="phase" id="ph3">
+  <div class="ph-left">
+    <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--p3)"></div>
+    <div class="ph-week">Week 2–3</div>
+    <div class="ph-num" style="color:var(--p3)">03</div>
+    <div class="ph-name">Multi-Agent Orchestration + EU Compliance Module</div>
+    <div class="ph-tag" style="color:var(--p3);border-color:rgba(255,107,53,0.3)">🧠 Agents + EU</div>
+    <div class="eu-badge">🇪🇺 Risk Classifier + XAI</div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-goal">Goal: <span>All 5 agents running via LangGraph + A2A. EU AI Act risk classification active. XAI decision traces emitting on every agent decision.</span></div>
+    <div class="tasks">
+      <div class="task">
+        <span class="task-i">3.1</span>
+        <div>
+          <div class="task-title">Build Planner Agent in agents/planner.py</div>
+          <div class="task-desc">Claude Opus + <code>.with_structured_output(SubTaskPlan)</code> where SubTaskPlan is a Pydantic model: <code>tasks: list[SubTask]</code>, each with <code>agent_type, input, parallel: bool</code>. Test decomposition on 5 different EU AI Act research goals before wiring routing. Build incrementally — Planner first, add other agents one at a time.</div>
+        </div>
+      </div>
+      <div class="task eu-task">
+        <span class="task-i">3.2</span>
+        <div>
+          <div class="task-title">Build EU AI Act Risk Classifier in compliance/risk_classifier.py</div>
+          <div class="task-desc">Load your <code>annex_iii_high_risk_list.json</code>. For each research goal, use Claude with a structured prompt to classify: UNACCEPTABLE / HIGH_RISK / LIMITED_RISK / MINIMAL_RISK per EU AI Act Annex III. Store result as <code>research_runs.risk_level</code>. Call this from the Planner node before decomposing tasks. This is a 50-line module that signals deep EU AI Act understanding.</div>
+        </div>
+      </div>
+      <div class="task xai-task">
+        <span class="task-i">3.3</span>
+        <div>
+          <div class="task-title">Add DecisionTrace Pydantic model to every agent</div>
+          <div class="task-desc">Create in <code>compliance/xai_traces.py</code>: <code>class DecisionTrace(BaseModel): agent_name: str; reasoning_steps: list[str]; sources_used: list[str]; confidence: float; alternatives_considered: list[str]</code>. Every agent node returns both its output AND a <code>DecisionTrace</code>. Store as JSONB in <code>agent_tasks.decision_trace</code>. This is EU AI Act Article 13 compliance made concrete.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">3.4</span>
+        <div>
+          <div class="task-title">Build full LangGraph StateGraph in agents/orchestrator.py</div>
+          <div class="task-desc">Define shared TypedDict state. Add all 5 nodes. Conditional edges from Planner → route to correct agents. Use <code>Send()</code> API for parallel execution when <code>parallel=True</code>. Every node writes its status + decision_trace to Supabase <code>agent_tasks</code> at start and end. Build Planner+Researcher first. Test. Then add Analyst, Critic, Synthesizer one at a time.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">3.5</span>
+        <div>
+          <div class="task-title">Implement A2A Protocol between Planner and all specialists</div>
+          <div class="task-desc">Define <code>AgentCard</code> for each specialist (name, capabilities, input/output schema). Planner emits <code>Task</code> messages to each specialist's endpoint. Start with Researcher only, verify A2A messaging works, then extend to all agents. A2A makes every agent-to-agent message a trackable, loggable event.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">3.6</span>
+        <div>
+          <div class="task-title">Build Analyst, Critic (GPT-4o judge + counterfactual), and Synthesizer agents</div>
+          <div class="task-desc">Analyst: Claude Sonnet + structured Pydantic output + chart generation. Critic: GPT-4o with confidence 0–1 scoring per claim + counterfactual generation when score &lt;0.7 (triggers retry). Synthesizer: Claude Sonnet + Jinja2 template + EU AI Act transparency notice appended to every report. Each agent writes its DecisionTrace.</div>
+        </div>
+      </div>
+      <div class="task eu-task">
+        <span class="task-i">3.7</span>
+        <div>
+          <div class="task-title">Build immutable audit trail in compliance/audit_log.py</div>
+          <div class="task-desc">Every agent event calls <code>write_audit_event(run_id, event_type, payload)</code> which: generates SHA-256 hash of (previous_hash + payload), inserts to append-only <code>audit_events</code> table. Add a DB trigger or application-level check that prevents UPDATE/DELETE on <code>audit_events</code>. This tamper-evident design is EU AI Act Article 12 compliance.</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="border-left:2px solid var(--p3);background:rgba(255,107,53,0.04)">
+      <strong>✓ Phase 3 Complete When:</strong>
+      Submit "EU AI Act obligations for Swedish manufacturing SME deploying quality control AI." All 5 agents fire in correct order, a report is saved to Supabase Storage, every agent task has a risk level and DecisionTrace, audit_events has a complete hash chain, and LangSmith shows the full multi-agent trace.
+    </div>
+  </div>
+</div>
+
+<!-- ─── PHASE 4 ─── -->
+<div class="phase" id="ph4">
+  <div class="ph-left">
+    <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--p4)"></div>
+    <div class="ph-week">Week 3</div>
+    <div class="ph-num" style="color:var(--p4)">04</div>
+    <div class="ph-name">Custom MCP Servers + FastAPI Layer</div>
+    <div class="ph-tag" style="color:var(--p4);border-color:rgba(155,114,255,0.3)">🔧 MCP + API</div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-goal">Goal: <span>2 custom MCP servers written by you and connected. FastAPI async layer between Streamlit and agents. Resume differentiator unlocked.</span></div>
+    <div class="tasks">
+      <div class="task">
+        <span class="task-i">4.1</span>
+        <div>
+          <div class="task-title">Build Web Scraper MCP Server in tools/scraper_mcp.py</div>
+          <div class="task-desc">Use <code>mcp</code> SDK. Expose one tool: <code>scrape_url(url: str) → str</code>. Inside: fetch with <code>httpx</code>, parse with <code>BeautifulSoup</code>, strip nav/footer/ads, return clean markdown. Run as subprocess. Register in Researcher agent via <code>MCPToolkit</code>. This is MCP code you wrote — say that explicitly in your README and interviews.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">4.2</span>
+        <div>
+          <div class="task-title">Build Citation Formatter MCP Server in tools/citation_mcp.py</div>
+          <div class="task-desc">Expose: <code>format_citation(url, title, date, excerpt, style="APA") → str</code>. Returns formatted APA or MLA citation string. The Synthesizer calls this before adding citations to the report. Simple but shows you understand writing MCP servers, not just consuming them.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">4.3</span>
+        <div>
+          <div class="task-title">Connect official Brave Search MCP server</div>
+          <div class="task-desc">Clone official Brave MCP repo. Set <code>BRAVE_API_KEY</code>. Register alongside your custom servers. Researcher now has 3 tools: Brave Search (official MCP), Web Scraper (your MCP), Hybrid RAG Retriever. Log all tool calls with input/output/latency to <code>agent_tasks.tool_calls</code> JSONB column.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">4.4</span>
+        <div>
+          <div class="task-title">Build FastAPI layer in api/routes.py with async agent execution</div>
+          <div class="task-desc"><code>POST /api/research</code> — receives goal, creates Supabase research_run, starts LangGraph in background task, returns <code>run_id</code> immediately. <code>GET /api/research/{run_id}</code> — returns current status from Supabase. <code>DELETE /api/users/{id}/data</code> — GDPR right-to-erasure endpoint. This async pattern is what makes the live progress page possible.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">4.5</span>
+        <div>
+          <div class="task-title">Wire Streamlit Page 1 to FastAPI — replace direct agent call</div>
+          <div class="task-desc">Replace the direct agent call from Phase 1 with: <code>response = httpx.post(f"{API_URL}/api/research", json={"goal": goal})</code>, store <code>run_id</code> in <code>st.session_state</code>, redirect to Progress page. This decouples UI from agent execution and makes the live polling pattern work.</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="border-left:2px solid var(--p4);background:rgba(155,114,255,0.04)">
+      <strong>✓ Phase 4 Complete When:</strong>
+      LangSmith shows your Researcher calling your custom scraper_mcp.py and citation_mcp.py — both servers you wrote. FastAPI accepts a research goal and returns a run_id within 200ms. The GDPR erasure endpoint returns 200 and deletes user data.
+    </div>
+  </div>
+</div>
+
+<!-- ─── PHASE 5 ─── -->
+<div class="phase" id="ph5">
+  <div class="ph-left">
+    <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--p5)"></div>
+    <div class="ph-week">Week 4</div>
+    <div class="ph-num" style="color:var(--p5)">05</div>
+    <div class="ph-name">Streamlit UI — All 6 Pages</div>
+    <div class="ph-tag" style="color:var(--p5);border-color:rgba(255,107,157,0.3)">🎈 Frontend</div>
+    <div class="eu-badge">🇪🇺 Compliance Dashboard</div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-goal">Goal: <span>All 6 Streamlit pages built and working. Live progress page is demo centrepiece. EU AI Act compliance page exists.</span></div>
+    <div class="tasks">
+      <div class="task">
+        <span class="task-i">5.1</span>
+        <div>
+          <div class="task-title">Convert to multi-page Streamlit app structure</div>
+          <div class="task-desc">Create <code>streamlit_app/pages/</code>. Files: <code>1_🏠_Home.py, 2_📄_Documents.py, 3_⚡_Progress.py, 4_📋_Reports.py, 5_📊_Evals.py, 6_🇪🇺_Compliance.py</code>. Add shared state in <code>streamlit_app/state.py</code>. Add Supabase Auth login screen — check <code>st.session_state.user</code> on app load, show login form if not set.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">5.2</span>
+        <div>
+          <div class="task-title">Build Live Agent Progress page — your demo centrepiece</div>
+          <div class="task-desc">Poll <code>agent_tasks</code> every 2s via <code>st.rerun(interval=2)</code>. Per agent: 🟡 pending / 🔵 running / ✅ completed / ❌ failed. Live log stream from <code>agent_tasks.output</code>. Progress bar: completed/total. This 60-second flow (submit → watch agents fire → report appears) is your entire demo. Make this page excellent.</div>
+        </div>
+      </div>
+      <div class="task xai-task">
+        <span class="task-i">5.3</span>
+        <div>
+          <div class="task-title">Build Report Viewer page with XAI decision trace expanders</div>
+          <div class="task-desc">Render report markdown. For each section add <code>st.expander("Why did the agent conclude this?")</code> showing <code>reasoning_steps</code>, <code>sources_used</code>, confidence bar via <code>st.progress(score)</code>. Download button for PDF export. Run history table. The XAI expanders transform a standard report viewer into a genuine differentiator.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">5.4</span>
+        <div>
+          <div class="task-title">Build Eval Dashboard page</div>
+          <div class="task-desc">RAGAS faithfulness line chart over time. <code>st.metric</code> for avg cost per run, avg latency, avg judge score. Dataframe of full run history. This page alone is worth 5 minutes of interview conversation — it proves you measure your system, not just build it.</div>
+        </div>
+      </div>
+      <div class="task eu-task">
+        <span class="task-i">5.5</span>
+        <div>
+          <div class="task-title">Build EU AI Act Compliance Dashboard (Page 6) — your portfolio centrepiece</div>
+          <div class="task-desc">Per run: risk level badge (MINIMAL / LIMITED / HIGH_RISK / UNACCEPTABLE), transparency score 0–100, checklist of EU AI Act obligations ticked. <code>st.metric</code> for avg transparency score. "Generate Compliance Summary" button → PDF export. This is the page that makes European interviewers stop scrolling. Screenshot it for LinkedIn immediately.</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="border-left:2px solid var(--p5);background:rgba(255,107,157,0.04)">
+      <strong>✓ Phase 5 Complete When:</strong>
+      You log in → upload a Swedish PDF → submit demo goal → watch live agent badges turn green → view report with XAI expanders → check compliance page showing MINIMAL_RISK with transparency score. That full flow in 90 seconds is your demo.
+    </div>
+  </div>
+</div>
+
+<!-- ─── PHASE 6 ─── -->
+<div class="phase" id="ph6">
+  <div class="ph-left">
+    <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--p6)"></div>
+    <div class="ph-week">Week 5</div>
+    <div class="ph-num" style="color:var(--p6)">06</div>
+    <div class="ph-name">Evaluation Suite — Get Your Benchmark Numbers</div>
+    <div class="ph-tag" style="color:var(--p6);border-color:rgba(29,233,182,0.3)">🧪 Evals</div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-goal">Goal: <span>40+ Q&A pairs evaluated. Before/after numbers documented. Numbers you can quote from memory in any interview.</span></div>
+    <div class="tasks">
+      <div class="task">
+        <span class="task-i">6.1</span>
+        <div>
+          <div class="task-title">Complete 20 manual Q&A pairs — write ground-truth answers from the actual documents</div>
+          <div class="task-desc">8 English EU AI Act questions, 6 English GDPR questions, 3 Swedish questions, 3 German questions. For each: read the source document, write the ground truth answer in your own words. Save as <code>evals/qa_pairs_manual.json</code>. Takes 1–2 hours. These are your golden dataset — the standard against which all RAGAS scores are measured.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">6.2</span>
+        <div>
+          <div class="task-title">Run RAGAS synthetic testset generator for 20+ additional pairs</div>
+          <div class="task-desc"><code>from ragas.testset import TestsetGenerator; generator = TestsetGenerator.with_openai(); testset = generator.generate_with_langchain_docs(docs, test_size=20, distributions={simple:0.5, reasoning:0.3, multi_context:0.2})</code>. Save as <code>evals/qa_pairs_synthetic.json</code>. Combined: 40+ pairs total. These auto-generated multi-hop questions test whether your retriever handles complex, cross-chunk queries.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">6.3</span>
+        <div>
+          <div class="task-title">Run RAGAS comparison: fixed-size chunking vs SemanticChunker</div>
+          <div class="task-desc">Temporarily swap to RecursiveCharacterTextSplitter(chunk_size=500). Re-embed the EU AI Act. Run RAGAS on all 40 pairs. Record faithfulness score. Then switch back to SemanticChunker. Re-run. Compare. The improvement proves your architecture decision was correct. This before/after is the core of your blog post.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">6.4</span>
+        <div>
+          <div class="task-title">Run LLM-as-Judge evaluation on 10 final reports</div>
+          <div class="task-desc">Run your demo goal 10 times (slight variations each time). Use GPT-4o to score each final report on: factual accuracy, completeness, citation quality, EU AI Act alignment (0–10 each). Store all scores in Supabase <code>eval_scores</code>. Calculate averages. These LLM-as-Judge scores go in your README alongside RAGAS scores.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">6.5</span>
+        <div>
+          <div class="task-title">Record your final benchmark numbers — memorise them</div>
+          <div class="task-desc">Write <code>evals/baseline_results.json</code> with: faithfulness score, answer_relevancy, context_precision, avg LLM-as-Judge score, avg cost per run in USD, avg latency in seconds, chunking improvement delta. Memorise the top 3 numbers. You will be asked "what were your evaluation results?" in every technical interview. Know the answer without opening your laptop.</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="border-left:2px solid var(--p6);background:rgba(29,233,182,0.04)">
+      <strong>✓ Phase 6 Complete When:</strong>
+      You can say without hesitation: "My system achieved X faithfulness score on RAGAS with 40 Q&A pairs. SemanticChunker improved it by Y% over fixed-size chunking. Average cost per research run is $Z." Those numbers are your most valuable interview asset.
+    </div>
+  </div>
+</div>
+
+<!-- ─── PHASE 7 ─── -->
+<div class="phase" id="ph7">
+  <div class="ph-left">
+    <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--p7)"></div>
+    <div class="ph-week">Week 5–6</div>
+    <div class="ph-num" style="color:var(--p7)">07</div>
+    <div class="ph-name">Deploy + Document + Ship</div>
+    <div class="ph-tag" style="color:var(--p7);border-color:rgba(96,165,250,0.3)">🚀 Ship It</div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-goal">Goal: <span>Live URL. Detailed README. Demo video. Blog post. Everything a recruiter needs to be convinced in 5 minutes.</span></div>
+    <div class="tasks">
+      <div class="task">
+        <span class="task-i">7.1</span>
+        <div>
+          <div class="task-title">Pre-populate live Supabase with demo documents before any deployment</div>
+          <div class="task-desc">Run ingestion on: EU AI Act (EN), Swedish DIGG report, German KI-Strategie, one manufacturing AI report. Your live app must never be empty when a recruiter visits. An empty RAG app looks broken. Pre-populated with real EU regulatory documents looks like a real product.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">7.2</span>
+        <div>
+          <div class="task-title">Deploy FastAPI to Railway</div>
+          <div class="task-desc">Add <code>Dockerfile</code>. Push to GitHub. Connect Railway to repo — auto-deploys on push. Set all env vars in Railway dashboard (never in code). Test the live FastAPI URL returns 200 on <code>GET /health</code> before deploying Streamlit. Your Railway URL becomes the <code>API_URL</code> in your Streamlit app's env vars.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">7.3</span>
+        <div>
+          <div class="task-title">Deploy Streamlit to Streamlit Community Cloud</div>
+          <div class="task-desc">push to GitHub → share.streamlit.io → connect repo → set secrets. Your live URL: <code>your-app.streamlit.app</code>. Test the complete end-to-end flow on the live deployment. The full flow (login → upload → submit → progress → report → compliance) must work without errors before recording the demo video.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">7.4</span>
+        <div>
+          <div class="task-title">Write README — the architecture document that gets you interviews</div>
+          <div class="task-desc">Structure: Problem → Architecture diagram (draw.io or Excalidraw) → Tech stack with reasons for each choice → Agent flow → EU AI Act compliance features → GDPR implementation → Multilingual support → Eval results with real numbers → How to run locally → Live demo link. The "why each technology" section is most important — every choice explained, every tradeoff acknowledged.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">7.5</span>
+        <div>
+          <div class="task-title">Record 3-minute demo video — all real data on screen</div>
+          <div class="task-desc">Script: Login → Upload Swedish PDF (show language detection) → Submit EU AI Act goal → Watch live agent badges turn green → Open Report (expand XAI decision trace) → Open Compliance page (show risk level + transparency score) → Open LangSmith (show full trace) → Open Eval Dashboard (show RAGAS numbers). Narrate each step. Upload to YouTube (unlisted). Pin to GitHub repo.</div>
+        </div>
+      </div>
+      <div class="task">
+        <span class="task-i">7.6</span>
+        <div>
+          <div class="task-title">Write and publish blog post</div>
+          <div class="task-desc">Title: "Building a GDPR-Compliant, EU AI Act-Ready Research Agent in 6 Weeks." Publish on Medium + dev.to. Include: architecture decisions with tradeoffs, RAGAS before/after numbers, the GDPR implementation details, a section on failures and how you fixed them, and a conclusion on what you'd do differently. This article is what shows up in Google when a German recruiter searches "LangGraph EU AI Act compliance."</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="border-left:2px solid var(--p7);background:rgba(96,165,250,0.04)">
+      <strong>✓ Project Complete When:</strong>
+      Live URL works. README has real RAGAS numbers (not placeholders). Demo video shows Swedish document + XAI traces + compliance dashboard. Blog post is live and indexed. You can demo the entire thing in 3 minutes on any device. That is your Europe-ready AI engineer portfolio piece.
+    </div>
+  </div>
+</div>
+
+</div><!-- /phases -->
+
+<!-- ══════════════════════════════════════
+     SECTION 3: MASTER CHECKLIST
+══════════════════════════════════════ -->
+<div class="sh" id="checklist">
+  <span class="sh-n">03 ——</span>
+  <span class="sh-t">Master Completion Checklist</span>
+  <span class="sh-c">52 Tasks Total</span>
+</div>
+
+<div class="progress-wrap">
+  <span class="prog-label">Progress</span>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+  <span class="prog-pct" id="prog-pct">0%</span>
+</div>
+
+<div class="cl-wrap" id="cl-wrap">
+
+  <!-- Phase 0 -->
+  <div class="cl-phase-header">
+    <div class="cl-ph-dot" style="background:var(--p0)"></div>
+    <span class="cl-ph-name">Phase 0 — Setup & Data</span>
+    <span class="cl-ph-week">Day 1</span>
+  </div>
+  <div class="cl-grid">
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Virtual env created + all packages installed<span class="sub">pip freeze → requirements.txt immediately</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Supabase project created — Frankfurt region selected<span class="sub">🔒 Cannot change after creation · GDPR requirement</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">All 5 accounts created + keys in .env file<span class="sub">Anthropic · Supabase · Brave · LangSmith · Railway</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">pgvector enabled in Supabase + all 8 tables created<span class="sub">Including consent_records · audit_events · data_subjects</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">EU AI Act PDF downloaded — English + Swedish versions<span class="sub">eur-lex.europa.eu — EN and SV</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">GDPR PDF, DIGG Swedish report, German KI-Strategie downloaded<span class="sub">All in /data/ before writing any ingestion code</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Annex III JSON created manually — 8 risk categories<span class="sub">artificialintelligenceact.eu/annex/3/</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">multilingual-e5-large verified — returns 1024-dim vector<span class="sub">🌍 Core of your multilingual pipeline</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Project folder structure created exactly as specified<span class="sub">agents/ compliance/ tools/ rag/ streamlit_app/ api/ db/ evals/ data/</span></div></div>
+  </div>
+
+  <!-- Phase 1 -->
+  <div class="cl-phase-header">
+    <div class="cl-ph-dot" style="background:var(--p1)"></div>
+    <span class="cl-ph-name">Phase 1 — Core Agent + Supabase</span>
+    <span class="cl-ph-week">Week 1</span>
+  </div>
+  <div class="cl-grid">
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Supabase client singleton built in db/client.py<span class="sub">Single get_supabase_client() function used everywhere</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">First LangGraph agent running with Brave Search<span class="sub">Real live web result returned before adding complexity</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Every agent run logged to research_runs with token count + cost<span class="sub">From run #1 — never retrofit this</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">LangSmith tracing verified — run appears in traces dashboard<span class="sub">Fix immediately if not appearing — don't proceed until working</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">GDPR middleware built — consent, PII scrub, erasure functions<span class="sub">🔒 record_consent() called on every session start</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Streamlit Page 1 wired: input → agent → Supabase → display<span class="sub">End-to-end wiring confirmed before moving to RAG</span></div></div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="cl-phase-header">
+    <div class="cl-ph-dot" style="background:var(--p2)"></div>
+    <span class="cl-ph-name">Phase 2 — RAG + Multilingual</span>
+    <span class="cl-ph-week">Week 1–2</span>
+  </div>
+  <div class="cl-grid">
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Ingestion pipeline built with PII scrubbing + SemanticChunker<span class="sub">rag/ingest.py · scrub_pii() called before chunking</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Language detection added — metadata["language"] on every chunk<span class="sub">🌍 langdetect · SV · DE · EN routing</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">EU AI Act PDF (EN) fully ingested into pgvector<span class="sub">~600–800 chunks · 1024-dim vectors confirmed in Supabase</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Hybrid retriever built — pgvector + BM25 + language-aware routing<span class="sub">rag/retriever.py · Swedish queries prioritise Swedish chunks</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Swedish multilingual retrieval tested + screenshot taken<span class="sub">🇸🇪 Swedish query → Swedish chunks · Post this on LinkedIn</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">RAGAS baseline score recorded to Supabase eval_scores<span class="sub">10 Q&A pairs minimum · Number recorded — this is your "before"</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Streamlit Page 2 built — upload shows detected language<span class="sub">st.success("Detected: Swedish 🇸🇪") after upload</span></div></div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="cl-phase-header">
+    <div class="cl-ph-dot" style="background:var(--p3)"></div>
+    <span class="cl-ph-name">Phase 3 — Multi-Agent + EU Compliance</span>
+    <span class="cl-ph-week">Week 2–3</span>
+  </div>
+  <div class="cl-grid">
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Planner Agent decomposing goals into structured SubTaskPlan<span class="sub">Claude Opus · Pydantic structured output · tested on 5 goals</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">EU AI Act Risk Classifier built + called from Planner<span class="sub">🇪🇺 Annex III JSON · UNACCEPTABLE/HIGH/LIMITED/MINIMAL</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">DecisionTrace Pydantic model on every agent<span class="sub">🔍 reasoning_steps · sources · confidence · alternatives</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Full LangGraph StateGraph with all 5 agents running<span class="sub">Planner → Researcher → Analyst → Critic → Synthesizer</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">A2A Protocol wired between Planner and all specialists<span class="sub">AgentCard defined for each agent · Task messages logged</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Critic retry loop working — claims &lt;0.7 confidence trigger re-research<span class="sub">Counterfactual analysis generated on failed claims</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Synthesizer appends EU AI Act Transparency Notice to every report<span class="sub">Which LLMs used · data sources · confidence · limitations</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Immutable audit trail with SHA-256 hash chain operational<span class="sub">🇪🇺 Append-only · Every agent event logged · Art. 12 ✓</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Full demo scenario runs end-to-end → report saved to Supabase Storage<span class="sub">EU AI Act obligations for Swedish manufacturing SME</span></div></div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="cl-phase-header">
+    <div class="cl-ph-dot" style="background:var(--p4)"></div>
+    <span class="cl-ph-name">Phase 4 — MCP Servers + FastAPI</span>
+    <span class="cl-ph-week">Week 3</span>
+  </div>
+  <div class="cl-grid">
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Custom Web Scraper MCP server written by you and connected<span class="sub">tools/scraper_mcp.py · httpx + BeautifulSoup · clean markdown out</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Custom Citation Formatter MCP server written by you and connected<span class="sub">tools/citation_mcp.py · APA/MLA output · Synthesizer uses it</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Official Brave Search MCP server connected alongside custom servers<span class="sub">Researcher has 3 tools total · all visible in LangSmith</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">FastAPI async layer built — POST /api/research returns run_id in &lt;200ms<span class="sub">Background task starts LangGraph · Streamlit polls for status</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">DELETE /api/users/{id}/data endpoint working — GDPR right to erasure<span class="sub">🔒 Anonymises runs · deletes chunks · logs erasure to audit trail</span></div></div>
+  </div>
+
+  <!-- Phase 5 -->
+  <div class="cl-phase-header">
+    <div class="cl-ph-dot" style="background:var(--p5)"></div>
+    <span class="cl-ph-name">Phase 5 — All 6 Streamlit Pages</span>
+    <span class="cl-ph-week">Week 4</span>
+  </div>
+  <div class="cl-grid">
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Supabase Auth integrated — login required to use app<span class="sub">JWT stored in session_state · added to every Supabase query header</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Live Progress page polling Supabase every 2s with colour badges<span class="sub">🟡 pending / 🔵 running / ✅ done / ❌ failed</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Report Viewer has XAI decision trace expanders per section<span class="sub">🔍 reasoning_steps + confidence bar per claim · EU AI Act Art. 13</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Eval Dashboard shows RAGAS scores + cost + latency trends<span class="sub">line_chart over time · st.metric for key numbers</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">EU AI Act Compliance Dashboard (Page 6) built and working<span class="sub">🇪🇺 Risk badge · transparency score · obligation checklist</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Full 90-second demo flow tested end-to-end on live app<span class="sub">Login → Upload SV PDF → Submit → Progress → Report → Compliance</span></div></div>
+  </div>
+
+  <!-- Phase 6 -->
+  <div class="cl-phase-header">
+    <div class="cl-ph-dot" style="background:var(--p6)"></div>
+    <span class="cl-ph-name">Phase 6 — Evaluations</span>
+    <span class="cl-ph-week">Week 5</span>
+  </div>
+  <div class="cl-grid">
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">20 manual Q&A pairs written with ground-truth answers<span class="sub">8 EU AI Act EN · 6 GDPR EN · 3 Swedish · 3 German</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">RAGAS synthetic testset generated — 20+ additional pairs<span class="sub">simple 50% · reasoning 30% · multi_context 20%</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">RAGAS before/after comparison: fixed-size vs SemanticChunker<span class="sub">Both scores documented · improvement delta calculated</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">LLM-as-Judge evaluation on 10 final reports<span class="sub">GPT-4o scoring: accuracy · completeness · citations · EU alignment</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Final benchmark numbers recorded in evals/baseline_results.json<span class="sub">Faithfulness · relevancy · avg cost · avg latency · memorise these</span></div></div>
+  </div>
+
+  <!-- Phase 7 -->
+  <div class="cl-phase-header">
+    <div class="cl-ph-dot" style="background:var(--p7)"></div>
+    <span class="cl-ph-name">Phase 7 — Deploy + Document + Ship</span>
+    <span class="cl-ph-week">Week 5–6</span>
+  </div>
+  <div class="cl-grid">
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Live Supabase pre-populated with EU regulatory documents<span class="sub">EU AI Act + DIGG + German KI-Strategie + manufacturing report</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">FastAPI deployed live on Railway<span class="sub">Dockerfile + env vars in Railway dashboard · /health returns 200</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Streamlit deployed live on Streamlit Community Cloud<span class="sub">your-app.streamlit.app · full end-to-end flow tested on live URL</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">README written with real numbers — not placeholders<span class="sub">Architecture diagram · tech decisions · RAGAS scores · live demo link</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">3-minute demo video recorded — pinned to GitHub repo<span class="sub">Swedish PDF + XAI traces + compliance page + LangSmith trace on screen</span></div></div>
+    <div class="cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">Blog post published on Medium + dev.to<span class="sub">RAGAS before/after · GDPR implementation · failures + fixes · what you'd change</span></div></div>
+    <div class="cl eu-cl" onclick="toggle(this)"><div class="cl-box"></div><div class="cl-text">LinkedIn post with Swedish retrieval screenshot + live URL<span class="sub">🇸🇪 Tag University West · mention EU AI Act compliance · post in Swedish AI groups</span></div></div>
+  </div>
+
+</div><!-- /cl-wrap -->
+
+<footer>
+  <span>Master Build Plan · EU Regulatory Intelligence Agent · 2026</span>
+  <span>University West · Trollhättan 🇸🇪</span>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+// Intersection observer for phases
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); });
+}, {threshold:0.04});
+document.querySelectorAll('.phase').forEach(el => obs.observe(el));
+
+// Checklist toggle + progress
+function toggle(el){
+  el.classList.toggle('done');
+  el.querySelector('.cl-box').textContent = el.classList.contains('done') ? '✓' : '';
+  updateProgress();
+}
+
+function updateProgress(){
+  const all = document.querySelectorAll('.cl').length;
+  const done = document.querySelectorAll('.cl.done').length;
+  const pct = Math.round((done/all)*100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+updateProgress();
+</script>
+</body>
+</html>

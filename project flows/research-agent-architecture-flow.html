@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Research Agent — Full Architecture Flow</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #0b0f1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 32px 20px 48px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  h1 {
+    color: #e2e8f0;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    color: #4a5568;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  svg { max-width: 900px; width: 100%; }
+
+  /* tooltip */
+  .tooltip {
+    position: fixed;
+    background: #1e2535;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #94a3b8;
+    max-width: 240px;
+    line-height: 1.6;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+  }
+  .tooltip strong { color: #e2e8f0; display: block; margin-bottom: 3px; font-size: 13px; }
+  .tooltip.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<h1>Research Agent — Full Architecture + AWS Deployment</h1>
+<p class="subtitle">LangGraph · LangChain · Supabase · EC2 · ECR · ALB · GitHub Actions · LangMem · EU Compliance · Streamlit · Hover any node for details</p>
+
+<div class="tooltip" id="tip"></div>
+
+<svg viewBox="0 0 900 1020" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+
+  <!-- color palettes -->
+  <!-- node fills / strokes defined inline -->
+</defs>
+
+<!-- ══════════════════════════════════
+     TITLE
+══════════════════════════════════ -->
+<text x="450" y="26" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="600">Research Agent — Full Architecture + AWS Deployment</text>
+<text x="450" y="44" text-anchor="middle" fill="#4a5568" font-size="10" letter-spacing="0.06em">LangGraph · LangChain · Supabase · EC2 · ECR · ALB · GitHub Actions · LangMem · EU Compliance · Streamlit</text>
+
+<!-- ══════════════════════════════════
+     REGION BORDERS
+══════════════════════════════════ -->
+
+<!-- Entry Points -->
+<rect x="20" y="62" width="175" height="330" rx="10" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="6 4"/>
+<text x="107" y="56" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="600">Entry Points</text>
+
+<!-- Orchestration -->
+<rect x="210" y="62" width="218" height="330" rx="10" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="6 4"/>
+<text x="319" y="56" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="600">Orchestration</text>
+
+<!-- AWS Infra -->
+<rect x="444" y="62" width="436" height="330" rx="10" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="6 4"/>
+<text x="662" y="56" text-anchor="middle" fill="#fb923c" font-size="11" font-weight="600">AWS Infra + ECR + EC2 + ALB</text>
+
+<!-- RAG Band -->
+<rect x="20" y="418" width="860" height="200" rx="10" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="6 4"/>
+<text x="450" y="412" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="600">RAG Pipeline + Supabase</text>
+
+<!-- Ext Intel -->
+<rect x="20" y="640" width="860" height="356" rx="10" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="6 4"/>
+<text x="450" y="634" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">External Intelligence + Observability + Memory + CI/CD</text>
+
+<!-- ══════════════════════════════════
+     ENTRY POINTS NODES
+══════════════════════════════════ -->
+
+<!-- Developer -->
+<g class="node" data-tip="Developer pushes code to GitHub main branch, which triggers the full 4-job GitHub Actions CI/CD pipeline automatically." style="cursor:pointer">
+  <rect x="30" y="76" width="155" height="44" rx="7" fill="#1e2535" stroke="#475569" stroke-width="0.8"/>
+  <text x="107" y="95" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="500">Developer</text>
+  <text x="107" y="111" text-anchor="middle" fill="#64748b" font-size="10">git push → main</text>
+</g>
+
+<line x1="107" y1="120" x2="107" y2="142" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="116" y="135" fill="#374151" font-size="9">triggers</text>
+
+<!-- GitHub Actions -->
+<g class="node" data-tip="4-job pipeline: (1) Test+Lint, (2) docker build + ECR push, (3) Blue-Green deploy to EC2, (4) Slack notify. Only runs on push to main." style="cursor:pointer">
+  <rect x="30" y="144" width="155" height="58" rx="7" fill="#1e1b4b" stroke="#6366f1" stroke-width="0.8"/>
+  <text x="107" y="165" text-anchor="middle" fill="#a5b4fc" font-size="12" font-weight="500">GitHub Actions</text>
+  <text x="107" y="181" text-anchor="middle" fill="#6366f1" font-size="10">Test → Build → Deploy</text>
+  <text x="107" y="195" text-anchor="middle" fill="#4338ca" font-size="9">4 jobs · Blue-Green</text>
+</g>
+
+<line x1="107" y1="202" x2="107" y2="224" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="116" y="217" fill="#374151" font-size="9">deploys</text>
+
+<!-- Streamlit UI -->
+<g class="node" data-tip="6-page Streamlit app hosted on Streamlit Community Cloud (free). Pages: Home, Documents, Live Progress, Reports, Eval Dashboard, EU Compliance." style="cursor:pointer">
+  <rect x="30" y="226" width="155" height="58" rx="7" fill="#1f1211" stroke="#ef4444" stroke-width="0.8"/>
+  <text x="107" y="247" text-anchor="middle" fill="#fca5a5" font-size="12" font-weight="500">Streamlit UI</text>
+  <text x="107" y="263" text-anchor="middle" fill="#ef4444" font-size="10">Streamlit Cloud · Free</text>
+  <text x="107" y="277" text-anchor="middle" fill="#7f1d1d" font-size="9">6 pages · your-app.streamlit.app</text>
+</g>
+
+<line x1="107" y1="284" x2="107" y2="306" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="116" y="299" fill="#374151" font-size="9">HTTP POST</text>
+
+<!-- FastAPI -->
+<g class="node" data-tip="FastAPI gateway validates JWT via Supabase Auth, triggers LangGraph runs, exposes /health for ALB checks, serves GDPR endpoints." style="cursor:pointer">
+  <rect x="30" y="308" width="155" height="58" rx="7" fill="#0c1a2e" stroke="#3b82f6" stroke-width="0.8"/>
+  <text x="107" y="329" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="500">FastAPI Gateway</text>
+  <text x="107" y="345" text-anchor="middle" fill="#3b82f6" font-size="10">Auth · /research · /health</text>
+  <text x="107" y="359" text-anchor="middle" fill="#1e3a5f" font-size="9">EC2 port 8000 · Docker container</text>
+</g>
+
+<!-- ══════════════════════════════════
+     ORCHESTRATION NODES
+══════════════════════════════════ -->
+
+<!-- Arrow: FastAPI → Planner -->
+<line x1="185" y1="337" x2="218" y2="337" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+
+<!-- Planner Agent -->
+<g class="node" data-tip="Planner uses Claude Opus with .with_structured_output(SubTaskPlan). Decomposes goal into SubTask list with agent_type, parallel bool, priority. Routes via A2A." style="cursor:pointer">
+  <rect x="220" y="76" width="196" height="58" rx="7" fill="#1c1400" stroke="#d97706" stroke-width="0.8"/>
+  <text x="318" y="97" text-anchor="middle" fill="#fcd34d" font-size="12" font-weight="500">Planner Agent</text>
+  <text x="318" y="113" text-anchor="middle" fill="#d97706" font-size="10">Claude Opus · A2A routing</text>
+  <text x="318" y="127" text-anchor="middle" fill="#78350f" font-size="9">SubTaskPlan Pydantic schema</text>
+</g>
+
+<line x1="318" y1="134" x2="318" y2="154" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="326" y="148" fill="#374151" font-size="9">Send()</text>
+
+<!-- LangGraph StateGraph -->
+<g class="node" data-tip="LangGraph StateGraph with typed ResearchState. Uses Send() API for parallel node execution. Checkpointer persists state to Postgres for resume on failure." style="cursor:pointer">
+  <rect x="220" y="156" width="196" height="58" rx="7" fill="#041c1c" stroke="#14b8a6" stroke-width="0.8"/>
+  <text x="318" y="177" text-anchor="middle" fill="#5eead4" font-size="12" font-weight="500">LangGraph StateGraph</text>
+  <text x="318" y="193" text-anchor="middle" fill="#14b8a6" font-size="10">Parallel nodes · Checkpointer</text>
+  <text x="318" y="207" text-anchor="middle" fill="#134e4a" font-size="9">TypedDict state · conditional edges</text>
+</g>
+
+<line x1="318" y1="214" x2="318" y2="236" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="326" y="229" fill="#374151" font-size="9">parallel</text>
+
+<!-- Specialist Swarm -->
+<g class="node" data-tip="4 specialist agents fire via A2A Task messages: Researcher (Claude Sonnet + Brave/RAG), Analyst (structured extraction + Python REPL), Critic (GPT-4o judge, retry loop), Synthesizer (Jinja2 report)." style="cursor:pointer">
+  <rect x="220" y="238" width="196" height="72" rx="7" fill="#160b2e" stroke="#7c3aed" stroke-width="0.8"/>
+  <text x="318" y="258" text-anchor="middle" fill="#c4b5fd" font-size="12" font-weight="500">Specialist Swarm</text>
+  <text x="318" y="274" text-anchor="middle" fill="#7c3aed" font-size="10">Researcher · Analyst</text>
+  <text x="318" y="289" text-anchor="middle" fill="#7c3aed" font-size="10">Critic · Synthesizer</text>
+  <text x="318" y="303" text-anchor="middle" fill="#3b0764" font-size="9">A2A AgentCard per specialist</text>
+</g>
+
+<line x1="318" y1="310" x2="318" y2="330" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="326" y="324" fill="#374151" font-size="9">tool calls</text>
+
+<!-- MCP Tool Layer -->
+<g class="node" data-tip="3 MCP servers: Official Brave Search MCP, Custom Web Scraper MCP (httpx + BeautifulSoup → clean markdown), Custom Citation Formatter MCP. All tool calls logged to agent_tasks.tool_calls JSONB." style="cursor:pointer">
+  <rect x="220" y="332" width="196" height="58" rx="7" fill="#0c1a2e" stroke="#3b82f6" stroke-width="0.8"/>
+  <text x="318" y="353" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="500">MCP Tool Layer</text>
+  <text x="318" y="369" text-anchor="middle" fill="#3b82f6" font-size="10">Brave · Scraper · Citation</text>
+  <text x="318" y="383" text-anchor="middle" fill="#1e3a5f" font-size="9">2 custom MCP servers (your code)</text>
+</g>
+
+<!-- Planner ←→ FastAPI horizontal arrow -->
+<line x1="220" y1="337" x2="187" y2="337" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+
+<!-- ══════════════════════════════════
+     AWS INFRA NODES
+══════════════════════════════════ -->
+
+<!-- GH Actions → ECR horizontal -->
+<path d="M185 173 L450 173" fill="none" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="318" y="166" text-anchor="middle" fill="#374151" font-size="9">docker push :git-sha</text>
+
+<!-- ECR -->
+<g class="node" data-tip="AWS ECR private registry in eu-north-1 (Stockholm). Every image tagged with git commit SHA for full traceability. GitHub Actions runner authenticates via IAM credentials stored as GitHub Secrets." style="cursor:pointer">
+  <rect x="454" y="76" width="174" height="58" rx="7" fill="#1c0f00" stroke="#f97316" stroke-width="0.8"/>
+  <text x="541" y="97" text-anchor="middle" fill="#fed7aa" font-size="12" font-weight="500">AWS ECR</text>
+  <text x="541" y="113" text-anchor="middle" fill="#f97316" font-size="10">research-agent:git-sha</text>
+  <text x="541" y="127" text-anchor="middle" fill="#7c2d12" font-size="9">eu-north-1 · private registry</text>
+</g>
+
+<line x1="541" y1="134" x2="541" y2="154" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="549" y="148" fill="#374151" font-size="9">docker pull</text>
+
+<!-- EC2 Green -->
+<g class="node" data-tip="EC2 t3.medium with IAM role attached (no hardcoded keys). Userdata script: install Docker → ecr-login via IAM role → docker pull :git-sha → docker run → pull secrets from Secrets Manager." style="cursor:pointer">
+  <rect x="454" y="156" width="174" height="72" rx="7" fill="#052e16" stroke="#22c55e" stroke-width="0.8"/>
+  <text x="541" y="176" text-anchor="middle" fill="#86efac" font-size="12" font-weight="500">EC2 Green</text>
+  <text x="541" y="192" text-anchor="middle" fill="#22c55e" font-size="10">t3.medium · Docker container</text>
+  <text x="541" y="207" text-anchor="middle" fill="#22c55e" font-size="10">IAM role auth · eu-north-1</text>
+  <text x="541" y="221" text-anchor="middle" fill="#14532d" font-size="9">Userdata pulls image on boot</text>
+</g>
+
+<line x1="541" y1="228" x2="541" y2="250" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="549" y="244" fill="#374151" font-size="9">health check /health</text>
+
+<!-- ALB -->
+<g class="node" data-tip="Application Load Balancer with Blue + Green target groups. After EC2 Green passes health check, listener switches 100% traffic to Green. Blue stays alive for instant rollback. Zero downtime." style="cursor:pointer">
+  <rect x="454" y="252" width="174" height="72" rx="7" fill="#1f0f0a" stroke="#ef4444" stroke-width="0.8"/>
+  <text x="541" y="272" text-anchor="middle" fill="#fca5a5" font-size="12" font-weight="500">ALB</text>
+  <text x="541" y="288" text-anchor="middle" fill="#ef4444" font-size="10">Blue TG ↔ Green TG</text>
+  <text x="541" y="303" text-anchor="middle" fill="#ef4444" font-size="10">Traffic switch on health pass</text>
+  <text x="541" y="317" text-anchor="middle" fill="#7f1d1d" font-size="9">HTTPS · ACM cert · Route 53</text>
+</g>
+
+<!-- Secrets Manager -->
+<g class="node" data-tip="AWS Secrets Manager stores all API keys: Anthropic, OpenAI, Supabase URL/key, Brave, LangChain. EC2 pulls at startup via IAM role — no .env file on server, no hardcoded credentials anywhere." style="cursor:pointer">
+  <rect x="652" y="156" width="218" height="58" rx="7" fill="#111827" stroke="#6b7280" stroke-width="0.8"/>
+  <text x="761" y="177" text-anchor="middle" fill="#d1d5db" font-size="12" font-weight="500">AWS Secrets Manager</text>
+  <text x="761" y="193" text-anchor="middle" fill="#6b7280" font-size="10">API keys at boot · IAM role auth</text>
+  <text x="761" y="207" text-anchor="middle" fill="#374151" font-size="9">No hardcoded creds anywhere</text>
+</g>
+
+<!-- EC2 → Secrets Manager -->
+<line x1="628" y1="192" x2="652" y2="192" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="640" y="186" text-anchor="middle" fill="#374151" font-size="9">pulls</text>
+
+<!-- Route 53 -->
+<g class="node" data-tip="Route 53 DNS maps your domain to the ALB. ACM provides the SSL certificate for HTTPS termination at the ALB level." style="cursor:pointer">
+  <rect x="652" y="252" width="218" height="72" rx="7" fill="#111827" stroke="#6b7280" stroke-width="0.8"/>
+  <text x="761" y="273" text-anchor="middle" fill="#d1d5db" font-size="12" font-weight="500">Route 53 + ACM</text>
+  <text x="761" y="289" text-anchor="middle" fill="#6b7280" font-size="10">DNS → ALB · HTTPS via ACM cert</text>
+  <text x="761" y="304" text-anchor="middle" fill="#6b7280" font-size="10">yourdomain.com → ALB</text>
+  <text x="761" y="319" text-anchor="middle" fill="#374151" font-size="9">eu-north-1 (Stockholm)</text>
+</g>
+
+<!-- ALB → Route53 -->
+<line x1="628" y1="288" x2="652" y2="288" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+
+<!-- ══════════════════════════════════
+     RAG BAND
+══════════════════════════════════ -->
+
+<!-- MCP → Hybrid Retriever (down-left path) -->
+<path d="M220 361 L128 361 L128 430" fill="none" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+
+<!-- Orch → Supabase vertical -->
+<line x1="318" y1="390" x2="318" y2="430" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="326" y="413" fill="#374151" font-size="9">query</text>
+
+<!-- AWS → Supabase -->
+<line x1="541" y1="390" x2="541" y2="430" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<text x="549" y="413" fill="#374151" font-size="9">writes</text>
+
+<line x1="761" y1="390" x2="761" y2="430" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+
+<!-- Hybrid Retriever -->
+<g class="node" data-tip="Custom BaseRetriever subclass combining pgvector cosine similarity (dense) + pg_trgm full-text (sparse). Language filter upranks Swedish/German chunks when query language matches. Cohere rerank optional." style="cursor:pointer">
+  <rect x="30" y="432" width="190" height="72" rx="7" fill="#041c1c" stroke="#14b8a6" stroke-width="0.8"/>
+  <text x="125" y="452" text-anchor="middle" fill="#5eead4" font-size="12" font-weight="500">Hybrid Retriever</text>
+  <text x="125" y="468" text-anchor="middle" fill="#14b8a6" font-size="10">pgvector + pg_trgm BM25</text>
+  <text x="125" y="483" text-anchor="middle" fill="#14b8a6" font-size="10">Language filter: SV/DE/EN</text>
+  <text x="125" y="497" text-anchor="middle" fill="#134e4a" font-size="9">BaseRetriever subclass</text>
+</g>
+
+<!-- SemanticChunker -->
+<g class="node" data-tip="SemanticChunker from langchain-experimental splits documents by semantic meaning (embedding similarity between sentences) — not by fixed character count. Produces higher RAGAS faithfulness scores." style="cursor:pointer">
+  <rect x="240" y="432" width="190" height="72" rx="7" fill="#052e16" stroke="#22c55e" stroke-width="0.8"/>
+  <text x="335" y="452" text-anchor="middle" fill="#86efac" font-size="12" font-weight="500">SemanticChunker</text>
+  <text x="335" y="468" text-anchor="middle" fill="#22c55e" font-size="10">langchain-experimental</text>
+  <text x="335" y="483" text-anchor="middle" fill="#22c55e" font-size="10">Splits by meaning not tokens</text>
+  <text x="335" y="497" text-anchor="middle" fill="#14532d" font-size="9">multilingual-e5-large embeddings</text>
+</g>
+
+<!-- Supabase -->
+<g class="node" data-tip="Supabase provides: Postgres + pgvector(1024) for embeddings, Auth (JWT), Storage (PDFs + reports), Realtime (agent status polling). Tables: users, research_runs, agent_tasks, documents, document_chunks, eval_scores, consent_records, audit_events." style="cursor:pointer">
+  <rect x="450" y="432" width="190" height="72" rx="7" fill="#041c1c" stroke="#14b8a6" stroke-width="0.8"/>
+  <text x="545" y="452" text-anchor="middle" fill="#5eead4" font-size="12" font-weight="500">Supabase</text>
+  <text x="545" y="468" text-anchor="middle" fill="#14b8a6" font-size="10">Postgres + pgvector(1024)</text>
+  <text x="545" y="483" text-anchor="middle" fill="#14b8a6" font-size="10">Auth · Storage · Realtime</text>
+  <text x="545" y="497" text-anchor="middle" fill="#134e4a" font-size="9">Frankfurt eu-central-1</text>
+</g>
+
+<!-- EU Compliance -->
+<g class="node" data-tip="EU Compliance module runs at start of every research run: Risk Classifier (UNACCEPTABLE/HIGH/LIMITED/MINIMAL via Annex III), XAI Decision Traces (Art. 13), GDPR right-to-erasure endpoint, SHA-256 audit hash chain." style="cursor:pointer">
+  <rect x="660" y="432" width="190" height="72" rx="7" fill="#0c1a2e" stroke="#3b82f6" stroke-width="0.8"/>
+  <text x="755" y="452" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="500">EU Compliance</text>
+  <text x="755" y="468" text-anchor="middle" fill="#3b82f6" font-size="10">Risk Classifier · XAI Traces</text>
+  <text x="755" y="483" text-anchor="middle" fill="#3b82f6" font-size="10">GDPR Art.5/15/17 · Audit chain</text>
+  <text x="755" y="497" text-anchor="middle" fill="#1e3a5f" font-size="9">EU AI Act Annex III · Art. 13</text>
+</g>
+
+<!-- RAG internal horizontal arrows -->
+<line x1="220" y1="468" x2="240" y2="468" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="430" y1="468" x2="450" y2="468" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="640" y1="468" x2="660" y2="468" stroke="#334155" stroke-width="1" marker-end="url(#arr)"/>
+
+<!-- RAG → Ext Intel vertical arrows -->
+<line x1="125" y1="504" x2="125" y2="656" stroke="#1e293b" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="335" y1="504" x2="335" y2="656" stroke="#1e293b" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="545" y1="504" x2="545" y2="656" stroke="#1e293b" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="755" y1="504" x2="755" y2="656" stroke="#1e293b" stroke-width="1" marker-end="url(#arr)"/>
+
+<!-- ══════════════════════════════════
+     EXT INTEL ROW 1
+══════════════════════════════════ -->
+
+<!-- Multilingual embeddings -->
+<g class="node" data-tip="intfloat/multilingual-e5-large from HuggingFace. 560MB model, 1024-dim vectors. Handles Swedish, German, English in one embedding space. Key differentiator for EU market portfolio project." style="cursor:pointer">
+  <rect x="30" y="658" width="190" height="72" rx="7" fill="#160b2e" stroke="#7c3aed" stroke-width="0.8"/>
+  <text x="125" y="676" text-anchor="middle" fill="#c4b5fd" font-size="12" font-weight="500">multilingual-e5-large</text>
+  <text x="125" y="692" text-anchor="middle" fill="#7c3aed" font-size="10">HuggingFace · 1024-dim</text>
+  <text x="125" y="707" text-anchor="middle" fill="#7c3aed" font-size="10">Swedish 🇸🇪 · German 🇩🇪 · EN</text>
+  <text x="125" y="721" text-anchor="middle" fill="#3b0764" font-size="9">langdetect → language filter</text>
+</g>
+
+<!-- LLM Providers -->
+<g class="node" data-tip="Claude Opus 3.7 (Planner — complex decomposition), Claude Sonnet 3.7 (Analyst + Synthesizer — structured extraction + reports), GPT-4o (Critic — LLM-as-Judge scoring with rubric). Cost routing saves ~60%." style="cursor:pointer">
+  <rect x="240" y="658" width="190" height="72" rx="7" fill="#1c1400" stroke="#d97706" stroke-width="0.8"/>
+  <text x="335" y="676" text-anchor="middle" fill="#fcd34d" font-size="12" font-weight="500">LLM Providers</text>
+  <text x="335" y="692" text-anchor="middle" fill="#d97706" font-size="10">Claude Opus / Sonnet</text>
+  <text x="335" y="707" text-anchor="middle" fill="#d97706" font-size="10">GPT-4o (Critic judge)</text>
+  <text x="335" y="721" text-anchor="middle" fill="#78350f" font-size="9">Cost-routed by task complexity</text>
+</g>
+
+<!-- LangSmith + RAGAS -->
+<g class="node" data-tip="LangSmith traces every LLM call, tool call, and A2A message automatically. RAGAS evaluates: faithfulness, answer_relevancy, context_precision. Target: faithfulness > 0.75. Scores stored in eval_scores table." style="cursor:pointer">
+  <rect x="450" y="658" width="190" height="72" rx="7" fill="#052e16" stroke="#22c55e" stroke-width="0.8"/>
+  <text x="545" y="676" text-anchor="middle" fill="#86efac" font-size="12" font-weight="500">LangSmith + RAGAS</text>
+  <text x="545" y="692" text-anchor="middle" fill="#22c55e" font-size="10">Traces every LLM + tool call</text>
+  <text x="545" y="707" text-anchor="middle" fill="#22c55e" font-size="10">faithfulness · relevancy · precision</text>
+  <text x="545" y="721" text-anchor="middle" fill="#14532d" font-size="9">Target: faithfulness &gt; 0.75</text>
+</g>
+
+<!-- LangMem -->
+<g class="node" data-tip="Phase 7 addition. LangMem cross-run memory: high-quality chunks (RAGAS > 0.8) stored in memories table with vector(1024). Future runs query memory first — semantic cache. ConversationSummaryBufferMemory for session context." style="cursor:pointer">
+  <rect x="660" y="658" width="190" height="72" rx="7" fill="#1f0a1f" stroke="#d946ef" stroke-width="0.8"/>
+  <text x="755" y="676" text-anchor="middle" fill="#f0abfc" font-size="12" font-weight="500">LangMem Memory</text>
+  <text x="755" y="692" text-anchor="middle" fill="#d946ef" font-size="10">Cross-run memory store</text>
+  <text x="755" y="707" text-anchor="middle" fill="#d946ef" font-size="10">Semantic cache · Phase 7</text>
+  <text x="755" y="721" text-anchor="middle" fill="#701a75" font-size="9">pip install langmem</text>
+</g>
+
+<!-- ══════════════════════════════════
+     EXT INTEL ROW 2
+══════════════════════════════════ -->
+
+<!-- Row 1 → Row 2 arrows -->
+<line x1="125" y1="730" x2="125" y2="754" stroke="#1e293b" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="335" y1="730" x2="335" y2="754" stroke="#1e293b" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="545" y1="730" x2="545" y2="754" stroke="#1e293b" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="755" y1="730" x2="755" y2="754" stroke="#1e293b" stroke-width="1" marker-end="url(#arr)"/>
+
+<!-- GitHub Actions CI/CD -->
+<g class="node" data-tip="4 jobs: (1) Test+Lint on every push — ruff + mypy + pytest. (2) docker build + ECR push on main only. (3) Blue-Green deploy with manual approval gate (environment: production). (4) Slack notify always." style="cursor:pointer">
+  <rect x="30" y="756" width="190" height="72" rx="7" fill="#111827" stroke="#6b7280" stroke-width="0.8"/>
+  <text x="125" y="776" text-anchor="middle" fill="#d1d5db" font-size="12" font-weight="500">GitHub Actions CI/CD</text>
+  <text x="125" y="792" text-anchor="middle" fill="#6b7280" font-size="10">4 jobs · ruff · mypy · pytest</text>
+  <text x="125" y="807" text-anchor="middle" fill="#6b7280" font-size="10">deploy.yml · .github/workflows/</text>
+  <text x="125" y="821" text-anchor="middle" fill="#374151" font-size="9">Manual approval gate on prod</text>
+</g>
+
+<!-- Blue-Green Deploy -->
+<g class="node" data-tip="scripts/blue_green_deploy.sh: launch Green EC2 → userdata pulls image → register with Green TG → wait ALB health check → switch listener → smoke test → terminate Blue. Full rollback if health check fails." style="cursor:pointer">
+  <rect x="240" y="756" width="190" height="72" rx="7" fill="#111827" stroke="#6b7280" stroke-width="0.8"/>
+  <text x="335" y="776" text-anchor="middle" fill="#d1d5db" font-size="12" font-weight="500">Blue-Green Deploy</text>
+  <text x="335" y="792" text-anchor="middle" fill="#6b7280" font-size="10">Zero downtime · instant rollback</text>
+  <text x="335" y="807" text-anchor="middle" fill="#6b7280" font-size="10">scripts/blue_green_deploy.sh</text>
+  <text x="335" y="821" text-anchor="middle" fill="#374151" font-size="9">ALB listener switch on health pass</text>
+</g>
+
+<!-- Audit Trail -->
+<g class="node" data-tip="SHA-256 hash chain in audit_events table. Every event hashes prev_hash + payload. GET /api/audit/verify walks chain and confirms integrity. Satisfies GDPR accountability requirement (Art. 5)." style="cursor:pointer">
+  <rect x="450" y="756" width="190" height="72" rx="7" fill="#111827" stroke="#6b7280" stroke-width="0.8"/>
+  <text x="545" y="776" text-anchor="middle" fill="#d1d5db" font-size="12" font-weight="500">Audit Trail</text>
+  <text x="545" y="792" text-anchor="middle" fill="#6b7280" font-size="10">SHA-256 hash chain</text>
+  <text x="545" y="807" text-anchor="middle" fill="#6b7280" font-size="10">audit_events · GDPR Art. 5</text>
+  <text x="545" y="821" text-anchor="middle" fill="#374151" font-size="9">GET /api/audit/verify endpoint</text>
+</g>
+
+<!-- Streamlit Community Cloud -->
+<g class="node" data-tip="Streamlit Community Cloud: free hosting for public repos. Connect GitHub → set secrets (SUPABASE_URL, ANTHROPIC_API_KEY, API_BASE_URL pointing to EC2 ALB) → auto-deploys on push to main." style="cursor:pointer">
+  <rect x="660" y="756" width="190" height="72" rx="7" fill="#111827" stroke="#6b7280" stroke-width="0.8"/>
+  <text x="755" y="776" text-anchor="middle" fill="#d1d5db" font-size="12" font-weight="500">Streamlit Cloud</text>
+  <text x="755" y="792" text-anchor="middle" fill="#6b7280" font-size="10">Free hosting · auto-deploy</text>
+  <text x="755" y="807" text-anchor="middle" fill="#6b7280" font-size="10">your-app.streamlit.app</text>
+  <text x="755" y="821" text-anchor="middle" fill="#374151" font-size="9">Points to EC2 ALB URL</text>
+</g>
+
+<!-- ══════════════════════════════════
+     LEGEND
+══════════════════════════════════ -->
+<rect x="20" y="960" width="860" height="50" rx="8" fill="#0f172a" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+<text x="450" y="980" text-anchor="middle" fill="#475569" font-size="10">Hover any node for details</text>
+<text x="450" y="997" text-anchor="middle" fill="#334155" font-size="10">🟣 Purple = Agents  🟡 Amber = LLMs/ECR  🟢 Green = Build/RAG/Eval  🔵 Blue = API/MCP  🟠 Orange = AWS  ⚫ Gray = Infra/CI</text>
+
+</svg>
+
+<div class="tooltip" id="tip"></div>
+
+<script>
+  const tip = document.getElementById('tip');
+  document.querySelectorAll('.node').forEach(node => {
+    node.addEventListener('mouseenter', e => {
+      const msg = node.getAttribute('data-tip');
+      if (!msg) return;
+      const name = node.querySelector('text')?.textContent || '';
+      tip.innerHTML = '<strong>' + name + '</strong>' + msg;
+      tip.classList.add('show');
+    });
+    node.addEventListener('mousemove', e => {
+      tip.style.left = (e.clientX + 16) + 'px';
+      tip.style.top  = (e.clientY - 10) + 'px';
+    });
+    node.addEventListener('mouseleave', () => {
+      tip.classList.remove('show');
+    });
+  });
+</script>
+</body>
+</html>

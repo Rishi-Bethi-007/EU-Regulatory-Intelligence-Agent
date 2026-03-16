@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Data Sourcing Guide — Project 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #080b08;
+  --bg2:      #0c110c;
+  --surface:  #111811;
+  --surf2:    #161e16;
+  --border:   rgba(74,222,128,0.12);
+  --text:     #d4e8d4;
+  --muted:    #4a6b4a;
+  --dim:      #1e2e1e;
+
+  --green:    #4ade80;
+  --green2:   #22c55e;
+  --amber:    #fbbf24;
+  --red:      #f87171;
+  --blue:     #60a5fa;
+  --cyan:     #22d3ee;
+  --purple:   #a78bfa;
+  --orange:   #fb923c;
+
+  /* category colors */
+  --cat-reg:   #4ade80;
+  --cat-api:   #fbbf24;
+  --cat-model: #a78bfa;
+  --cat-eval:  #22d3ee;
+  --cat-test:  #fb923c;
+  --cat-live:  #f87171;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+/* scanline effect */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none; z-index: 9998;
+}
+
+/* grid bg */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(74,222,128,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,222,128,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none; z-index: 0;
+}
+
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+
+/* ── TERMINAL HEADER ── */
+.term-bar {
+  background: var(--surf2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 28px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  position: sticky; top: 0; z-index: 100;
+}
+
+.tb-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.tb-dots { display: flex; gap: 6px; margin-right: 8px; }
+.tb-dots span:nth-child(1) { background: #f87171; }
+.tb-dots span:nth-child(2) { background: #fbbf24; }
+.tb-dots span:nth-child(3) { background: #4ade80; }
+
+.tb-path { color: var(--green); flex: 1; }
+.tb-status { color: var(--amber); }
+
+/* ── HERO ── */
+.hero {
+  padding: 64px 0 52px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+.hero-prompt {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--green);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cursor {
+  display: inline-block;
+  width: 8px; height: 14px;
+  background: var(--green);
+  animation: blink 1.1s step-end infinite;
+  vertical-align: middle;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.hero h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(44px, 7vw, 96px);
+  font-weight: 800;
+  line-height: .9;
+  letter-spacing: -.01em;
+  color: #fff;
+  margin-bottom: 24px;
+}
+
+.hero h1 em { color: var(--green); font-style: normal; }
+.hero h1 .dim { color: var(--muted); }
+
+.hero-sub {
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 640px;
+  line-height: 1.8;
+  margin-bottom: 36px;
+}
+
+/* stat strip */
+.stat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+.stat-item {
+  padding: 16px 24px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 120px;
+}
+.stat-item:last-child { border-right: none; }
+
+.stat-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── LEGEND ── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 24px 0 0;
+  margin-top: 0;
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.leg-dot {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+}
+
+/* ── SECTION HEADER ── */
+.sec-hdr {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 52px 0 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.sec-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.sec-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .02em;
+}
+
+.sec-count {
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+/* ── DATA CARDS ── */
+.data-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.data-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 4px 1fr;
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: opacity .45s ease, transform .45s ease;
+}
+.data-card.visible { opacity: 1; transform: translateX(0); }
+
+.dc-stripe { }
+
+.dc-inner { padding: 0; }
+
+.dc-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.dc-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.dc-meta { flex: 1; min-width: 0; }
+
+.dc-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 3px;
+}
+
+.dc-type {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.dc-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+  align-items: center;
+}
+
+.badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  padding: 2px 8px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+
+.free-badge  { color: var(--green);  border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.06); }
+.paid-badge  { color: var(--amber);  border-color: rgba(251,191,36,0.3);  background: rgba(251,191,36,0.06); }
+.api-badge   { color: var(--blue);   border-color: rgba(96,165,250,0.3);  background: rgba(96,165,250,0.06); }
+.model-badge { color: var(--purple); border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.06); }
+.dl-badge    { color: var(--cyan);   border-color: rgba(34,211,238,0.3);  background: rgba(34,211,238,0.06); }
+.manual-badge{ color: var(--orange); border-color: rgba(251,146,60,0.3);  background: rgba(251,146,60,0.06); }
+
+.dc-body {
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 640px) { .dc-body { grid-template-columns: 1fr; } }
+
+.dc-col-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.dc-url {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  word-break: break-all;
+  line-height: 1.7;
+  margin-bottom: 4px;
+}
+
+.dc-url a {
+  color: var(--green);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(74,222,128,0.3);
+}
+.dc-url a:hover { border-bottom-color: var(--green); }
+
+.dc-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.dc-desc code {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  background: var(--surf2);
+  padding: 1px 6px;
+  color: var(--green);
+}
+
+.dc-how {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.dc-how strong { color: var(--text); font-weight: 500; }
+
+.dc-files {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dc-file {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  color: var(--amber);
+  background: var(--surf2);
+  padding: 4px 10px;
+  border-left: 2px solid rgba(251,191,36,0.4);
+}
+
+/* ── PHASE TIMELINE ── */
+.phases-section { margin-bottom: 60px; }
+
+.phase-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.phase-row:first-child { border-radius: 8px 8px 0 0; }
+.phase-row:last-child  { border-bottom: 1px solid var(--border); border-radius: 0 0 8px 8px; }
+.phase-row.visible { opacity: 1; transform: translateY(0); }
+
+.pr-left {
+  background: var(--surf2);
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.pr-phase {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pr-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--green);
+}
+
+.pr-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.pr-time {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  color: var(--muted);
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+}
+
+.pr-right {
+  padding: 20px 24px;
+  background: var(--bg2);
+}
+
+.pr-collect-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.pr-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pr-item {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.pr-item-idx {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  padding-top: 2px;
+}
+
+.pr-item-name { font-size: 12.5px; font-weight: 500; color: #fff; }
+.pr-item-why  { font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 2px; }
+
+.pr-item-phase {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  padding: 2px 8px;
+  border: 1px solid;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+/* priority note */
+.prio-note {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-left: 2px solid;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.65;
+  background: rgba(74,222,128,0.03);
+}
+.prio-note strong {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ── CHECKLIST ── */
+.checklist-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 640px) { .checklist-grid { grid-template-columns: 1fr; } }
+
+.cl-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.cl-item:hover { border-color: rgba(74,222,128,0.3); }
+.cl-item.done  { border-color: rgba(74,222,128,0.4); background: rgba(74,222,128,0.04); }
+
+.cl-box {
+  width: 16px; height: 16px;
+  border: 1px solid var(--muted);
+  flex-shrink: 0; margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; transition: all .15s;
+}
+.cl-item.done .cl-box { background: var(--green); border-color: var(--green); color: #000; }
+
+.cl-text { font-size: 12.5px; color: var(--text); line-height: 1.5; }
+.cl-text span { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); display: block; margin-top: 2px; }
+
+/* ── COST TABLE ── */
+.cost-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  font-size: 12.5px;
+}
+.cost-table th {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--surf2);
+}
+.cost-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  vertical-align: top;
+  line-height: 1.6;
+}
+.cost-table tr:last-child td { border-bottom: none; }
+.cost-table td:first-child { color: var(--text); font-weight: 500; }
+.cost-table .free  { color: var(--green); font-weight: 600; }
+.cost-table .paid  { color: var(--amber); font-weight: 600; }
+.cost-table .total { color: #fff; font-weight: 700; font-size: 14px; }
+
+/* ── FOLDER STRUCTURE ── */
+.folder-box {
+  background: var(--surf2);
+  border: 1px solid var(--border);
+  padding: 24px 28px;
+  margin-bottom: 48px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  line-height: 2;
+  color: var(--muted);
+}
+.folder-box .dir  { color: var(--amber); }
+.folder-box .file { color: var(--green); }
+.folder-box .note { color: var(--muted); font-size: 10px; }
+.folder-box .head {
+  font-size: 10px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 0 48px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: .25em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>
+</head>
+<body>
+
+<!-- TERMINAL BAR -->
+<div class="term-bar">
+  <div class="tb-dots">
+    <span></span><span></span><span></span>
+  </div>
+  <span class="tb-path">~/eu-regulatory-intelligence-agent/DATA_GUIDE.md</span>
+  <span class="tb-status">● 6 categories · 24 sources · 3 phases</span>
+</div>
+
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-prompt">$ cat data_requirements.md <span class="cursor"></span></div>
+  <h1>
+    ALL THE DATA<br/>
+    <em>YOU NEED.</em><br/>
+    <span class="dim">WHERE TO GET IT.</span>
+  </h1>
+  <p class="hero-sub">
+    Every dataset, document, API key, model weight, and evaluation file you need — catalogued by category, sourced with exact URLs, and sequenced into 3 collection phases so you never block yourself waiting for data.
+  </p>
+
+  <div class="stat-strip">
+    <div class="stat-item">
+      <span class="stat-num" style="color:var(--green)">18</span>
+      <span class="stat-label">Free Sources</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" style="color:var(--amber)">6</span>
+      <span class="stat-label">Paid / API Keys</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" style="color:var(--purple)">2</span>
+      <span class="stat-label">ML Models to Download</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" style="color:var(--cyan)">40+</span>
+      <span class="stat-label">Eval Q&A Pairs to Create</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" style="color:var(--orange)">~€0</span>
+      <span class="stat-label">Data Cost (Mostly Free)</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--cat-reg)"></div> Regulatory Docs</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--cat-api)"></div> API Keys / Services</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--cat-model)"></div> ML Models</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--cat-eval)"></div> Evaluation Data</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--cat-test)"></div> Test Documents</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--cat-live)"></div> Live / API Data</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     CATEGORY 1 — REGULATORY DOCUMENTS
+════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <span class="sec-label">Category 01</span>
+  <span class="sec-title" style="color:var(--cat-reg)">Regulatory Documents</span>
+  <span class="sec-count">7 sources · all FREE</span>
+</div>
+
+<div class="data-grid">
+
+  <!-- EU AI ACT -->
+  <div class="data-card" id="d1">
+    <div class="dc-stripe" style="background:var(--cat-reg)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🇪🇺</div>
+        <div class="dc-meta">
+          <div class="dc-name">EU AI Act — Full Official Text</div>
+          <div class="dc-type" style="color:var(--cat-reg)">Regulation (EU) 2024/1689</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge dl-badge">PDF Download</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Exact URL</div>
+          <div class="dc-url"><a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202401689" target="_blank">eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202401689</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Save as: data/regulatory/eu_ai_act_2024_en.pdf</div>
+            <div class="dc-file">→ Also get: Swedish version (SV) — same base URL, change EN→SV</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">Why You Need This + How to Use</div>
+          <div class="dc-how">This is your <strong>primary RAG corpus</strong>. Ingest it first. Your demo goal "EU AI Act obligations for manufacturing SME" must retrieve from this document. The PDF is ~458 pages. After chunking it will produce ~600–800 chunks. Also use the Swedish version to test your multilingual pipeline.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GDPR -->
+  <div class="data-card" id="d2">
+    <div class="dc-stripe" style="background:var(--cat-reg)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🔒</div>
+        <div class="dc-meta">
+          <div class="dc-name">GDPR — General Data Protection Regulation</div>
+          <div class="dc-type" style="color:var(--cat-reg)">Regulation (EU) 2016/679</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge dl-badge">PDF Download</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Exact URL</div>
+          <div class="dc-url"><a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679" target="_blank">eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Save as: data/regulatory/gdpr_2016_679_en.pdf</div>
+            <div class="dc-file">→ Swedish version: replace EN→SV in the URL</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">How to Use</div>
+          <div class="dc-how">Ingest this into your RAG pipeline alongside the AI Act. When a user asks "what are our GDPR obligations for storing AI outputs?", your retriever should pull from this. Also use Article 17 (right to erasure) and Article 5 (data minimization) text as reference when building your GDPR compliance module.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EU AI Act Annexes -->
+  <div class="data-card" id="d3">
+    <div class="dc-stripe" style="background:var(--cat-reg)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">📋</div>
+        <div class="dc-meta">
+          <div class="dc-name">EU AI Act — Annex III (High-Risk Use Cases List)</div>
+          <div class="dc-type" style="color:var(--cat-reg)">Key Annex — Risk Classification</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge manual-badge">Extract Manually</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Where to Get It</div>
+          <div class="dc-url"><a href="https://artificialintelligenceact.eu/annex/3/" target="_blank">artificialintelligenceact.eu/annex/3/</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Save as: data/regulatory/annex_iii_high_risk_list.json</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">How to Use</div>
+          <div class="dc-how">Copy the 8 high-risk categories into a JSON file. Your <code>risk_classifier.py</code> module will compare the user's research topic against this list using Claude. This is how you classify UNACCEPTABLE / HIGH_RISK / LIMITED_RISK / MINIMAL_RISK — a 30-line module backed by the actual legal text.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Swedish DIGG -->
+  <div class="data-card" id="d4">
+    <div class="dc-stripe" style="background:var(--cat-reg)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🇸🇪</div>
+        <div class="dc-meta">
+          <div class="dc-name">DIGG — Swedish Agency for Digital Government AI Reports</div>
+          <div class="dc-type" style="color:var(--cat-reg)">Swedish Government Reports · Svenska</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge dl-badge">PDF Download</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Exact URLs</div>
+          <div class="dc-url"><a href="https://www.digg.se/kunskap-och-stod/ai/reglering-av-ai" target="_blank">digg.se/kunskap-och-stod/ai/reglering-av-ai</a></div>
+          <div class="dc-url"><a href="https://www.digg.se/download/18.3a10ceef18e0b8a3eba4ef3/1703756418453/digg-vagledning-anvandning-av-ai-i-offentlig-forvaltning.pdf" target="_blank">DIGG Vägledning AI i offentlig förvaltning (PDF)</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Save as: data/swedish/digg_ai_vagledning_sv.pdf</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">How to Use</div>
+          <div class="dc-how">This is your <strong>Swedish language test corpus</strong>. Upload it in your Streamlit app and verify that your multilingual-e5-large embeddings retrieve relevant Swedish chunks when you query in both Swedish and English. Screenshot this working — it's your most compelling Sweden-specific demo moment.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vinnova -->
+  <div class="data-card" id="d5">
+    <div class="dc-stripe" style="background:var(--cat-reg)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🔬</div>
+        <div class="dc-meta">
+          <div class="dc-name">Vinnova — Swedish Innovation Agency AI Strategy PDFs</div>
+          <div class="dc-type" style="color:var(--cat-reg)">Swedish Industrial AI Reports</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge dl-badge">PDF Download</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">URL</div>
+          <div class="dc-url"><a href="https://www.vinnova.se/en/our-activities/emerging-technologies-and-platforms/ai/" target="_blank">vinnova.se/en/our-activities/emerging-technologies-and-platforms/ai/</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Save as: data/swedish/vinnova_ai_strategy_*.pdf</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">How to Use</div>
+          <div class="dc-how">Download 2–3 PDFs from their AI section. These are real Swedish industrial AI reports — ingesting them makes your demo feel grounded in the actual Swedish AI landscape. Good for showing Swedish employers you know the local ecosystem, not just US AI trends.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- German Federal AI Strategy -->
+  <div class="data-card" id="d6">
+    <div class="dc-stripe" style="background:var(--cat-reg)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🇩🇪</div>
+        <div class="dc-meta">
+          <div class="dc-name">German Federal Government — AI Strategy (Nationale KI-Strategie)</div>
+          <div class="dc-type" style="color:var(--cat-reg)">German Regulatory Document · Deutsch</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge dl-badge">PDF Download</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">URL</div>
+          <div class="dc-url"><a href="https://www.bmbf.de/SharedDocs/Downloads/de/2023/ki-strategie.pdf" target="_blank">bmbf.de — KI-Strategie 2023 (PDF)</a></div>
+          <div class="dc-url"><a href="https://www.bmwk.de/Redaktion/DE/Publikationen/Technologie/strategie-kuenstliche-intelligenz-der-bundesregierung.html" target="_blank">bmwk.de — Bundesregierung KI Strategie</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Save as: data/german/ki_strategie_2023_de.pdf</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">How to Use</div>
+          <div class="dc-how">Your <strong>German language test corpus</strong>. Run the same multilingual retrieval test you did with Swedish. Query "Was sind die KI-Anforderungen für deutsche Industrieunternehmen?" and show it returns relevant German chunks. This dual-language demo (Swedish + German) is your strongest European differentiator.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EU AI Office -->
+  <div class="data-card" id="d7">
+    <div class="dc-stripe" style="background:var(--cat-reg)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🏛️</div>
+        <div class="dc-meta">
+          <div class="dc-name">EU AI Office — Implementation Guidance & Guidelines</div>
+          <div class="dc-type" style="color:var(--cat-reg)">Official EU AI Office Guidance</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge dl-badge">Web + PDF</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">URL</div>
+          <div class="dc-url"><a href="https://digital-strategy.ec.europa.eu/en/policies/ai-office" target="_blank">digital-strategy.ec.europa.eu/en/policies/ai-office</a></div>
+          <div class="dc-url"><a href="https://artificialintelligenceact.eu/" target="_blank">artificialintelligenceact.eu — interactive guide</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Use WebBaseLoader in LangChain to ingest these pages</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">How to Use</div>
+          <div class="dc-how">Use <code>WebBaseLoader</code> to ingest key pages directly. The <code>artificialintelligenceact.eu</code> site has an excellent article-by-article breakdown — scrape it into your RAG corpus. This gives your agent access to plain-English explanations alongside the dense legal text.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /data-grid -->
+
+<!-- ═══════════════════════════════════════
+     CATEGORY 2 — API KEYS & SERVICES
+════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <span class="sec-label">Category 02</span>
+  <span class="sec-title" style="color:var(--cat-api)">API Keys & External Services</span>
+  <span class="sec-count">6 services · mix of free + paid</span>
+</div>
+
+<div class="data-grid">
+
+  <div class="data-card" id="d8">
+    <div class="dc-stripe" style="background:var(--cat-api)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🤖</div>
+        <div class="dc-meta">
+          <div class="dc-name">Anthropic API — Claude Opus + Sonnet</div>
+          <div class="dc-type" style="color:var(--cat-api)">LLM Provider — Core Agent Brain</div>
+          <div class="dc-badges">
+            <span class="badge paid-badge">Paid — ~$5–15 total for dev</span>
+            <span class="badge api-badge">API Key</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Where to Get</div>
+          <div class="dc-url"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com → API Keys</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ .env: ANTHROPIC_API_KEY=sk-ant-...</div>
+            <div class="dc-file">→ Use claude-opus-4-5 for Planner</div>
+            <div class="dc-file">→ Use claude-sonnet-4-5 for Analyst/Synth</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">Cost Control Tip</div>
+          <div class="dc-how"><strong>Set a $20 hard limit</strong> in the console. During development use <code>claude-haiku-4-5</code> (cheapest) for all testing. Only switch to Sonnet/Opus when testing final output quality. Your entire dev phase should cost under $15 total.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card" id="d9">
+    <div class="dc-stripe" style="background:var(--cat-api)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">⚡</div>
+        <div class="dc-meta">
+          <div class="dc-name">Supabase — Database + Auth + Vector Store + Storage</div>
+          <div class="dc-type" style="color:var(--cat-api)">Backend Platform</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free Tier — sufficient for this project</span>
+            <span class="badge api-badge">API Key + URL</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Setup Steps</div>
+          <div class="dc-url"><a href="https://supabase.com" target="_blank">supabase.com → New Project</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Region: eu-central-1 (Frankfurt) ← CRITICAL for GDPR</div>
+            <div class="dc-file">→ .env: SUPABASE_URL=https://xxx.supabase.co</div>
+            <div class="dc-file">→ .env: SUPABASE_KEY=eyJ... (anon key)</div>
+            <div class="dc-file">→ .env: SUPABASE_SERVICE_KEY=eyJ... (service key)</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">Critical Setting</div>
+          <div class="dc-how"><strong>Must select Frankfurt (eu-central-1) region</strong> when creating the project — this cannot be changed after creation. This is your GDPR data residency requirement. The free tier gives you 500MB database + 1GB storage — more than enough for all your regulatory documents and chunks.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card" id="d10">
+    <div class="dc-stripe" style="background:var(--cat-api)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🔍</div>
+        <div class="dc-meta">
+          <div class="dc-name">Brave Search API — Web Search for Research Agent</div>
+          <div class="dc-type" style="color:var(--cat-api)">Search Tool for Researcher Agent</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free — 2,000 queries/month</span>
+            <span class="badge api-badge">API Key</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Where to Get</div>
+          <div class="dc-url"><a href="https://api.search.brave.com/register" target="_blank">api.search.brave.com/register</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ .env: BRAVE_API_KEY=BSA...</div>
+            <div class="dc-file">→ Free tier: 2,000 queries/month</div>
+            <div class="dc-file">→ Used by: Researcher Agent + Brave MCP Server</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">Why Brave (Not Google)</div>
+          <div class="dc-how">Brave has an official MCP server you can wire up directly. Free tier is generous for development. Privacy-focused — aligns with your GDPR narrative. 2,000 queries/month is plenty. If you hit the limit, the official Brave MCP server also supports SerpAPI as a fallback.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card" id="d11">
+    <div class="dc-stripe" style="background:var(--cat-api)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">📊</div>
+        <div class="dc-meta">
+          <div class="dc-name">LangSmith — LLM Tracing & Evaluation Platform</div>
+          <div class="dc-type" style="color:var(--cat-api)">Observability + Eval</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free — Developer tier</span>
+            <span class="badge api-badge">API Key</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Where to Get</div>
+          <div class="dc-url"><a href="https://smith.langchain.com" target="_blank">smith.langchain.com → Settings → API Keys</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ .env: LANGCHAIN_API_KEY=ls__...</div>
+            <div class="dc-file">→ .env: LANGCHAIN_TRACING_V2=true</div>
+            <div class="dc-file">→ .env: LANGCHAIN_PROJECT=eu-reg-agent</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">What You'll See</div>
+          <div class="dc-how">Every LangChain and LangGraph run automatically appears in LangSmith with full token counts, latency, and cost. Set it up on Day 1. Your demo video <strong>must</strong> show the LangSmith trace — it's proof your system is production-instrumented. Free tier keeps 10,000 traces.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card" id="d12">
+    <div class="dc-stripe" style="background:var(--cat-api)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🚂</div>
+        <div class="dc-meta">
+          <div class="dc-name">Railway — FastAPI Deployment</div>
+          <div class="dc-type" style="color:var(--cat-api)">Cloud Hosting — Backend</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free — $5 credit on signup</span>
+            <span class="badge api-badge">Account Required</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Where to Get</div>
+          <div class="dc-url"><a href="https://railway.app" target="_blank">railway.app → New Project → Deploy from GitHub</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Only needed in Phase 3 (deployment)</div>
+            <div class="dc-file">→ $5 free credit lasts weeks at dev scale</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">Setup Note</div>
+          <div class="dc-how">Create account now but don't deploy until Phase 3. Railway auto-detects your Dockerfile and deploys in ~3 minutes. Set your environment variables in Railway's dashboard, not in code. Your Supabase and LangSmith are already cloud-hosted — Railway just runs your FastAPI server.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card" id="d13">
+    <div class="dc-stripe" style="background:var(--cat-api)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🎈</div>
+        <div class="dc-meta">
+          <div class="dc-name">OpenAI API — GPT-4o for Critic Agent</div>
+          <div class="dc-type" style="color:var(--cat-api)">LLM Provider — Judge / Critic</div>
+          <div class="dc-badges">
+            <span class="badge paid-badge">Paid — ~$3–8 total for dev</span>
+            <span class="badge api-badge">API Key</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Where to Get</div>
+          <div class="dc-url"><a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ .env: OPENAI_API_KEY=sk-proj-...</div>
+            <div class="dc-file">→ Used only for Critic Agent (LLM-as-Judge)</div>
+            <div class="dc-file">→ Also needed for RAGAS evaluation</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">Cost Control</div>
+          <div class="dc-how"><strong>Optional</strong> — you can use Claude as the Critic too. But having GPT-4o as a second judge is architecturally stronger because it introduces an independent perspective. Set a $10 limit. GPT-4o-mini is fine for Critic at ~10x cheaper. Only use full GPT-4o for final eval runs.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     CATEGORY 3 — ML MODELS
+════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <span class="sec-label">Category 03</span>
+  <span class="sec-title" style="color:var(--cat-model)">ML Models to Download</span>
+  <span class="sec-count">2 models · both FREE · local</span>
+</div>
+
+<div class="data-grid">
+
+  <div class="data-card" id="d14">
+    <div class="dc-stripe" style="background:var(--cat-model)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🧠</div>
+        <div class="dc-meta">
+          <div class="dc-name">multilingual-e5-large — Your Core Embedding Model</div>
+          <div class="dc-type" style="color:var(--cat-model)">Sentence Transformer · 560MB · 100+ Languages</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge model-badge">HuggingFace</span>
+            <span class="badge dl-badge">Auto-downloads on first run</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">HuggingFace Model Page</div>
+          <div class="dc-url"><a href="https://huggingface.co/intfloat/multilingual-e5-large" target="_blank">huggingface.co/intfloat/multilingual-e5-large</div>
+          <div class="dc-files">
+            <div class="dc-file">→ pip install sentence-transformers</div>
+            <div class="dc-file">→ Auto-cached to: ~/.cache/huggingface/</div>
+            <div class="dc-file">→ First load: ~30 seconds. After: instant.</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">Integration Code</div>
+          <div class="dc-how">
+            <code>from langchain_community.embeddings import HuggingFaceEmbeddings</code><br/><br/>
+            <code>embeddings = HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large")</code><br/><br/>
+            Drop-in replacement for OpenAIEmbeddings. Runs locally — no API cost, no data leaves your machine. Output: 1024-dim vectors. Update your Supabase <code>vector(1024)</code> column type accordingly.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card" id="d15">
+    <div class="dc-stripe" style="background:var(--cat-model)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🔍</div>
+        <div class="dc-meta">
+          <div class="dc-name">multilingual-e5-large-instruct — Query-Optimised Variant</div>
+          <div class="dc-type" style="color:var(--cat-model)">Instruction-Tuned Variant · Better for Queries</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge model-badge">HuggingFace</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">HuggingFace Model Page</div>
+          <div class="dc-url"><a href="https://huggingface.co/intfloat/multilingual-e5-large-instruct" target="_blank">huggingface.co/intfloat/multilingual-e5-large-instruct</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Use this for QUERY embeddings</div>
+            <div class="dc-file">→ Use base model for DOCUMENT embeddings</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">When to Use</div>
+          <div class="dc-how">Use the <strong>instruct</strong> variant when embedding the user's query. Use the <strong>base</strong> variant for document chunks. This asymmetric setup is the correct way to use E5 models and gives better retrieval quality. Prefix queries with: <code>"query: what are the EU AI Act obligations..."</code>. Mention this in your README — it shows model-level thinking.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     CATEGORY 4 — EVALUATION DATA
+════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <span class="sec-label">Category 04</span>
+  <span class="sec-title" style="color:var(--cat-eval)">Evaluation Data — You Create This</span>
+  <span class="sec-count">40+ Q&A pairs · manual + synthetic</span>
+</div>
+
+<div class="data-grid">
+
+  <div class="data-card" id="d16">
+    <div class="dc-stripe" style="background:var(--cat-eval)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">📝</div>
+        <div class="dc-meta">
+          <div class="dc-name">Manual Q&A Pairs — Your RAGAS Evaluation Dataset</div>
+          <div class="dc-type" style="color:var(--cat-eval)">You Create This · 20 pairs minimum</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free — Your time only</span>
+            <span class="badge manual-badge">Manual Creation</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">Exact Questions to Write</div>
+          <div class="dc-how" style="font-size:11px">
+            Write exactly these 20 Q&A pairs in <code>evals/qa_pairs.json</code>:<br/><br/>
+            <strong>EU AI Act (English) — 8 questions:</strong><br/>
+            "What are the prohibited AI practices under Article 5?"<br/>
+            "Which sectors are listed in Annex III as high-risk?"<br/>
+            "What does Article 13 require for transparency?"<br/>
+            "What fines can be imposed under the AI Act?"<br/>
+            "What is a conformity assessment under Article 43?"<br/>
+            "How does the AI Act define a general purpose AI model?"<br/>
+            "What obligations apply to AI system providers?"<br/>
+            "When did the EU AI Act enter into force?"<br/><br/>
+            <strong>GDPR (English) — 6 questions:</strong><br/>
+            "What is the right to erasure under Article 17?"<br/>
+            "What constitutes lawful processing under Article 6?"<br/>
+            "What are the data minimization principles?"<br/>
+            "What must a privacy notice include?"<br/>
+            "What is a Data Protection Impact Assessment?"<br/>
+            "What are the breach notification requirements?"<br/><br/>
+            <strong>Swedish language — 3 questions:</strong><br/>
+            "Vad säger AI-förordningen om riskklassificering?"<br/>
+            "Vilka krav ställer GDPR på dataminimering?"<br/>
+            "Vad är DIGG:s roll i AI-reglering?"<br/><br/>
+            <strong>German language — 3 questions:</strong><br/>
+            "Was sind die Anforderungen der KI-Verordnung für Hochrisiko-KI?"<br/>
+            "Welche Strafen sieht der AI Act vor?"<br/>
+            "Was versteht man unter Transparenzpflichten?"
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">How to Use in RAGAS</div>
+          <div class="dc-how">For each Q&A pair, write the <strong>ground truth answer</strong> yourself by reading the source document. Store as <code>{"question": "...", "answer": "...", "contexts": ["..."], "ground_truth": "..."}</code>. RAGAS scores your system's answers against these. Target: faithfulness &gt; 0.75, answer relevancy &gt; 0.70. These numbers go directly in your README and CV.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card" id="d17">
+    <div class="dc-stripe" style="background:var(--cat-eval)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">⚗️</div>
+        <div class="dc-meta">
+          <div class="dc-name">RAGAS Synthetic Testset Generator — Auto-Generate More Q&A Pairs</div>
+          <div class="dc-type" style="color:var(--cat-eval)">Automated Eval Dataset Generation</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free (uses your OpenAI/Claude API)</span>
+            <span class="badge model-badge">RAGAS Library</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">How to Generate</div>
+          <div class="dc-how" style="font-size:11px">
+            After ingesting your EU AI Act PDF, run:<br/><br/>
+            <code>from ragas.testset import TestsetGenerator</code><br/>
+            <code>from ragas.testset.evolutions import simple, reasoning, multi_context</code><br/><br/>
+            <code>generator = TestsetGenerator.with_openai()</code><br/>
+            <code>testset = generator.generate_with_langchain_docs(docs, test_size=20, distributions={simple: 0.5, reasoning: 0.3, multi_context: 0.2})</code><br/><br/>
+            This auto-generates 20 more Q&A pairs from your EU AI Act document.
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">What You Get</div>
+          <div class="dc-how">Combines with your 20 manual pairs for a <strong>40+ pair evaluation dataset</strong>. The synthetic generator creates multi-hop questions that test whether your retriever can find information that spans multiple chunks — much harder than single-chunk retrieval. Document the generation process in your README. Save the testset as <code>evals/testset_generated.json</code>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     CATEGORY 5 — TEST DOCUMENTS
+════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <span class="sec-label">Category 05</span>
+  <span class="sec-title" style="color:var(--cat-test)">Test Documents — Upload & Verify</span>
+  <span class="sec-count">5 documents · all FREE</span>
+</div>
+
+<div class="data-grid">
+
+  <div class="data-card" id="d18">
+    <div class="dc-stripe" style="background:var(--cat-test)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🏭</div>
+        <div class="dc-meta">
+          <div class="dc-name">Industrifakta / Teknikföretagen — Swedish Manufacturing AI Reports</div>
+          <div class="dc-type" style="color:var(--cat-test)">Swedish Industry · Demo Use Case Context</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free</span>
+            <span class="badge dl-badge">PDF Download</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">URLs</div>
+          <div class="dc-url"><a href="https://www.teknikforetagen.se/globalassets/rapporter/ai-i-industrin.pdf" target="_blank">teknikforetagen.se — AI i Industrin (PDF)</a></div>
+          <div class="dc-url"><a href="https://www.rise.se/en/areas-of-operations/ai/" target="_blank">ri.se — RISE Research Institutes AI Reports</a></div>
+          <div class="dc-files">
+            <div class="dc-file">→ Save as: data/test_docs/swedish_manufacturing_ai.pdf</div>
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">Why This Document</div>
+          <div class="dc-how">Your demo scenario is a <em>Swedish manufacturing SME</em> asking about AI Act obligations. Upload this doc alongside the AI Act. When your agent runs, it should pull from both — cross-referencing the regulation with real industrial AI use cases. This grounds your demo in a real Swedish business context.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card" id="d19">
+    <div class="dc-stripe" style="background:var(--cat-test)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">📄</div>
+        <div class="dc-meta">
+          <div class="dc-name">Your Own University Thesis / Course Papers</div>
+          <div class="dc-type" style="color:var(--cat-test)">Personal Test Documents — University West</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">You Already Have These</span>
+            <span class="badge manual-badge">Use Your Own Work</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">What to Use</div>
+          <div class="dc-how">Use a course paper or research essay you've written as a test document. Upload it and ask questions about your own work. This tests the pipeline on real, mixed-content academic text — and in your demo video it shows a personal, authentic use case. Makes the demo feel real rather than staged.</div>
+        </div>
+        <div>
+          <div class="dc-col-label">Why This Matters</div>
+          <div class="dc-how">Interviewers see the same Notion vs Obsidian demos repeatedly. Showing your own University West paper being processed by your own AI agent has a memorable authenticity. Also useful for testing Swedish academic language in your multilingual pipeline.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     CATEGORY 6 — LIVE / REAL-TIME DATA
+════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <span class="sec-label">Category 06</span>
+  <span class="sec-title" style="color:var(--cat-live)">Live Data — No Download Needed</span>
+  <span class="sec-count">Real-time · via APIs</span>
+</div>
+
+<div class="data-grid">
+
+  <div class="data-card" id="d20">
+    <div class="dc-stripe" style="background:var(--cat-live)"></div>
+    <div class="dc-inner">
+      <div class="dc-head">
+        <div class="dc-icon">🌐</div>
+        <div class="dc-meta">
+          <div class="dc-name">Brave Search API — Live Web Research During Agent Runs</div>
+          <div class="dc-type" style="color:var(--cat-live)">Live Data · No Pre-Download</div>
+          <div class="dc-badges">
+            <span class="badge free-badge">Free — 2,000/month</span>
+            <span class="badge api-badge">Brave API Key</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="dc-col-label">What the Agent Will Search Live</div>
+          <div class="dc-how">
+            During a research run, your Researcher agent will search for:<br/><br/>
+            • "EU AI Act manufacturing compliance 2024 2025"<br/>
+            • "GDPR AI systems obligations Sweden"<br/>
+            • "EU AI Act Annex III high-risk systems examples"<br/>
+            • "EU AI Act fines enforcement cases"<br/><br/>
+            These live results are scraped, chunked, and fed into your RAG pipeline alongside your pre-ingested documents — giving you both stable reference knowledge and current news.
+          </div>
+        </div>
+        <div>
+          <div class="dc-col-label">Your Custom Scraper MCP Handles This</div>
+          <div class="dc-how">Your Web Scraper MCP server (Phase 4) will fetch and clean these search results. The pipeline is: Brave Search → top 5 URLs → your scraper MCP → cleaned markdown → chunk → retrieve. This means your agent is always working with current information, not just your pre-ingested PDFs. Critical for regulatory topics that change.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     3 COLLECTION PHASES
+════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <span class="sec-label">Master Plan</span>
+  <span class="sec-title">3 Collection Phases — Do It In This Order</span>
+  <span class="sec-count">Never block yourself on missing data</span>
+</div>
+
+<div class="phases-section">
+
+  <!-- PHASE 0 -->
+  <div class="phase-row" id="pr0">
+    <div class="pr-left">
+      <div class="pr-phase">Phase</div>
+      <div class="pr-num">0</div>
+      <div class="pr-name">Before Writing Any Code</div>
+      <div class="pr-time">Day 1 — 2 hours</div>
+    </div>
+    <div class="pr-right">
+      <div class="pr-collect-label">✦ Collect Everything That Doesn't Require Code</div>
+      <div class="pr-items">
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Create all 5 accounts: Supabase (Frankfurt region!), LangSmith, Brave Search, Railway, Anthropic Console</div>
+            <div class="pr-item-why">Don't discover mid-build that you need to wait for an API key approval. Get all credentials on Day 1. Store them all in your .env file immediately.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--amber);border-color:rgba(251,191,36,0.3)">30 min</span>
+        </div>
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Download EU AI Act PDF (English + Swedish) and GDPR PDF</div>
+            <div class="pr-item-why">These are your primary RAG corpus. Have them in /data/regulatory/ before you write a single line of ingestion code so you can test immediately.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--green);border-color:rgba(74,222,128,0.3)">10 min</span>
+        </div>
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Download DIGG Swedish AI PDF and German KI-Strategie PDF</div>
+            <div class="pr-item-why">Your multilingual test corpus. You need these ready before Phase 2 when you build the multilingual pipeline.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--green);border-color:rgba(74,222,128,0.3)">10 min</span>
+        </div>
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Copy EU AI Act Annex III into annex_iii_high_risk_list.json manually</div>
+            <div class="pr-item-why">This is the schema your risk_classifier.py will use. It's 8 categories, takes 20 minutes to copy, and is the backbone of your EU AI Act compliance module.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--orange);border-color:rgba(251,146,60,0.3)">20 min</span>
+        </div>
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Run: <code>pip install sentence-transformers langdetect</code> and verify multilingual-e5-large downloads correctly</div>
+            <div class="pr-item-why">The model is 560MB. Download it once now on a good connection. It auto-caches — subsequent loads are instant. Verify it works with a quick test embedding before building around it.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--purple);border-color:rgba(167,139,250,0.3)">20 min</span>
+        </div>
+
+      </div>
+      <div class="prio-note" style="border-color:var(--green)">
+        <strong>✓ Phase 0 Complete When:</strong>
+        You have 5 active accounts, 4 PDFs in /data/, your .env has 8+ keys, and <code>HuggingFaceEmbeddings("intfloat/multilingual-e5-large").embed_query("test")</code> returns a 1024-dim vector without errors.
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase-row" id="pr1">
+    <div class="pr-left">
+      <div class="pr-phase">Phase</div>
+      <div class="pr-num">1</div>
+      <div class="pr-name">During Build — Weeks 1–3</div>
+      <div class="pr-time">As you code each module</div>
+    </div>
+    <div class="pr-right">
+      <div class="pr-collect-label">✦ Create Data As You Build Each Component</div>
+      <div class="pr-items">
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Write your 20 manual Q&A pairs (when you finish Phase 2 RAG pipeline)</div>
+            <div class="pr-item-why">Do this immediately after your first successful document retrieval. Read the EU AI Act, write 8 questions with ground-truth answers from the text. Takes 1–2 hours. These are your RAGAS baseline dataset.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--cyan);border-color:rgba(34,211,238,0.3)">After Phase 2</span>
+        </div>
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Run RAGAS synthetic testset generation (20 more Q&A pairs auto-generated)</div>
+            <div class="pr-item-why">Run this once your EU AI Act document is fully ingested into pgvector. The generator needs the LangChain document objects. Save the output — this is your test dataset for the remainder of the project.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--cyan);border-color:rgba(34,211,238,0.3)">After Phase 2</span>
+        </div>
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Ingest Swedish DIGG PDF and test multilingual retrieval (when you build the multilingual module)</div>
+            <div class="pr-item-why">Upload via your Streamlit Document Upload page. Query in Swedish. Verify chunks come back. Screenshot it. This is the exact screenshot to post on LinkedIn when you announce the project.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--cyan);border-color:rgba(34,211,238,0.3)">Upgrade 4</span>
+        </div>
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Run your demo scenario end-to-end and save the output report as sample_report.md in your repo</div>
+            <div class="pr-item-why">Goal: "EU AI Act obligations for a Swedish manufacturing SME deploying quality control AI". Run this once all agents are working. Save the output. This is your README example and demo video content.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--cyan);border-color:rgba(34,211,238,0.3)">After Phase 3</span>
+        </div>
+
+      </div>
+      <div class="prio-note" style="border-color:var(--amber)">
+        <strong>✓ Phase 1 Data Complete When:</strong>
+        You have 40+ Q&A pairs in evals/, a working multilingual retrieval demo (Swedish + German), and one saved sample report from your full agent pipeline.
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-row" id="pr2">
+    <div class="pr-left">
+      <div class="pr-phase">Phase</div>
+      <div class="pr-num">2</div>
+      <div class="pr-name">Before Deployment — Week 5</div>
+      <div class="pr-time">2–3 hours, one sitting</div>
+    </div>
+    <div class="pr-right">
+      <div class="pr-collect-label">✦ Final Data Preparation Before Going Public</div>
+      <div class="pr-items">
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Run full RAGAS evaluation on all 40+ pairs — record your final benchmark numbers</div>
+            <div class="pr-item-why">These numbers go on your CV, your README, and in every interview. You need: faithfulness score, answer_relevancy score, context_precision. Run it twice — once with fixed-size chunking, once with SemanticChunker. Show the improvement.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--green);border-color:rgba(74,222,128,0.3)">Week 5</span>
+        </div>
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Download 2–3 more documents for the live demo corpus (RISE AI reports, Vinnova docs)</div>
+            <div class="pr-item-why">Pre-populate your deployed Supabase with these documents so new users hitting your live URL see content immediately, not an empty app. A pre-populated demo is 10x more impressive than an empty one.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--green);border-color:rgba(74,222,128,0.3)">Week 5</span>
+        </div>
+
+        <div class="pr-item">
+          <span class="pr-item-idx">→</span>
+          <div>
+            <div class="pr-item-name">Record your 3-minute demo video — all data and results must be final before recording</div>
+            <div class="pr-item-why">You need real RAGAS scores on screen, real agent traces in LangSmith, real Swedish document retrieval. Record only after all data is confirmed working. Pin the video to your repo. Upload to YouTube (unlisted) for the README embed.</div>
+          </div>
+          <span class="pr-item-phase" style="color:var(--green);border-color:rgba(74,222,128,0.3)">Week 6</span>
+        </div>
+
+      </div>
+      <div class="prio-note" style="border-color:var(--cyan)">
+        <strong>✓ All Data Complete When:</strong>
+        Your README has real RAGAS numbers (not placeholders), your live demo has pre-populated documents, and your demo video shows Swedish text being retrieved from a German PDF. That combination is your full Europe-ready portfolio piece.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /phases -->
+
+<!-- FOLDER STRUCTURE -->
+<div class="sec-hdr">
+  <span class="sec-label">Reference</span>
+  <span class="sec-title">Exact Folder Structure for All Data</span>
+  <span class="sec-count">Create this on Day 1</span>
+</div>
+
+<div class="folder-box">
+  <div class="head">$ tree eu-regulatory-intelligence-agent/data/</div>
+<span class="dir">data/</span>
+├── <span class="dir">regulatory/</span>
+│   ├── <span class="file">eu_ai_act_2024_en.pdf</span>          <span class="note">← 458 pages · primary corpus</span>
+│   ├── <span class="file">eu_ai_act_2024_sv.pdf</span>          <span class="note">← Swedish version · multilingual test</span>
+│   ├── <span class="file">gdpr_2016_679_en.pdf</span>           <span class="note">← GDPR full text</span>
+│   └── <span class="file">annex_iii_high_risk_list.json</span>  <span class="note">← 8 categories · risk classifier input</span>
+│
+├── <span class="dir">swedish/</span>
+│   ├── <span class="file">digg_ai_vagledning_sv.pdf</span>      <span class="note">← DIGG report · Swedish govt</span>
+│   └── <span class="file">vinnova_ai_strategy_2023.pdf</span>   <span class="note">← Swedish innovation agency</span>
+│
+├── <span class="dir">german/</span>
+│   └── <span class="file">ki_strategie_2023_de.pdf</span>       <span class="note">← Federal German AI strategy</span>
+│
+├── <span class="dir">test_docs/</span>
+│   ├── <span class="file">swedish_manufacturing_ai.pdf</span>   <span class="note">← Teknikföretagen report</span>
+│   └── <span class="file">your_university_paper.pdf</span>     <span class="note">← your own work for authentic demo</span>
+│
+└── <span class="dir">evals/</span>
+    ├── <span class="file">qa_pairs_manual.json</span>           <span class="note">← 20 manual Q&A pairs you write</span>
+    ├── <span class="file">qa_pairs_synthetic.json</span>        <span class="note">← 20+ RAGAS-generated pairs</span>
+    └── <span class="file">baseline_results.json</span>          <span class="note">← your RAGAS scores to quote from memory</span>
+</div>
+
+<!-- COST SUMMARY -->
+<div class="sec-hdr">
+  <span class="sec-label">Budget</span>
+  <span class="sec-title">Total Data & Infrastructure Cost</span>
+  <span class="sec-count">Mostly free</span>
+</div>
+
+<table class="cost-table">
+  <thead>
+    <tr><th>Item</th><th>Cost</th><th>Free Tier Limit</th><th>Note</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>All regulatory documents (EU AI Act, GDPR, DIGG, German)</td>
+      <td class="free">€0</td>
+      <td>Unlimited — public domain</td>
+      <td>Official government PDFs, freely downloadable forever</td>
+    </tr>
+    <tr>
+      <td>multilingual-e5-large model</td>
+      <td class="free">€0</td>
+      <td>Free forever</td>
+      <td>Open weights on HuggingFace, runs on your laptop CPU</td>
+    </tr>
+    <tr>
+      <td>Supabase (DB + Storage + Auth + pgvector)</td>
+      <td class="free">€0</td>
+      <td>500MB DB, 1GB Storage, 50MB file uploads</td>
+      <td>Free tier is sufficient for entire dev phase</td>
+    </tr>
+    <tr>
+      <td>Brave Search API</td>
+      <td class="free">€0</td>
+      <td>2,000 queries/month</td>
+      <td>Enough for all dev and demo runs</td>
+    </tr>
+    <tr>
+      <td>LangSmith</td>
+      <td class="free">€0</td>
+      <td>10,000 traces/month</td>
+      <td>More than enough for all development</td>
+    </tr>
+    <tr>
+      <td>Streamlit Community Cloud</td>
+      <td class="free">€0</td>
+      <td>1 public app</td>
+      <td>Free forever for public repos</td>
+    </tr>
+    <tr>
+      <td>Railway (FastAPI hosting)</td>
+      <td class="free">~€0</td>
+      <td>$5 credit on signup</td>
+      <td>$5 lasts weeks at dev traffic levels</td>
+    </tr>
+    <tr>
+      <td>Anthropic API (Claude)</td>
+      <td class="paid">~€10–15</td>
+      <td>No free tier — pay per token</td>
+      <td>Use Haiku for dev, Sonnet for final testing only</td>
+    </tr>
+    <tr>
+      <td>OpenAI API (GPT-4o Critic)</td>
+      <td class="paid">~€3–8</td>
+      <td>No free tier</td>
+      <td>Optional — can use Claude as Critic instead</td>
+    </tr>
+    <tr>
+      <td>RAGAS evaluation dataset creation</td>
+      <td class="free">€0 + 2 hours</td>
+      <td>—</td>
+      <td>Manual work — your time only, no cost</td>
+    </tr>
+    <tr>
+      <td style="font-weight:700">TOTAL</td>
+      <td class="total">~€13–23</td>
+      <td colspan="2" style="color:var(--muted)">Full project, deployed, evaluated, with live demo URL</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- MASTER CHECKLIST -->
+<div class="sec-hdr">
+  <span class="sec-label">Checklist</span>
+  <span class="sec-title">Data Collection Checklist</span>
+  <span class="sec-count">Tick as you go</span>
+</div>
+
+<div class="checklist-grid">
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">Supabase project created — Frankfurt region selected<span>Day 1 · Cannot be changed later</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">EU AI Act PDF downloaded — English version<span>eur-lex.europa.eu</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">EU AI Act PDF downloaded — Swedish version (SV)<span>Same EUR-Lex URL, change EN→SV</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">GDPR PDF downloaded — English version<span>eur-lex.europa.eu</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">Annex III JSON created manually — 8 risk categories<span>artificialintelligenceact.eu/annex/3/</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">DIGG Swedish AI PDF downloaded<span>digg.se</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">German KI-Strategie PDF downloaded<span>bmbf.de</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">multilingual-e5-large model verified working locally<span>HuggingFace auto-download · 560MB</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">All 5 API accounts created + keys in .env<span>Anthropic, Supabase, Brave, LangSmith, Railway</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">20 manual Q&A pairs written in evals/qa_pairs_manual.json<span>After Phase 2 RAG pipeline works</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">RAGAS synthetic testset generated — 20+ additional pairs<span>After EU AI Act fully ingested</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">Swedish multilingual retrieval tested + screenshot taken<span>Proof of bilingual capability</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">Full demo scenario run end-to-end + report saved<span>Manufacturing SME + EU AI Act demo</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">Final RAGAS benchmark numbers recorded — ready to quote from memory<span>Target: faithfulness &gt; 0.75</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">Live Supabase pre-populated with demo documents before recording<span>Empty app = bad first impression</span></div>
+  </div>
+  <div class="cl-item" onclick="this.classList.toggle('done');this.querySelector('.cl-box').textContent=this.classList.contains('done')?'✓':''">
+    <div class="cl-box"></div>
+    <div class="cl-text">Demo video recorded with all real data on screen<span>LangSmith trace + RAGAS scores + Swedish retrieval</span></div>
+  </div>
+</div>
+
+<footer>
+  <span>DATA GUIDE · EU REGULATORY INTELLIGENCE AGENT · 2026</span>
+  <span>University West · Trollhättan 🇸🇪</span>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+const io = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 60);
+    }
+  });
+}, { threshold: 0.04 });
+
+document.querySelectorAll('.data-card, .phase-row').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

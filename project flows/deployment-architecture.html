@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Deployment Architecture — Research Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #07090f;
+  --bg2:     #0b0e17;
+  --surface: #10151f;
+  --surf2:   #151c28;
+  --border:  rgba(255,255,255,0.07);
+  --text:    #dde4f0;
+  --muted:   #50607a;
+  --dim:     #242d3d;
+
+  --aws:     #f90;
+  --gh:      #e6edf3;
+  --st:      #ff4b4b;
+  --supa:    #3ecf8e;
+  --green:   #22c55e;
+  --blue:    #4d8fe0;
+  --purple:  #8b5cf6;
+  --teal:    #2dd4bf;
+  --red:     #f87171;
+  --gold:    #f59e0b;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  font-weight:300;
+  line-height:1.6;
+}
+
+body::before{
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(255,153,0,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,153,0,0.018) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none; z-index:0;
+}
+
+.wrap{ max-width:1040px; margin:0 auto; padding:0 28px 60px; position:relative; z-index:1; }
+
+/* HERO */
+.hero{ padding:52px 0 40px; border-bottom:1px solid var(--border); margin-bottom:48px; }
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:.4em; text-transform:uppercase;
+  color:var(--aws); margin-bottom:12px;
+}
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(26px,4vw,46px);
+  font-weight:800; letter-spacing:-.02em; line-height:1.05;
+  color:#fff; margin-bottom:14px;
+}
+.hero h1 span{ color:var(--aws); }
+.hero-sub{ font-size:14px; color:var(--muted); max-width:640px; line-height:1.75; }
+
+/* SEC HEADER */
+.sec-hdr{ display:flex; align-items:baseline; gap:14px; margin:52px 0 22px; }
+.sec-num{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:.2em; flex-shrink:0; }
+.sec-title{ font-family:'Syne',sans-serif; font-size:clamp(17px,2.2vw,22px); font-weight:700; color:#fff; border-bottom:2px solid var(--aws); padding-bottom:3px; }
+
+/* TIER CARDS */
+.tiers{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:36px; }
+@media(max-width:700px){ .tiers{ grid-template-columns:1fr; } }
+
+.tier{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:20px; position:relative;
+  overflow:hidden; transition:border-color .2s;
+}
+.tier:hover{ border-color:rgba(255,153,0,.3); }
+.tier::before{ content:''; position:absolute; top:0;left:0;right:0; height:3px; }
+.tier.t1::before{ background:var(--green); }
+.tier.t2::before{ background:var(--aws); }
+.tier.t3::before{ background:var(--purple); }
+
+.tier-label{ font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.tier-name{ font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:#fff; margin-bottom:4px; }
+.tier-sub{ font-size:12px; color:var(--muted); margin-bottom:14px; line-height:1.5; }
+.tier-items{ display:flex; flex-direction:column; gap:5px; }
+.tier-item{ font-size:12px; color:#94a3b8; display:flex; gap:7px; align-items:flex-start; }
+.tier-item::before{ content:'→'; color:var(--muted); flex-shrink:0; }
+.tier-verdict{
+  margin-top:14px; padding:8px 12px;
+  border-radius:5px; font-size:11px; line-height:1.55;
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* ARCH DIAGRAM */
+.arch-box{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:28px 24px; margin-bottom:14px;
+  overflow-x:auto;
+}
+
+.arch-layers{ display:flex; flex-direction:column; gap:12px; min-width:700px; }
+
+.arch-row{
+  display:grid; gap:10px;
+  align-items:stretch;
+}
+
+.arch-node{
+  padding:12px 14px; border-radius:8px; border:1px solid;
+  display:flex; flex-direction:column; gap:3px;
+}
+
+.an-label{ font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.25em; text-transform:uppercase; }
+.an-name{ font-size:12px; font-weight:600; color:#fff; }
+.an-sub{ font-size:10px; color:var(--muted); line-height:1.4; }
+
+.arch-arrow{
+  text-align:center; color:var(--muted); font-size:13px;
+  margin:-4px 0;
+}
+
+.layer-wrap{
+  display:flex; gap:10px; align-items:stretch; flex-wrap:wrap;
+}
+
+/* CI/CD PIPELINE */
+.pipeline{ display:flex; flex-direction:column; gap:0; margin-bottom:28px; }
+
+.pipe-step{
+  display:grid; grid-template-columns:200px 1fr;
+  border:1px solid var(--border); border-bottom:none;
+  opacity:0; transform:translateY(18px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.pipe-step:first-child{ border-radius:10px 10px 0 0; }
+.pipe-step:last-child{ border-bottom:1px solid var(--border); border-radius:0 0 10px 10px; }
+.pipe-step.visible{ opacity:1; transform:translateY(0); }
+
+.ps-left{
+  padding:18px 16px; background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column; gap:4px;
+  position:relative; overflow:hidden;
+}
+.ps-trigger{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted);
+}
+.ps-name{ font-size:13px; font-weight:600; color:var(--text); }
+.ps-runner{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; color:var(--aws); margin-top:2px;
+}
+
+.ps-right{ padding:16px 20px; background:var(--bg2); }
+
+.ps-goal{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; color:var(--muted);
+  margin-bottom:12px; padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+.ps-goal span{ color:var(--aws); }
+
+.steps-list{ display:flex; flex-direction:column; gap:6px; }
+
+.step-item{
+  display:grid; grid-template-columns:22px 1fr;
+  gap:8px; align-items:flex-start;
+}
+.si-num{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); margin-top:2px; }
+.si-body{}
+.si-title{ font-size:12px; font-weight:500; color:var(--text); }
+.si-code{
+  font-family:'JetBrains Mono',monospace; font-size:10.5px;
+  background:var(--surf2); padding:2px 7px; border-radius:3px;
+  color:var(--teal); display:inline-block; margin-top:2px;
+}
+
+/* YAML BLOCK */
+.yaml-wrap{
+  background:#060a0e; border:1px solid var(--border);
+  border-radius:10px; overflow:hidden; margin-bottom:28px;
+}
+.yaml-header{
+  padding:10px 16px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+  font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted);
+}
+.yaml-dots{ display:flex; gap:5px; }
+.yaml-dot{ width:10px; height:10px; border-radius:50%; }
+.yaml-body{
+  padding:20px 22px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px; line-height:1.8;
+  overflow-x:auto; white-space:pre;
+  color:#94a3b8;
+}
+.y-key  { color:#60a5fa; }
+.y-val  { color:#7dd3b0; }
+.y-str  { color:#fcd34d; }
+.y-cm   { color:#4b5563; font-style:italic; }
+.y-kw   { color:#f9a8d4; }
+
+/* DEPLOY STRATEGIES */
+.strategies{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:28px; }
+@media(max-width:640px){ .strategies{ grid-template-columns:1fr; } }
+
+.strategy{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; padding:18px; overflow:hidden;
+  position:relative;
+}
+.strategy::after{
+  content:''; position:absolute;
+  top:0;left:0;right:0; height:2px;
+}
+.s-blue::after  { background:var(--blue); }
+.s-green::after { background:var(--green); }
+.s-purple::after{ background:var(--purple); }
+.s-gold::after  { background:var(--gold); }
+
+.strat-name{ font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:#fff; margin-bottom:4px; }
+.strat-tag{
+  display:inline-block; padding:2px 7px; border-radius:3px;
+  font-family:'JetBrains Mono',monospace; font-size:9px;
+  letter-spacing:.15em; text-transform:uppercase; border:1px solid;
+  margin-bottom:10px;
+}
+.strat-desc{ font-size:12px; color:var(--muted); line-height:1.65; margin-bottom:10px; }
+.strat-when{ font-size:11px; color:#94a3b8; font-style:italic; }
+
+/* FRONTEND OPTIONS */
+.fe-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-bottom:28px; }
+
+.fe-card{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; padding:16px; transition:border-color .2s;
+}
+.fe-card:hover{ border-color:rgba(255,255,255,.15); }
+.fe-icon{ font-size:22px; margin-bottom:8px; }
+.fe-name{ font-size:13px; font-weight:600; color:#fff; margin-bottom:3px; }
+.fe-cost{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--aws); margin-bottom:6px; }
+.fe-desc{ font-size:12px; color:var(--muted); line-height:1.55; margin-bottom:8px; }
+.fe-tags{ display:flex; flex-wrap:wrap; gap:4px; }
+.fe-tag{
+  font-family:'JetBrains Mono',monospace; font-size:9px;
+  padding:2px 6px; border-radius:3px;
+  background:var(--surf2); color:var(--muted);
+  border:1px solid var(--border);
+}
+.fe-best{
+  margin-top:8px; font-size:11px;
+  padding:5px 9px; border-radius:4px;
+  border:1px solid;
+}
+
+/* VERDICT */
+.verdict{
+  background:linear-gradient(135deg,var(--surf2),var(--surface));
+  border:1px solid rgba(255,153,0,.2);
+  border-radius:10px; padding:28px 32px; margin-bottom:28px;
+}
+.verdict h2{ font-family:'Syne',sans-serif; font-size:20px; font-weight:700; color:#fff; margin-bottom:14px; }
+.verdict-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:600px){ .verdict-grid{ grid-template-columns:1fr; } }
+.v-item{ display:flex; gap:10px; align-items:flex-start; }
+.v-icon{ font-size:16px; flex-shrink:0; }
+.v-body{}
+.v-label{ font-size:13px; font-weight:500; color:var(--text); margin-bottom:2px; }
+.v-sub{ font-size:12px; color:var(--muted); line-height:1.55; }
+
+footer{
+  border-top:1px solid var(--border); padding:24px 0 0;
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  color:var(--dim); letter-spacing:.2em; text-align:center;
+}
+
+@media(max-width:640px){
+  .pipe-step{ grid-template-columns:1fr; }
+  .ps-left{ border-right:none; border-bottom:1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">◉ Project 1 · Deployment Architecture · AWS + CI/CD</div>
+  <h1>Deploy Like a<br/><span>Senior Engineer.</span></h1>
+  <p class="hero-sub">
+    Full AWS EC2 deployment with Application Load Balancer, Auto Scaling Group, blue-green deployment strategy, and GitHub Actions CI/CD pipeline. Plus every frontend option compared honestly.
+  </p>
+</div>
+
+<!-- TIER COMPARISON -->
+<div class="sec-hdr">
+  <span class="sec-num">01 ——</span>
+  <span class="sec-title">Three Deployment Tiers — Pick Your Tradeoff</span>
+</div>
+
+<div class="tiers">
+  <div class="tier t1">
+    <div class="tier-label">Tier 1 · Simplest</div>
+    <div class="tier-name">Quick Ship</div>
+    <div class="tier-sub">Get live in 2 hours. Zero DevOps. Best for early demos.</div>
+    <div class="tier-items">
+      <div class="tier-item">Backend → Railway ($5/mo)</div>
+      <div class="tier-item">Frontend → Streamlit Cloud (free)</div>
+      <div class="tier-item">DB → Supabase (already there)</div>
+      <div class="tier-item">CI/CD → Railway auto-deploy</div>
+    </div>
+    <div class="tier-verdict" style="background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);color:#86efac;">
+      ✓ Best for: getting recruiters to see a live demo fast
+    </div>
+  </div>
+
+  <div class="tier t2">
+    <div class="tier-label">Tier 2 · Recommended ★</div>
+    <div class="tier-name">AWS Production</div>
+    <div class="tier-sub">EC2 + ALB + ASG + GitHub Actions. Real production architecture.</div>
+    <div class="tier-items">
+      <div class="tier-item">Backend → EC2 behind ALB</div>
+      <div class="tier-item">Frontend → Streamlit on EC2 OR S3+CloudFront</div>
+      <div class="tier-item">DB → Supabase (keep it, don't move to RDS)</div>
+      <div class="tier-item">CI/CD → GitHub Actions full pipeline</div>
+      <div class="tier-item">Deployment → Blue-Green strategy</div>
+    </div>
+    <div class="tier-verdict" style="background:rgba(255,153,0,0.07);border:1px solid rgba(255,153,0,0.2);color:#fcd34d;">
+      ★ Best for: resume signal + interview talking points
+    </div>
+  </div>
+
+  <div class="tier t3">
+    <div class="tier-label">Tier 3 · Overkill</div>
+    <div class="tier-name">Full Enterprise</div>
+    <div class="tier-sub">ECS Fargate + ECR + RDS + full VPC. Only if you have weeks extra.</div>
+    <div class="tier-items">
+      <div class="tier-item">Backend → ECS Fargate (serverless containers)</div>
+      <div class="tier-item">Frontend → CloudFront + S3</div>
+      <div class="tier-item">DB → RDS Postgres + ElastiCache</div>
+      <div class="tier-item">CI/CD → GitHub Actions + ECR push</div>
+    </div>
+    <div class="tier-verdict" style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd;">
+      ⚠ Skip for now — learn ECS after you're hired
+    </div>
+  </div>
+</div>
+
+<!-- AWS ARCHITECTURE -->
+<div class="sec-hdr">
+  <span class="sec-num">02 ——</span>
+  <span class="sec-title">AWS Architecture — Tier 2 Full Breakdown</span>
+</div>
+
+<div class="arch-box">
+  <div class="arch-layers">
+
+    <!-- Internet -->
+    <div class="layer-wrap">
+      <div class="arch-node" style="flex:1;background:rgba(77,143,224,0.07);border-color:rgba(77,143,224,0.25)">
+        <div class="an-label" style="color:var(--blue)">Users</div>
+        <div class="an-name">Internet Traffic</div>
+        <div class="an-sub">Streamlit users, API consumers</div>
+      </div>
+      <div class="arch-node" style="flex:1;background:rgba(255,153,0,0.07);border-color:rgba(255,153,0,0.25)">
+        <div class="an-label" style="color:var(--aws)">AWS Route 53</div>
+        <div class="an-name">DNS + Domain</div>
+        <div class="an-sub">yourdomain.com → ALB</div>
+      </div>
+      <div class="arch-node" style="flex:1;background:rgba(255,153,0,0.07);border-color:rgba(255,153,0,0.25)">
+        <div class="an-label" style="color:var(--aws)">AWS ACM</div>
+        <div class="an-name">SSL Certificate</div>
+        <div class="an-sub">HTTPS termination at ALB</div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓ HTTPS :443</div>
+
+    <!-- ALB -->
+    <div class="layer-wrap">
+      <div class="arch-node" style="flex:1;background:rgba(255,153,0,0.1);border-color:rgba(255,153,0,0.35)">
+        <div class="an-label" style="color:var(--aws)">Application Load Balancer</div>
+        <div class="an-name">ALB — Traffic Distribution</div>
+        <div class="an-sub">
+          /api/* → FastAPI Target Group (port 8000)<br/>
+          /* → Streamlit Target Group (port 8501)<br/>
+          Health checks every 30s<br/>
+          Sticky sessions for Streamlit
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓ Routes to Target Groups</div>
+
+    <!-- EC2 -->
+    <div class="layer-wrap">
+      <div class="arch-node" style="flex:2;background:rgba(255,153,0,0.07);border-color:rgba(255,153,0,0.2)">
+        <div class="an-label" style="color:var(--aws)">Auto Scaling Group — FastAPI (t3.medium)</div>
+        <div class="an-name">FastAPI + LangGraph Agents</div>
+        <div class="an-sub">
+          Min: 1 instance · Max: 3 instances · Desired: 1<br/>
+          Scale up when CPU &gt; 70%<br/>
+          Blue (active) + Green (standby) target groups<br/>
+          Userdata script: pull Docker image, start container
+        </div>
+      </div>
+      <div class="arch-node" style="flex:1;background:rgba(255,75,75,0.07);border-color:rgba(255,75,75,0.2)">
+        <div class="an-label" style="color:var(--st)">EC2 — Streamlit (t3.small)</div>
+        <div class="an-name">Streamlit Frontend</div>
+        <div class="an-sub">
+          Single instance (no ASG needed)<br/>
+          Nginx reverse proxy → port 8501<br/>
+          OR: deploy to Streamlit Cloud instead
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓ Reads/Writes</div>
+
+    <!-- Data -->
+    <div class="layer-wrap">
+      <div class="arch-node" style="flex:1;background:rgba(62,207,142,0.07);border-color:rgba(62,207,142,0.25)">
+        <div class="an-label" style="color:var(--supa)">Supabase (external)</div>
+        <div class="an-name">Postgres + pgvector + Auth + Storage</div>
+        <div class="an-sub">Keep on Supabase — don't migrate to RDS for portfolio</div>
+      </div>
+      <div class="arch-node" style="flex:1;background:rgba(255,153,0,0.07);border-color:rgba(255,153,0,0.25)">
+        <div class="an-label" style="color:var(--aws)">AWS ECR</div>
+        <div class="an-name">Container Registry</div>
+        <div class="an-sub">Docker images pushed by GitHub Actions CI/CD</div>
+      </div>
+      <div class="arch-node" style="flex:1;background:rgba(255,153,0,0.07);border-color:rgba(255,153,0,0.25)">
+        <div class="an-label" style="color:var(--aws)">AWS Secrets Manager</div>
+        <div class="an-name">API Keys + Env Vars</div>
+        <div class="an-sub">EC2 pulls secrets at startup. Never in code.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CI/CD PIPELINE -->
+<div class="sec-hdr">
+  <span class="sec-num">03 ——</span>
+  <span class="sec-title">GitHub Actions CI/CD Pipeline — 4 Jobs</span>
+</div>
+
+<div class="pipeline">
+
+  <!-- JOB 1 -->
+  <div class="pipe-step" id="ps1">
+    <div class="ps-left" style="border-left:3px solid var(--blue)">
+      <div class="ps-trigger">Trigger: push to any branch</div>
+      <div class="ps-name">Job 1: Test + Lint</div>
+      <div class="ps-runner">runs-on: ubuntu-latest</div>
+    </div>
+    <div class="ps-right">
+      <div class="ps-goal">Goal: <span>Catch failures before any image is built</span></div>
+      <div class="steps-list">
+        <div class="step-item"><span class="si-num">1</span><div class="si-body"><div class="si-title">Checkout code + set up Python 3.11</div></div></div>
+        <div class="step-item"><span class="si-num">2</span><div class="si-body"><div class="si-title">Install dependencies from requirements.txt</div><div class="si-code">pip install -r requirements.txt</div></div></div>
+        <div class="step-item"><span class="si-num">3</span><div class="si-body"><div class="si-title">Lint with Ruff (faster than flake8)</div><div class="si-code">ruff check . --select E,W,F</div></div></div>
+        <div class="step-item"><span class="si-num">4</span><div class="si-body"><div class="si-title">Type check with mypy</div><div class="si-code">mypy agents/ rag/ db/ api/ --ignore-missing-imports</div></div></div>
+        <div class="step-item"><span class="si-num">5</span><div class="si-body"><div class="si-title">Run unit tests with pytest</div><div class="si-code">pytest tests/ -v --tb=short</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOB 2 -->
+  <div class="pipe-step" id="ps2">
+    <div class="ps-left" style="border-left:3px solid var(--aws)">
+      <div class="ps-trigger">Trigger: push to main branch only</div>
+      <div class="ps-name">Job 2: Build + Push to ECR</div>
+      <div class="ps-runner">needs: [test-and-lint]</div>
+    </div>
+    <div class="ps-right">
+      <div class="ps-goal">Goal: <span>Build Docker image, tag with git SHA, push to AWS ECR</span></div>
+      <div class="steps-list">
+        <div class="step-item"><span class="si-num">1</span><div class="si-body"><div class="si-title">Configure AWS credentials from GitHub Secrets</div><div class="si-code">aws-actions/configure-aws-credentials@v4</div></div></div>
+        <div class="step-item"><span class="si-num">2</span><div class="si-body"><div class="si-title">Login to Amazon ECR</div><div class="si-code">aws-actions/amazon-ecr-login@v2</div></div></div>
+        <div class="step-item"><span class="si-num">3</span><div class="si-body"><div class="si-title">Build Docker image tagged with git SHA + latest</div><div class="si-code">docker build -t $ECR_REPO:${{ github.sha }} -t $ECR_REPO:latest .</div></div></div>
+        <div class="step-item"><span class="si-num">4</span><div class="si-body"><div class="si-title">Push both tags to ECR</div><div class="si-code">docker push $ECR_REPO:${{ github.sha }} &amp;&amp; docker push $ECR_REPO:latest</div></div></div>
+        <div class="step-item"><span class="si-num">5</span><div class="si-body"><div class="si-title">Output image URI as job artifact for next job</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOB 3 -->
+  <div class="pipe-step" id="ps3">
+    <div class="ps-left" style="border-left:3px solid var(--green)">
+      <div class="ps-trigger">Trigger: after ECR push succeeds</div>
+      <div class="ps-name">Job 3: Blue-Green Deploy</div>
+      <div class="ps-runner">needs: [build-and-push]</div>
+    </div>
+    <div class="ps-right">
+      <div class="ps-goal">Goal: <span>Deploy to Green, health check, shift traffic, terminate Blue</span></div>
+      <div class="steps-list">
+        <div class="step-item"><span class="si-num">1</span><div class="si-body"><div class="si-title">Launch new EC2 instance (Green) from latest AMI</div><div class="si-code">aws ec2 run-instances --user-data deploy_script.sh</div></div></div>
+        <div class="step-item"><span class="si-num">2</span><div class="si-body"><div class="si-title">Green instance pulls image from ECR + starts container</div><div class="si-code">docker pull $ECR_REPO:${{ github.sha }} &amp;&amp; docker run -d ...</div></div></div>
+        <div class="step-item"><span class="si-num">3</span><div class="si-body"><div class="si-title">Wait for ALB health check to pass on Green (max 5 min)</div><div class="si-code">aws elbv2 wait target-in-service --target-group-arn $GREEN_TG</div></div></div>
+        <div class="step-item"><span class="si-num">4</span><div class="si-body"><div class="si-title">Shift 100% of ALB traffic to Green target group</div><div class="si-code">aws elbv2 modify-listener --default-actions green_tg</div></div></div>
+        <div class="step-item"><span class="si-num">5</span><div class="si-body"><div class="si-title">Run smoke tests against live Green endpoint</div><div class="si-code">curl -f https://api.yourdomain.com/health</div></div></div>
+        <div class="step-item"><span class="si-num">6</span><div class="si-body"><div class="si-title">On success: terminate Blue instance. On failure: rollback to Blue immediately.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOB 4 -->
+  <div class="pipe-step" id="ps4">
+    <div class="ps-left" style="border-left:3px solid var(--purple)">
+      <div class="ps-trigger">Trigger: after deploy (always runs)</div>
+      <div class="ps-name">Job 4: Notify + Tag</div>
+      <div class="ps-runner">needs: [deploy] · if: always()</div>
+    </div>
+    <div class="ps-right">
+      <div class="ps-goal">Goal: <span>Visibility into every deployment — success or failure</span></div>
+      <div class="steps-list">
+        <div class="step-item"><span class="si-num">1</span><div class="si-body"><div class="si-title">Post deploy status to Slack (or email) with git SHA + diff link</div></div></div>
+        <div class="step-item"><span class="si-num">2</span><div class="si-body"><div class="si-title">Create GitHub Release tag on successful deploy</div><div class="si-code">gh release create v${{ github.sha }} --generate-notes</div></div></div>
+        <div class="step-item"><span class="si-num">3</span><div class="si-body"><div class="si-title">Log deployment event to Supabase deployments table</div></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- GITHUB ACTIONS YAML -->
+<div class="sec-hdr">
+  <span class="sec-num">04 ——</span>
+  <span class="sec-title">Full GitHub Actions YAML — Copy This</span>
+</div>
+
+<div class="yaml-wrap">
+  <div class="yaml-header">
+    <div class="yaml-dots">
+      <div class="yaml-dot" style="background:#f87171"></div>
+      <div class="yaml-dot" style="background:#fcd34d"></div>
+      <div class="yaml-dot" style="background:#4ade80"></div>
+    </div>
+    .github/workflows/deploy.yml
+  </div>
+  <div class="yaml-body"><span class="y-key">name</span>: <span class="y-val">CI/CD — Research Agent</span>
+
+<span class="y-key">on</span>:
+  <span class="y-key">push</span>:
+    <span class="y-key">branches</span>: [<span class="y-str">"main"</span>, <span class="y-str">"develop"</span>]
+  <span class="y-key">pull_request</span>:
+    <span class="y-key">branches</span>: [<span class="y-str">"main"</span>]
+
+<span class="y-key">env</span>:
+  <span class="y-key">AWS_REGION</span>:     <span class="y-val">eu-north-1</span>           <span class="y-cm"># Stockholm — closest to you</span>
+  <span class="y-key">ECR_REPOSITORY</span>: <span class="y-val">research-agent-api</span>
+  <span class="y-key">PYTHON_VERSION</span>: <span class="y-str">"3.11"</span>
+
+<span class="y-key">jobs</span>:
+
+  <span class="y-cm"># ─────────────────────────────────────────</span>
+  <span class="y-cm"># JOB 1: Test + Lint (runs on every push)</span>
+  <span class="y-cm"># ─────────────────────────────────────────</span>
+  <span class="y-key">test-and-lint</span>:
+    <span class="y-key">name</span>: <span class="y-val">Test + Lint</span>
+    <span class="y-key">runs-on</span>: <span class="y-val">ubuntu-latest</span>
+    <span class="y-key">steps</span>:
+      - <span class="y-key">uses</span>: <span class="y-val">actions/checkout@v4</span>
+
+      - <span class="y-key">name</span>: <span class="y-val">Set up Python</span>
+        <span class="y-key">uses</span>: <span class="y-val">actions/setup-python@v5</span>
+        <span class="y-key">with</span>:
+          <span class="y-key">python-version</span>: <span class="y-str">"3.11"</span>
+          <span class="y-key">cache</span>: <span class="y-str">"pip"</span>
+
+      - <span class="y-key">name</span>: <span class="y-val">Install dependencies</span>
+        <span class="y-key">run</span>: <span class="y-val">pip install -r requirements.txt ruff mypy pytest</span>
+
+      - <span class="y-key">name</span>: <span class="y-val">Lint with Ruff</span>
+        <span class="y-key">run</span>: <span class="y-val">ruff check . --select E,W,F --output-format=github</span>
+
+      - <span class="y-key">name</span>: <span class="y-val">Run tests</span>
+        <span class="y-key">env</span>:
+          <span class="y-key">SUPABASE_URL</span>:      <span class="y-val">${{ secrets.SUPABASE_URL }}</span>
+          <span class="y-key">SUPABASE_SERVICE_KEY</span>: <span class="y-val">${{ secrets.SUPABASE_SERVICE_KEY }}</span>
+          <span class="y-key">ANTHROPIC_API_KEY</span>: <span class="y-val">${{ secrets.ANTHROPIC_API_KEY }}</span>
+        <span class="y-key">run</span>: <span class="y-val">pytest tests/ -v --tb=short -x</span>
+
+  <span class="y-cm"># ─────────────────────────────────────────</span>
+  <span class="y-cm"># JOB 2: Build Docker + Push to ECR</span>
+  <span class="y-cm"># ─────────────────────────────────────────</span>
+  <span class="y-key">build-and-push</span>:
+    <span class="y-key">name</span>: <span class="y-val">Build + Push to ECR</span>
+    <span class="y-key">runs-on</span>: <span class="y-val">ubuntu-latest</span>
+    <span class="y-key">needs</span>: <span class="y-val">test-and-lint</span>
+    <span class="y-key">if</span>: <span class="y-val">github.ref == 'refs/heads/main'</span>
+    <span class="y-key">outputs</span>:
+      <span class="y-key">image</span>: <span class="y-val">${{ steps.build-image.outputs.image }}</span>
+    <span class="y-key">steps</span>:
+      - <span class="y-key">uses</span>: <span class="y-val">actions/checkout@v4</span>
+
+      - <span class="y-key">name</span>: <span class="y-val">Configure AWS credentials</span>
+        <span class="y-key">uses</span>: <span class="y-val">aws-actions/configure-aws-credentials@v4</span>
+        <span class="y-key">with</span>:
+          <span class="y-key">aws-access-key-id</span>:     <span class="y-val">${{ secrets.AWS_ACCESS_KEY_ID }}</span>
+          <span class="y-key">aws-secret-access-key</span>: <span class="y-val">${{ secrets.AWS_SECRET_ACCESS_KEY }}</span>
+          <span class="y-key">aws-region</span>:            <span class="y-val">${{ env.AWS_REGION }}</span>
+
+      - <span class="y-key">name</span>: <span class="y-val">Login to Amazon ECR</span>
+        <span class="y-key">id</span>: <span class="y-val">login-ecr</span>
+        <span class="y-key">uses</span>: <span class="y-val">aws-actions/amazon-ecr-login@v2</span>
+
+      - <span class="y-key">name</span>: <span class="y-val">Build, tag and push image</span>
+        <span class="y-key">id</span>: <span class="y-val">build-image</span>
+        <span class="y-key">env</span>:
+          <span class="y-key">ECR_REGISTRY</span>: <span class="y-val">${{ steps.login-ecr.outputs.registry }}</span>
+          <span class="y-key">IMAGE_TAG</span>:    <span class="y-val">${{ github.sha }}</span>
+        <span class="y-key">run</span>: |
+          <span class="y-val">docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+                         -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT</span>
+
+  <span class="y-cm"># ─────────────────────────────────────────</span>
+  <span class="y-cm"># JOB 3: Blue-Green Deploy to EC2</span>
+  <span class="y-cm"># ─────────────────────────────────────────</span>
+  <span class="y-key">deploy</span>:
+    <span class="y-key">name</span>: <span class="y-val">Blue-Green Deploy</span>
+    <span class="y-key">runs-on</span>: <span class="y-val">ubuntu-latest</span>
+    <span class="y-key">needs</span>: <span class="y-val">build-and-push</span>
+    <span class="y-key">environment</span>: <span class="y-val">production</span>   <span class="y-cm"># requires manual approval in GitHub</span>
+    <span class="y-key">steps</span>:
+      - <span class="y-key">uses</span>: <span class="y-val">actions/checkout@v4</span>
+
+      - <span class="y-key">name</span>: <span class="y-val">Configure AWS credentials</span>
+        <span class="y-key">uses</span>: <span class="y-val">aws-actions/configure-aws-credentials@v4</span>
+        <span class="y-key">with</span>:
+          <span class="y-key">aws-access-key-id</span>:     <span class="y-val">${{ secrets.AWS_ACCESS_KEY_ID }}</span>
+          <span class="y-key">aws-secret-access-key</span>: <span class="y-val">${{ secrets.AWS_SECRET_ACCESS_KEY }}</span>
+          <span class="y-key">aws-region</span>:            <span class="y-val">${{ env.AWS_REGION }}</span>
+
+      - <span class="y-key">name</span>: <span class="y-val">Run Blue-Green deploy script</span>
+        <span class="y-key">env</span>:
+          <span class="y-key">IMAGE_URI</span>:       <span class="y-val">${{ needs.build-and-push.outputs.image }}</span>
+          <span class="y-key">BLUE_TG_ARN</span>:     <span class="y-val">${{ secrets.BLUE_TARGET_GROUP_ARN }}</span>
+          <span class="y-key">GREEN_TG_ARN</span>:    <span class="y-val">${{ secrets.GREEN_TARGET_GROUP_ARN }}</span>
+          <span class="y-key">ALB_LISTENER_ARN</span>: <span class="y-val">${{ secrets.ALB_LISTENER_ARN }}</span>
+          <span class="y-key">EC2_KEY_NAME</span>:    <span class="y-val">${{ secrets.EC2_KEY_NAME }}</span>
+          <span class="y-key">SUBNET_ID</span>:       <span class="y-val">${{ secrets.SUBNET_ID }}</span>
+          <span class="y-key">SG_ID</span>:           <span class="y-val">${{ secrets.SECURITY_GROUP_ID }}</span>
+        <span class="y-key">run</span>: <span class="y-val">bash scripts/blue_green_deploy.sh</span>
+
+  <span class="y-cm"># ─────────────────────────────────────────</span>
+  <span class="y-cm"># JOB 4: Notify</span>
+  <span class="y-cm"># ─────────────────────────────────────────</span>
+  <span class="y-key">notify</span>:
+    <span class="y-key">name</span>: <span class="y-val">Notify</span>
+    <span class="y-key">runs-on</span>: <span class="y-val">ubuntu-latest</span>
+    <span class="y-key">needs</span>: [<span class="y-val">deploy</span>]
+    <span class="y-key">if</span>: <span class="y-val">always()</span>
+    <span class="y-key">steps</span>:
+      - <span class="y-key">name</span>: <span class="y-val">Post to Slack</span>
+        <span class="y-key">uses</span>: <span class="y-val">slackapi/slack-github-action@v1.26.0</span>
+        <span class="y-key">with</span>:
+          <span class="y-key">channel-id</span>: <span class="y-val">${{ secrets.SLACK_CHANNEL_ID }}</span>
+          <span class="y-key">slack-message</span>: |
+            <span class="y-val">Deploy ${{ job.status }} — ${{ github.sha }}
+            Branch: ${{ github.ref_name }}
+            Actor: ${{ github.actor }}</span>
+        <span class="y-key">env</span>:
+          <span class="y-key">SLACK_BOT_TOKEN</span>: <span class="y-val">${{ secrets.SLACK_BOT_TOKEN }}</span></div>
+</div>
+
+<!-- DEPLOYMENT STRATEGIES -->
+<div class="sec-hdr">
+  <span class="sec-num">05 ——</span>
+  <span class="sec-title">4 Deployment Strategies — Know All of Them</span>
+</div>
+
+<div class="strategies">
+  <div class="strategy s-blue">
+    <div class="strat-name">Rolling Deployment</div>
+    <div class="strat-tag" style="color:var(--blue);border-color:rgba(77,143,224,0.3);background:rgba(77,143,224,0.07)">simplest</div>
+    <div class="strat-desc">Replace instances one at a time. Old version serves traffic while new instances come up. If the new version fails, some users already got it.</div>
+    <div class="strat-when">Use when: downtime is okay and rollback speed doesn't matter. Not recommended for your project.</div>
+  </div>
+
+  <div class="strategy s-green">
+    <div class="strat-name">Blue-Green Deployment ★</div>
+    <div class="strat-tag" style="color:var(--green);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.07)">recommended</div>
+    <div class="strat-desc">Two identical environments — Blue (live) and Green (new). Deploy to Green, health check, switch ALB traffic instantly. Blue stays alive for instant rollback. Zero downtime.</div>
+    <div class="strat-when">Use for: your project. Clean cutover, instant rollback, zero downtime. Best resume talking point.</div>
+  </div>
+
+  <div class="strategy s-purple">
+    <div class="strat-name">Canary Deployment</div>
+    <div class="strat-tag" style="color:var(--purple);border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.07)">advanced</div>
+    <div class="strat-desc">Send 5% of traffic to new version, monitor errors, gradually increase to 100%. Catches issues before they affect all users. Requires traffic splitting at ALB level.</div>
+    <div class="strat-when">Know for interviews. Overkill to implement for a portfolio project — mention it as "next step".</div>
+  </div>
+
+  <div class="strategy s-gold">
+    <div class="strat-name">Recreate Deployment</div>
+    <div class="strat-tag" style="color:var(--gold);border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.07)">avoid</div>
+    <div class="strat-desc">Stop all old instances, start all new ones. Causes downtime between stop and start. Simple but unacceptable for any user-facing service.</div>
+    <div class="strat-when">Avoid. Mention it only to explain why you chose Blue-Green instead.</div>
+  </div>
+</div>
+
+<!-- FRONTEND OPTIONS -->
+<div class="sec-hdr">
+  <span class="sec-num">06 ——</span>
+  <span class="sec-title">Where to Deploy the Streamlit Frontend</span>
+</div>
+
+<div class="fe-grid">
+  <div class="fe-card">
+    <div class="fe-icon">🎈</div>
+    <div class="fe-name">Streamlit Community Cloud</div>
+    <div class="fe-cost">Free (public repos)</div>
+    <div class="fe-desc">Connect GitHub repo → set secrets → done. Auto-deploys on push. youapp.streamlit.app URL. Zero config.</div>
+    <div class="fe-tags">
+      <span class="fe-tag">zero config</span>
+      <span class="fe-tag">free</span>
+      <span class="fe-tag">auto-deploy</span>
+    </div>
+    <div class="fe-best" style="color:#86efac;border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.07)">✓ Best for: portfolio demos. Use this.</div>
+  </div>
+
+  <div class="fe-card">
+    <div class="fe-icon">⚡</div>
+    <div class="fe-name">EC2 (same instance as API)</div>
+    <div class="fe-cost">~$15/mo (t3.small)</div>
+    <div class="fe-desc">Run Streamlit on port 8501, Nginx reverse proxy. ALB routes /* to it. Full control, but you manage the server.</div>
+    <div class="fe-tags">
+      <span class="fe-tag">full control</span>
+      <span class="fe-tag">nginx needed</span>
+      <span class="fe-tag">aws only</span>
+    </div>
+    <div class="fe-best" style="color:#fcd34d;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.07)">✓ Best for: if you want everything on AWS for the resume story</div>
+  </div>
+
+  <div class="fe-card">
+    <div class="fe-icon">🚂</div>
+    <div class="fe-name">Railway</div>
+    <div class="fe-cost">~$5/mo</div>
+    <div class="fe-desc">Connect GitHub, auto-detect Python, set PORT=8501. Deploys in minutes. Good middle ground between Streamlit Cloud and EC2.</div>
+    <div class="fe-tags">
+      <span class="fe-tag">easy</span>
+      <span class="fe-tag">auto-deploy</span>
+      <span class="fe-tag">custom domain</span>
+    </div>
+    <div class="fe-best" style="color:#94a3b8;border-color:var(--border);background:var(--surf2)">Use if: Streamlit Cloud has limits you're hitting</div>
+  </div>
+
+  <div class="fe-card">
+    <div class="fe-icon">☁️</div>
+    <div class="fe-name">S3 + CloudFront</div>
+    <div class="fe-cost">~$1/mo</div>
+    <div class="fe-desc">Only works if you convert Streamlit to a static React/Next.js app. Not applicable to Streamlit — skip this for now.</div>
+    <div class="fe-tags">
+      <span class="fe-tag">static only</span>
+      <span class="fe-tag">not streamlit</span>
+    </div>
+    <div class="fe-best" style="color:#f87171;border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.07)">✗ Skip — requires migrating away from Streamlit</div>
+  </div>
+</div>
+
+<!-- FINAL VERDICT -->
+<div class="sec-hdr">
+  <span class="sec-num">07 ——</span>
+  <span class="sec-title">The Recommended Setup for Your Project</span>
+</div>
+
+<div class="verdict">
+  <h2>Your Deployment Stack — Final Answer</h2>
+  <div class="verdict-grid">
+    <div class="v-item">
+      <span class="v-icon">🚀</span>
+      <div class="v-body">
+        <div class="v-label">Backend → AWS EC2 + ALB</div>
+        <div class="v-sub">t3.medium, eu-north-1 (Stockholm). Single instance to start — ASG ready for when you need it. ~$35/mo. Worth every cent for the resume story.</div>
+      </div>
+    </div>
+    <div class="v-item">
+      <span class="v-icon">🎈</span>
+      <div class="v-body">
+        <div class="v-label">Frontend → Streamlit Community Cloud</div>
+        <div class="v-sub">Free, zero config, auto-deploys from GitHub. Points to your EC2 backend URL. Don't overcomplicate the frontend deployment.</div>
+      </div>
+    </div>
+    <div class="v-item">
+      <span class="v-icon">⚡</span>
+      <div class="v-body">
+        <div class="v-label">DB → Supabase (stay there)</div>
+        <div class="v-sub">Don't migrate to RDS. Supabase already handles pgvector, Auth, Storage, and Realtime. Moving to RDS costs weeks and adds nothing for a portfolio project.</div>
+      </div>
+    </div>
+    <div class="v-item">
+      <span class="v-icon">🔄</span>
+      <div class="v-body">
+        <div class="v-label">CI/CD → GitHub Actions (full pipeline)</div>
+        <div class="v-sub">4 jobs: Test → Build+ECR → Blue-Green Deploy → Notify. Push to main = automatic deploy. Every merge is a deployment event with a paper trail.</div>
+      </div>
+    </div>
+    <div class="v-item">
+      <span class="v-icon">🚢</span>
+      <div class="v-body">
+        <div class="v-label">Strategy → Blue-Green</div>
+        <div class="v-sub">Zero downtime, instant rollback. The single most impressive deployment talking point for a junior-to-mid AI Engineer role. Know it inside out.</div>
+      </div>
+    </div>
+    <div class="v-item">
+      <span class="v-icon">🔐</span>
+      <div class="v-body">
+        <div class="v-label">Secrets → AWS Secrets Manager</div>
+        <div class="v-sub">All API keys (Anthropic, OpenAI, Supabase, Brave) stored in Secrets Manager. EC2 pulls them at startup via IAM role. Never in .env on the server.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<footer>PROJECT 1 · DEPLOYMENT ARCHITECTURE · AWS EC2 + ALB + GITHUB ACTIONS CI/CD · 2026</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.04 });
+document.querySelectorAll('.pipe-step').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

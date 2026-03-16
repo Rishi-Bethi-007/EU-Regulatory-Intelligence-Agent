@@ -1,0 +1,33 @@
+# Environment
+.env
+.env.local
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Data
+data/
+
+# IDE
+.vscode/
+.idea/
+*.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Misc
+*.log
+*.tmp

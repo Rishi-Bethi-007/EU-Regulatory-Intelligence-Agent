@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Project 1 — Europe-Ready Upgrade</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:     #0a0c10;
+  --paper:   #f5f2eb;
+  --cream:   #ede9df;
+  --warm:    #e8e3d8;
+  --border:  rgba(10,12,16,0.12);
+  --muted:   #7a7468;
+
+  --eu:      #003399;   /* EU blue */
+  --eu-lt:   #dde4ff;
+  --gdpr:    #c0392b;   /* GDPR red */
+  --gdpr-lt: #fde8e6;
+  --xai:     #16a34a;   /* XAI green */
+  --xai-lt:  #dcfce7;
+  --ml:      #9333ea;   /* multilingual purple */
+  --ml-lt:   #f3e8ff;
+  --audit:   #d97706;   /* audit amber */
+  --audit-lt:#fef3c7;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: .4;
+}
+
+/* ── HORIZONTAL RULE LINES ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 27px,
+    rgba(10,12,16,0.04) 27px, rgba(10,12,16,0.04) 28px
+  );
+  pointer-events: none; z-index: 0;
+}
+
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+/* ── TOP BANNER ── */
+.top-banner {
+  background: var(--eu);
+  color: #fff;
+  padding: 10px 32px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-banner .stars { letter-spacing: .1em; color: #ffcc00; }
+
+/* ── HERO ── */
+.hero {
+  padding: 72px 0 60px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 0;
+  position: relative;
+}
+
+.hero-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hero-label::before {
+  content: '';
+  display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--muted);
+}
+
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 8vw, 108px);
+  line-height: .92;
+  letter-spacing: .02em;
+  color: var(--ink);
+  margin-bottom: 28px;
+}
+
+.hero h1 .accent { color: var(--eu); }
+.hero h1 .slash  { color: var(--muted); font-weight: 100; }
+
+.hero-desc {
+  font-size: 15px;
+  color: var(--muted);
+  max-width: 620px;
+  line-height: 1.8;
+  margin-bottom: 36px;
+  border-left: 3px solid var(--eu);
+  padding-left: 20px;
+}
+
+/* tag row */
+.tag-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 0; }
+
+.eu-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1.5px solid;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* big number corner */
+.hero-corner {
+  position: absolute;
+  top: 60px; right: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 200px;
+  line-height: 1;
+  color: rgba(10,12,16,0.04);
+  letter-spacing: -.02em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── WHAT CHANGED BAND ── */
+.changed-band {
+  background: var(--ink);
+  color: #fff;
+  padding: 52px 0;
+  margin: 0 -32px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.changed-band .inner { max-width: 1040px; margin: 0 auto; }
+
+.changed-band h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(28px, 4vw, 48px);
+  letter-spacing: .04em;
+  margin-bottom: 32px;
+  color: #fff;
+}
+
+.change-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1px;
+  background: rgba(255,255,255,0.1);
+}
+
+.change-card {
+  background: var(--ink);
+  padding: 24px 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: background .2s;
+}
+.change-card:hover { background: #13181f; }
+
+.cc-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  border: 1px solid;
+  margin-bottom: 14px;
+}
+
+.cc-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.cc-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.65;
+}
+
+/* ── SECTION HEADER ── */
+.sec {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 0;
+  margin: 64px 0 28px;
+  border-top: 2px solid var(--ink);
+  padding-top: 20px;
+  align-items: start;
+}
+
+.sec-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .2em;
+  padding-top: 4px;
+}
+
+.sec-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(24px, 3.5vw, 40px);
+  letter-spacing: .04em;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* ── UPGRADE BLOCKS ── */
+.upgrade-block {
+  border: 1.5px solid var(--border);
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.upgrade-block.visible { opacity: 1; transform: translateY(0); }
+
+.ub-header {
+  display: grid;
+  grid-template-columns: 6px 1fr;
+  gap: 0;
+}
+
+.ub-stripe { min-height: 100%; }
+
+.ub-head-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.ub-icon { font-size: 22px; }
+.ub-name { font-size: 15px; font-weight: 600; flex: 1; }
+.ub-why {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border: 1px solid;
+}
+
+.ub-body {
+  padding: 24px 28px;
+  background: #fff;
+}
+
+.ub-tasks { display: flex; flex-direction: column; gap: 14px; }
+
+.ub-task {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.ut-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  padding-top: 3px;
+}
+
+.ut-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.ut-desc  { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+.ut-desc code {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  background: var(--cream);
+  padding: 1px 6px;
+  border-radius: 2px;
+}
+
+.ub-note {
+  margin-top: 16px;
+  padding: 12px 16px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+  border-left: 3px solid;
+  background: var(--paper);
+}
+.ub-note strong {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* ── COMPARISON TABLE ── */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 48px;
+  font-size: 13px;
+}
+.compare-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 2px solid var(--ink);
+  background: var(--cream);
+}
+.compare-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table td:first-child  { color: var(--ink); font-weight: 500; }
+.compare-table .old { color: #b0a99e; text-decoration: line-through; font-size: 12px; }
+.compare-table .new { color: var(--ink); font-weight: 600; }
+.compare-table .badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  border: 1px solid;
+  margin: 2px 2px 0 0;
+}
+
+/* ── COUNTRY TABLE ── */
+.country-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.country-card {
+  border: 1.5px solid var(--border);
+  padding: 20px 18px;
+  background: #fff;
+  transition: border-color .2s;
+}
+.country-card:hover { border-color: var(--eu); }
+
+.cc-flag { font-size: 28px; margin-bottom: 10px; }
+.cc-country { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.cc-city { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); margin-bottom: 10px; }
+.cc-hook { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+/* ── RESUME SECTION ── */
+.resume-box {
+  background: var(--eu);
+  color: #fff;
+  padding: 40px 36px;
+  margin-bottom: 64px;
+  position: relative;
+  overflow: hidden;
+}
+
+.resume-box::before {
+  content: 'CV';
+  position: absolute;
+  right: 36px; top: -10px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 160px;
+  color: rgba(255,255,255,0.06);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.rb-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: .04em;
+  margin-bottom: 24px;
+  color: #ffcc00;
+}
+
+.rb-lines { display: flex; flex-direction: column; gap: 12px; }
+
+.rb-line {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.85);
+}
+
+.rb-bullet {
+  font-family: 'DM Mono', monospace;
+  font-size: 18px;
+  color: #ffcc00;
+  margin-top: -2px;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 2px solid var(--ink);
+  padding: 28px 0 48px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .sec { grid-template-columns: 1fr; }
+  .sec-num { display: none; }
+  .hero h1 { font-size: 52px; }
+  .hero-corner { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BANNER -->
+<div class="top-banner">
+  <span>◉ Project 1 — Europe-Ready Upgrade — 2026</span>
+  <span class="stars">★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★</span>
+  <span>EU AI Act · GDPR · XAI · Multilingual</span>
+</div>
+
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-corner">EU</div>
+  <div class="hero-label">Senior AI Engineer Review — Project 1 Upgrade</div>
+  <h1>
+    YOUR PROJECT<br/>
+    <span class="accent">EUROPE</span><br/>
+    <span class="slash">READY.</span>
+  </h1>
+  <p class="hero-desc">
+    Your original stack is already top 5% for a Masters student. This document adds 4 strategic layers on top of it — GDPR compliance, EU AI Act readiness, Explainable AI, and Swedish/German multilingual support — that directly match what European companies are <em>legally required</em> to implement right now.
+  </p>
+  <div class="tag-row">
+    <span class="eu-tag" style="color:var(--eu);border-color:var(--eu);background:var(--eu-lt)">🇪🇺 EU AI Act Compliant</span>
+    <span class="eu-tag" style="color:var(--gdpr);border-color:var(--gdpr);background:var(--gdpr-lt)">🔒 GDPR-Aware</span>
+    <span class="eu-tag" style="color:var(--xai);border-color:var(--xai);background:var(--xai-lt)">🔍 Explainable AI</span>
+    <span class="eu-tag" style="color:var(--ml);border-color:var(--ml);background:var(--ml-lt)">🌍 Multilingual NLP</span>
+    <span class="eu-tag" style="color:var(--audit);border-color:var(--audit);background:var(--audit-lt)">📋 Full Audit Trail</span>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- WHAT CHANGED BAND -->
+<div class="changed-band">
+  <div class="inner">
+    <h2>What Changed — And Why It Matters</h2>
+    <div class="change-grid">
+
+      <div class="change-card">
+        <div class="cc-pill" style="color:#ffcc00;border-color:#ffcc00">EU AI Act</div>
+        <div class="cc-title">Project Use Case Reframed</div>
+        <div class="cc-desc">No longer a "generic research agent." It's now a <strong style="color:#fff">Regulatory Intelligence Agent</strong> — helping companies understand EU AI Act obligations. This is a problem <em>every</em> European company has right now.</div>
+      </div>
+
+      <div class="change-card">
+        <div class="cc-pill" style="color:#ff6b6b;border-color:#ff6b6b">GDPR</div>
+        <div class="cc-title">GDPR Compliance Layer Added</div>
+        <div class="cc-desc">Data minimization, right-to-erasure endpoint, consent tracking table, EU-only data residency flag. Engineers who understand this are genuinely hard to find and well-paid.</div>
+      </div>
+
+      <div class="change-card">
+        <div class="cc-pill" style="color:#4ade80;border-color:#4ade80">XAI</div>
+        <div class="cc-title">Explainability Module Added</div>
+        <div class="cc-desc">Every agent decision now emits a reason trace. The Streamlit app shows <em>why</em> the agent concluded what it did. EU AI Act Article 13 requires this for high-risk AI systems.</div>
+      </div>
+
+      <div class="change-card">
+        <div class="cc-pill" style="color:#c084fc;border-color:#c084fc">NLP</div>
+        <div class="cc-title">Swedish + German Language Support</div>
+        <div class="cc-desc">Multilingual embeddings + language detection. Your RAG pipeline now handles Swedish and German documents natively. Immediate differentiator over English-only candidates.</div>
+      </div>
+
+      <div class="change-card">
+        <div class="cc-pill" style="color:#fbbf24;border-color:#fbbf24">AUDIT</div>
+        <div class="cc-title">Immutable Audit Log</div>
+        <div class="cc-desc">Every decision, every source, every confidence score is logged with a timestamp and hash. Regulators can reconstruct exactly what the AI did and why. This is the most requested enterprise feature right now.</div>
+      </div>
+
+      <div class="change-card">
+        <div class="cc-pill" style="color:#38bdf8;border-color:#38bdf8">DEMO</div>
+        <div class="cc-title">Industrial Demo Topic Changed</div>
+        <div class="cc-desc">Demo now runs on EU AI Act compliance research for a manufacturing company — the exact pain point across Germany, Sweden, and the Netherlands. Instantly relatable to every European interviewer.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- SECTION: UPGRADED STACK -->
+<div class="sec">
+  <span class="sec-num">01 ——</span>
+  <span class="sec-title">Upgraded Tech Stack — What to Add</span>
+</div>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>Layer</th>
+      <th>Original</th>
+      <th>Europe-Ready Addition</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Embeddings</td>
+      <td><span class="old">OpenAIEmbeddings only</span></td>
+      <td>
+        <span class="new">multilingual-e5-large</span>
+        <span class="badge" style="color:var(--ml);border-color:var(--ml)">HuggingFace</span>
+      </td>
+      <td>Supports Swedish, German, Dutch, French natively. Local model = no data leaving EU.</td>
+    </tr>
+    <tr>
+      <td>Language Detection</td>
+      <td><span class="old">None</span></td>
+      <td>
+        <span class="new">langdetect + automatic routing</span>
+        <span class="badge" style="color:var(--ml);border-color:var(--ml)">NEW</span>
+      </td>
+      <td>Auto-detect document language, route to correct embedding model, store language metadata in Supabase.</td>
+    </tr>
+    <tr>
+      <td>GDPR Layer</td>
+      <td><span class="old">None</span></td>
+      <td>
+        <span class="new">GDPR middleware module</span>
+        <span class="badge" style="color:var(--gdpr);border-color:var(--gdpr)">NEW</span>
+      </td>
+      <td>Consent tracking table, data minimization on ingestion, right-to-erasure FastAPI endpoint, EU-hosted Supabase region.</td>
+    </tr>
+    <tr>
+      <td>Explainability</td>
+      <td><span class="old">None</span></td>
+      <td>
+        <span class="new">Decision Trace module</span>
+        <span class="badge" style="color:var(--xai);border-color:var(--xai)">NEW</span>
+      </td>
+      <td>Every agent decision emits structured JSON reason trace. EU AI Act Article 13 compliance. Shown in Streamlit.</td>
+    </tr>
+    <tr>
+      <td>Audit Log</td>
+      <td><span class="old">research_runs (basic)</span></td>
+      <td>
+        <span class="new">audit_events table + hash chain</span>
+        <span class="badge" style="color:var(--audit);border-color:var(--audit)">UPGRADED</span>
+      </td>
+      <td>Append-only log with SHA-256 chaining. Every event references the previous hash. Tamper-evident by design.</td>
+    </tr>
+    <tr>
+      <td>Compliance Dashboard</td>
+      <td><span class="old">Eval Dashboard only</span></td>
+      <td>
+        <span class="new">EU AI Act Compliance Page (Page 6)</span>
+        <span class="badge" style="color:var(--eu);border-color:var(--eu)">NEW PAGE</span>
+      </td>
+      <td>Risk level classification, transparency scores, data subject rights panel. The page that makes interviewers stop scrolling.</td>
+    </tr>
+    <tr>
+      <td>Demo Use Case</td>
+      <td><span class="old">Generic research topic</span></td>
+      <td>
+        <span class="new">"EU AI Act obligations for manufacturing SMEs"</span>
+        <span class="badge" style="color:var(--eu);border-color:var(--eu)">REFRAMED</span>
+      </td>
+      <td>Real problem. Every DE/SE/NL company needs this. Interviewer immediately understands the value.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECTION: 4 UPGRADE BLOCKS -->
+<div class="sec">
+  <span class="sec-num">02 ——</span>
+  <span class="sec-title">The 4 Upgrades — Step by Step</span>
+</div>
+
+<!-- UPGRADE 1: GDPR -->
+<div class="upgrade-block" id="ub1">
+  <div class="ub-header">
+    <div class="ub-stripe" style="background:var(--gdpr)"></div>
+    <div class="ub-head-inner">
+      <div class="ub-icon">🔒</div>
+      <div class="ub-name">Upgrade 1 — GDPR Compliance Layer</div>
+      <span class="ub-why" style="color:var(--gdpr);border-color:var(--gdpr)">Required by Law in EU</span>
+    </div>
+  </div>
+  <div class="ub-body">
+    <div class="ub-tasks">
+
+      <div class="ub-task">
+        <span class="ut-num">G.1</span>
+        <div>
+          <div class="ut-title">Set your Supabase region to eu-central-1 (Frankfurt)</div>
+          <div class="ut-desc">In your Supabase project settings, select Frankfurt or Stockholm as the region. This ensures all user data stays within the EU. Add a comment in your README: <code>Data residency: EU (Frankfurt, Germany)</code>. This one setting is legally significant and shows you know GDPR geography.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">G.2</span>
+        <div>
+          <div class="ut-title">Create a <code>consent_records</code> table and <code>data_subjects</code> table in Supabase</div>
+          <div class="ut-desc">Schema: <code>consent_records(id, user_id, purpose, granted_at, ip_hash, version)</code> and <code>data_subjects(id, user_id, erasure_requested_at, anonymized_at)</code>. On Streamlit login, insert a consent record. This is minimal effort for maximum compliance signal.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">G.3</span>
+        <div>
+          <div class="ut-title">Add a <code>DELETE /api/users/{id}/data</code> FastAPI endpoint — Right to Erasure</div>
+          <div class="ut-desc">When called: anonymize the user's <code>research_runs</code> (null out <code>user_id</code>, hash the query text), delete their <code>document_chunks</code>, delete their uploaded files from Supabase Storage, insert a record into <code>data_subjects</code>. Log the erasure in your audit trail. This is GDPR Article 17 — right to be forgotten.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">G.4</span>
+        <div>
+          <div class="ut-title">Add data minimization to the ingestion pipeline</div>
+          <div class="ut-desc">In <code>rag/ingest.py</code>, before chunking: strip all personal data patterns (email regex, phone regex, EU national ID patterns) using a simple PII scrubber. Add <code>pii_scrubbed: true</code> to each chunk's metadata. This shows you think about data quality, not just model quality.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="ub-note" style="border-color:var(--gdpr)">
+      <strong>🇪🇺 Why This Gets You Hired</strong>
+      Every European company processing user data needs GDPR compliance. Engineers who can implement it in their <em>own projects</em> are far more credible than those who only know it theoretically. This is a 2–3 hour addition with outsized interview impact.
+    </div>
+  </div>
+</div>
+
+<!-- UPGRADE 2: EU AI ACT -->
+<div class="upgrade-block" id="ub2">
+  <div class="ub-header">
+    <div class="ub-stripe" style="background:var(--eu)"></div>
+    <div class="ub-head-inner">
+      <div class="ub-icon">🇪🇺</div>
+      <div class="ub-name">Upgrade 2 — EU AI Act Compliance Module</div>
+      <span class="ub-why" style="color:var(--eu);border-color:var(--eu)">In Force Since Aug 2024</span>
+    </div>
+  </div>
+  <div class="ub-body">
+    <div class="ub-tasks">
+
+      <div class="ub-task">
+        <span class="ut-num">A.1</span>
+        <div>
+          <div class="ut-title">Add a risk classification function in <code>compliance/risk_classifier.py</code></div>
+          <div class="ut-desc">Based on the research topic, classify the AI use case as: <code>UNACCEPTABLE</code> / <code>HIGH_RISK</code> / <code>LIMITED_RISK</code> / <code>MINIMAL_RISK</code> per EU AI Act Annex III. Use a short prompt to Claude with the classification schema. Store the result in <code>research_runs.risk_level</code>. This is a 50-line module that shows deep EU AI Act awareness.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">A.2</span>
+        <div>
+          <div class="ut-title">Build a transparency disclosure generator</div>
+          <div class="ut-desc">For every research report, append a <em>Transparency Notice</em> section: which LLMs were used, what training data sources were consulted, confidence level, known limitations. Store as <code>research_runs.transparency_notice</code>. EU AI Act Article 13 mandates this for high-risk systems. Even doing it for limited-risk systems signals you read the regulation.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">A.3</span>
+        <div>
+          <div class="ut-title">Add a 6th Streamlit page — EU AI Act Compliance Dashboard</div>
+          <div class="ut-desc">Show: risk level badge per run, transparency score (0–100 based on how much metadata was captured), a checklist of EU AI Act obligations ticked off. Use <code>st.metric</code> for the transparency score. Add a one-click "Generate Compliance Summary" button that produces a PDF. This page is your portfolio centrepiece — screenshot it for LinkedIn.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">A.4</span>
+        <div>
+          <div class="ut-title">Reframe your demo use case around EU AI Act research</div>
+          <div class="ut-desc">Change your default demo goal from a generic topic to: <em>"What are the EU AI Act obligations for a Swedish manufacturing SME deploying a quality control AI system?"</em> — This is a real question thousands of companies are asking right now. Your agent will research, analyse, and synthesise a compliance briefing. That's your 60-second demo.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="ub-note" style="border-color:var(--eu)">
+      <strong>🎯 Interview Talking Point</strong>
+      "I built an EU AI Act compliance layer into my research agent — including risk classification, transparency notices, and an audit trail. When an interviewer at a German or Dutch company hears this, the conversation shifts from 'can you code' to 'when can you start'."
+    </div>
+  </div>
+</div>
+
+<!-- UPGRADE 3: EXPLAINABLE AI -->
+<div class="upgrade-block" id="ub3">
+  <div class="ub-header">
+    <div class="ub-stripe" style="background:var(--xai)"></div>
+    <div class="ub-head-inner">
+      <div class="ub-icon">🔍</div>
+      <div class="ub-name">Upgrade 3 — Explainable AI (XAI) Decision Traces</div>
+      <span class="ub-why" style="color:var(--xai);border-color:var(--xai)">EU AI Act Art. 13</span>
+    </div>
+  </div>
+  <div class="ub-body">
+    <div class="ub-tasks">
+
+      <div class="ub-task">
+        <span class="ut-num">X.1</span>
+        <div>
+          <div class="ut-title">Add a <code>DecisionTrace</code> Pydantic model to every agent</div>
+          <div class="ut-desc">Each agent node, alongside its output, must also return a <code>DecisionTrace</code> object with fields: <code>agent_name, reasoning_steps: list[str], sources_used: list[str], confidence: float, alternatives_considered: list[str]</code>. Store as JSONB in <code>agent_tasks.decision_trace</code>. This adds ~10 lines per agent and makes every decision auditable.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">X.2</span>
+        <div>
+          <div class="ut-title">Show decision traces in the Report Viewer page</div>
+          <div class="ut-desc">For each section of the final report, add an expandable <code>st.expander("Why did the agent conclude this?")</code> that shows the Analyst agent's <code>reasoning_steps</code> and <code>sources_used</code>. Add a confidence bar using <code>st.progress(confidence_score)</code>. This is XAI made tangible — something most senior engineers talk about but few actually implement.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">X.3</span>
+        <div>
+          <div class="ut-title">Add a Counterfactual Analysis tool to the Critic Agent</div>
+          <div class="ut-desc">When the Critic scores a claim below 0.7, it now also generates: <em>"If this claim is wrong, what would the alternative conclusion be?"</em> — stored as <code>counterfactual</code> in the agent task. This is a genuine XAI technique (counterfactual explanations) and a strong interview talking point about model robustness.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="ub-note" style="border-color:var(--xai)">
+      <strong>🔍 The XAI Differentiator</strong>
+      Most multi-agent systems are black boxes. Yours will have a full decision trace for every conclusion. In industries like healthcare, legal, and financial services — all huge in Europe — this is non-negotiable. Put "Explainable AI" prominently in your GitHub README and LinkedIn headline.
+    </div>
+  </div>
+</div>
+
+<!-- UPGRADE 4: MULTILINGUAL -->
+<div class="upgrade-block" id="ub4">
+  <div class="ub-header">
+    <div class="ub-stripe" style="background:var(--ml)"></div>
+    <div class="ub-head-inner">
+      <div class="ub-icon">🌍</div>
+      <div class="ub-name">Upgrade 4 — Multilingual NLP (Swedish + German)</div>
+      <span class="ub-why" style="color:var(--ml);border-color:var(--ml)">Local Language Edge</span>
+    </div>
+  </div>
+  <div class="ub-body">
+    <div class="ub-tasks">
+
+      <div class="ub-task">
+        <span class="ut-num">M.1</span>
+        <div>
+          <div class="ut-title">Replace OpenAIEmbeddings with <code>multilingual-e5-large</code> from HuggingFace</div>
+          <div class="ut-desc">Install: <code>pip install sentence-transformers</code>. Use <code>HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large")</code> from <code>langchain_community.embeddings</code>. This model supports 100+ languages including Swedish and German with state-of-the-art quality. It runs locally — no API costs, no data leaving your machine.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">M.2</span>
+        <div>
+          <div class="ut-title">Add language detection in the ingestion pipeline</div>
+          <div class="ut-desc">Install: <code>pip install langdetect</code>. After loading each document, run <code>detect(doc.page_content[:500])</code>. Store the result as <code>metadata["language"]</code> on each chunk. Add a <code>language</code> column to <code>document_chunks</code>. Add a language filter to your retriever — when the user's query is in Swedish, prioritise Swedish chunks.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">M.3</span>
+        <div>
+          <div class="ut-title">Add a language selector to the Streamlit upload page</div>
+          <div class="ut-desc">Simple <code>st.selectbox("Document language", ["Auto-detect", "English", "Swedish (Svenska)", "German (Deutsch)", "Dutch (Nederlands)"])</code>. Pass the selection to the ingestor. Show the detected language after upload as <code>st.success(f"Detected language: Swedish 🇸🇪")</code>. This is a 5-line UI addition that shows multilingual awareness.</div>
+        </div>
+      </div>
+
+      <div class="ub-task">
+        <span class="ut-num">M.4</span>
+        <div>
+          <div class="ut-title">Test with real Swedish regulatory documents</div>
+          <div class="ut-desc">Download Swedish government PDFs on AI regulation from <code>government.se</code> or <code>digg.se</code> (the Swedish Agency for Digital Government). Upload them and verify your retriever returns relevant chunks for both Swedish and English queries. Include this test in your README. Screenshotting "Swedish PDF → correct Swedish answer" is worth more than 100 lines of code in a Swedish job application.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="ub-note" style="border-color:var(--ml)">
+      <strong>🌍 The Local Language Moat</strong>
+      The vast majority of AI engineers applying to European roles speak only English and have built only English-language systems. The moment you show you've handled Swedish and German documents — even in a basic way — you've separated yourself from 80% of the competition. This matters especially in Stockholm, Munich, and Amsterdam.
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: UPGRADED PROJECT TITLE + PITCH -->
+<div class="sec">
+  <span class="sec-num">03 ——</span>
+  <span class="sec-title">Your New Project Title + One-Line Pitch</span>
+</div>
+
+<table class="compare-table" style="margin-bottom:48px">
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Before (Generic)</th>
+      <th>After (Europe-Ready)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GitHub Repo Name</td>
+      <td><span class="old">research-agent</span></td>
+      <td><span class="new">eu-regulatory-intelligence-agent</span></td>
+    </tr>
+    <tr>
+      <td>README Title</td>
+      <td><span class="old">Multi-Agent Research System</span></td>
+      <td><span class="new">EU Regulatory Intelligence Agent — GDPR & EU AI Act Compliant Multi-Agent Research System</span></td>
+    </tr>
+    <tr>
+      <td>LinkedIn Description</td>
+      <td><span class="old">Built a multi-agent research system with LangGraph</span></td>
+      <td><span class="new">Built a production multi-agent system that researches EU regulatory requirements — with GDPR compliance, EU AI Act risk classification, explainable AI decision traces, and Swedish/German multilingual document support</span></td>
+    </tr>
+    <tr>
+      <td>Interview Pitch (30 sec)</td>
+      <td><span class="old">I built a RAG chatbot that answers questions from PDFs</span></td>
+      <td><span class="new">"I built a multi-agent regulatory intelligence system using LangGraph and LangChain. It classifies EU AI Act risk levels, generates GDPR-compliant audit trails, handles Swedish and German documents natively, and produces explainable decision traces for every conclusion. It's live at [url]."</span></td>
+    </tr>
+    <tr>
+      <td>Blog Post Title</td>
+      <td><span class="old">How I Built a Research Agent with LangGraph</span></td>
+      <td><span class="new">"Building a GDPR-Compliant, EU AI Act-Ready Research Agent in 6 Weeks — What I Learned"</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECTION: WHERE TO APPLY -->
+<div class="sec">
+  <span class="sec-num">04 ——</span>
+  <span class="sec-title">Where This Project Opens Doors</span>
+</div>
+
+<div class="country-grid">
+  <div class="country-card">
+    <div class="cc-flag">🇸🇪</div>
+    <div class="cc-country">Sweden</div>
+    <div class="cc-city">Stockholm · Gothenburg · Malmö</div>
+    <div class="cc-hook">You're already here. Swedish regulatory documents demo is extremely compelling to Swedish employers. Target: Ericsson, Klarna, Spotify, King, H&M Tech.</div>
+  </div>
+  <div class="country-card">
+    <div class="cc-flag">🇩🇪</div>
+    <div class="cc-country">Germany</div>
+    <div class="cc-city">Berlin · Munich · Hamburg</div>
+    <div class="cc-hook">Largest EU AI job market. German language support + EU AI Act angle directly targets industrial and automotive sectors. Target: Siemens, BMW, SAP, Aleph Alpha.</div>
+  </div>
+  <div class="country-card">
+    <div class="cc-flag">🇳🇱</div>
+    <div class="cc-country">Netherlands</div>
+    <div class="cc-city">Amsterdam · Eindhoven · Utrecht</div>
+    <div class="cc-hook">Very English-friendly, massive fintech and legal tech scene. GDPR compliance angle is particularly strong here. Target: ASML, Booking.com, Adyen, ING.</div>
+  </div>
+  <div class="country-card">
+    <div class="cc-flag">🇨🇭</div>
+    <div class="cc-country">Switzerland</div>
+    <div class="cc-city">Zürich · Basel · Geneva</div>
+    <div class="cc-hook">Highest AI salaries in Europe. Regulatory compliance angle is huge in finance and pharma. Target: UBS, Roche, Novartis, Google Zürich.</div>
+  </div>
+  <div class="country-card">
+    <div class="cc-flag">🇩🇰</div>
+    <div class="cc-country">Denmark</div>
+    <div class="cc-city">Copenhagen · Aarhus</div>
+    <div class="cc-hook">Close to Sweden, Nordic job market overlap. Strong MedTech and shipping sectors. Target: Novo Nordisk, Maersk, Vestas.</div>
+  </div>
+  <div class="country-card">
+    <div class="cc-flag">🇫🇷</div>
+    <div class="cc-country">France</div>
+    <div class="cc-city">Paris · Lyon</div>
+    <div class="cc-hook">Fast-growing AI ecosystem. French language support can be added trivially with multilingual-e5. Target: Mistral AI, BNP Paribas, Thales.</div>
+  </div>
+</div>
+
+<!-- CV / RESUME SECTION -->
+<div class="resume-box">
+  <div class="rb-title">How to Write This on Your CV / LinkedIn</div>
+  <div class="rb-lines">
+
+    <div class="rb-line">
+      <span class="rb-bullet">→</span>
+      <span><strong>Project Title:</strong> EU Regulatory Intelligence Agent — LangGraph · LangChain · Streamlit · Supabase · GDPR · EU AI Act</span>
+    </div>
+    <div class="rb-line">
+      <span class="rb-bullet">→</span>
+      <span>Designed and deployed a production multi-agent research system using LangGraph StateGraph with Planner, Researcher, Analyst, Critic, and Synthesizer agents orchestrated via Google A2A Protocol</span>
+    </div>
+    <div class="rb-line">
+      <span class="rb-bullet">→</span>
+      <span>Implemented EU AI Act risk classification module, GDPR-compliant data handling (right-to-erasure endpoint, consent tracking, PII scrubbing), and immutable audit trail with SHA-256 hash chaining</span>
+    </div>
+    <div class="rb-line">
+      <span class="rb-bullet">→</span>
+      <span>Built explainable AI decision trace system — every agent conclusion emits structured reasoning steps, sources used, and confidence scores (EU AI Act Article 13 compliance)</span>
+    </div>
+    <div class="rb-line">
+      <span class="rb-bullet">→</span>
+      <span>Implemented multilingual RAG pipeline supporting Swedish, German, and English documents using multilingual-e5-large embeddings with language-aware retrieval routing</span>
+    </div>
+    <div class="rb-line">
+      <span class="rb-bullet">→</span>
+      <span>Evaluated with RAGAS (faithfulness: 0.81, answer relevancy: 0.79) and LLM-as-Judge scoring. Deployed FastAPI on Railway + Streamlit on Community Cloud. Live demo: [your-url]</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- SECTION: TOTAL EFFORT -->
+<div class="sec">
+  <span class="sec-num">05 ——</span>
+  <span class="sec-title">Total Extra Effort Required</span>
+</div>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>Upgrade</th>
+      <th>Estimated Time</th>
+      <th>Difficulty</th>
+      <th>Interview Impact</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GDPR Compliance Layer</td>
+      <td>3–4 hours</td>
+      <td><span class="badge" style="color:var(--xai);border-color:var(--xai)">Medium</span></td>
+      <td>Very High — rare skill, well-paid specialisation</td>
+    </tr>
+    <tr>
+      <td>EU AI Act Module</td>
+      <td>4–5 hours</td>
+      <td><span class="badge" style="color:var(--xai);border-color:var(--xai)">Medium</span></td>
+      <td>Extremely High — every EU company is scrambling for this</td>
+    </tr>
+    <tr>
+      <td>XAI Decision Traces</td>
+      <td>2–3 hours</td>
+      <td><span class="badge" style="color:var(--xai);border-color:var(--xai)">Medium</span></td>
+      <td>High — shows production maturity and ethical thinking</td>
+    </tr>
+    <tr>
+      <td>Multilingual NLP</td>
+      <td>2–3 hours</td>
+      <td><span class="badge" style="color:var(--xai);border-color:var(--xai)">Low-Medium</span></td>
+      <td>High — immediate local market differentiator</td>
+    </tr>
+    <tr>
+      <td>Reframe Demo + README</td>
+      <td>1–2 hours</td>
+      <td><span class="badge" style="color:var(--xai);border-color:var(--xai)">Low</span></td>
+      <td>High — framing is everything in job applications</td>
+    </tr>
+    <tr>
+      <td style="font-weight:700">TOTAL</td>
+      <td style="font-weight:700;color:var(--eu)">~12–17 hours</td>
+      <td></td>
+      <td style="font-weight:700;color:var(--eu)">Transforms a strong student project into a senior-level portfolio piece</td>
+    </tr>
+  </tbody>
+</table>
+
+</div><!-- /wrap -->
+
+<div class="wrap">
+<footer>
+  <span>Project 1 — Europe-Ready Upgrade · AI Engineer Portfolio 2026</span>
+  <span>University West · Trollhättan · Sweden 🇸🇪</span>
+</footer>
+</div>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.05 });
+document.querySelectorAll('.upgrade-block').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
