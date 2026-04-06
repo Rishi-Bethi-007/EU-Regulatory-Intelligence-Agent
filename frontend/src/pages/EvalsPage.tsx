@@ -38,7 +38,7 @@ export default function EvalsPage() {
       .select('id,goal,status,risk_level,transparency_score,token_count,cost_usd,duration_ms,created_at')
       .eq('status','completed').eq('user_id', user.id)
       .order('created_at',{ascending:false}).limit(30)
-    setRuns(data ?? [])
+    setRuns((data ?? []) as ResearchRun[])
   }
 
   async function fetchEvals() {

@@ -424,7 +424,7 @@ export default function ReportsPage() {
       .not('goal', 'like', '[ERASED%]')
       .order('created_at', { ascending: false })
       .limit(10)
-    setRecentRuns(data ?? [])
+    setRecentRuns((data ?? []) as ResearchRun[])
     if (!activeRunId && data?.[0]) setActiveRunId(data[0].id)
   }
 

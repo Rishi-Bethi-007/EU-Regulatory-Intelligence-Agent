@@ -35,7 +35,7 @@ export default function HomePage() {
       .not('goal', 'like', '[ERASED%]')
       .order('created_at', { ascending: false })
       .limit(8)
-    setRecentRuns(data ?? [])
+    setRecentRuns((data ?? []) as ResearchRun[])
   }
 
   async function handleRun() {
