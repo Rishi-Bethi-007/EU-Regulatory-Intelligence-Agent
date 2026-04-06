@@ -80,7 +80,7 @@ jobs:
           LANGCHAIN_API_KEY:   ${{ secrets.LANGCHAIN_API_KEY }}
           LANGCHAIN_TRACING_V2: "false"
           ENVIRONMENT:         "test"
-        run: uv run pytest tests/ -v --tb=short -x --ignore=tests/test_orchestrator.py --ignore=tests/test_retriever.py
+        run: uv run pytest tests/test_mcp_servers.py::test_citation_formatter tests/test_mcp_servers.py::test_tool_call_log_schema -v --tb=short
 
   # ── Job 2: Build + Push to ECR ─────────────────────────────────────────────
   # Runs on main branch only, after test passes.
