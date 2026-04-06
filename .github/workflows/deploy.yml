@@ -38,6 +38,7 @@ on:
 env:
   AWS_REGION:      eu-north-1
   PYTHON_VERSION:  "3.13"
+  UV_PYTHON_PREFERENCE: only-system
 
 jobs:
   # ── Job 1: Test + Lint ──────────────────────────────────────────────────────
@@ -62,6 +63,8 @@ jobs:
           version: "0.6.6"
 
       - name: Install dependencies
+        env:
+          UV_PYTHON_PREFERENCE: only-system
         run: uv sync --frozen
 
       - name: Lint with ruff
