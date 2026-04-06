@@ -10,7 +10,6 @@ Usage:
 """
 
 import asyncio
-import uuid
 import sys
 from pathlib import Path
 

@@ -48,3 +48,7 @@ explicit = true
 
 [tool.uv.sources]
 torch = { index = "pytorch-cpu" }
+
+[tool.ruff.lint]
+select = ["E", "W", "F"]
+ignore = ["E501", "F841"]

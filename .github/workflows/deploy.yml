@@ -65,7 +65,7 @@ jobs:
         run: uv sync --frozen
 
       - name: Lint with ruff
-        run: uv run ruff check . --select E,W,F --output-format=github
+        run: uv run ruff check . --output-format=github
 
       - name: Run tests
         env:

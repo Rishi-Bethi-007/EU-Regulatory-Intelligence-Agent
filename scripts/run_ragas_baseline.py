@@ -48,7 +48,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from rag.retriever import HybridRetriever
 from db.client import async_insert
-from config.settings import ANTHROPIC_API_KEY, OPENAI_API_KEY
+from config.settings import ANTHROPIC_API_KEY
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -179,9 +179,9 @@ async def build_cache(qa_pairs: list[dict]) -> dict:
     contexts_list = []
     ground_truths = []
 
-    print(f"\nBuilding answer cache (Claude Sonnet — runs once)...")
+    print("\nBuilding answer cache (Claude Sonnet — runs once)...")
     print(f"Retriever: top_k={EVAL_TOP_K}, threshold={EVAL_MATCH_THRESHOLD}, match_count={EVAL_MATCH_COUNT}")
-    print(f"Article keyword augmentation: enabled\n")
+    print("Article keyword augmentation: enabled\n")
 
     for i, pair in enumerate(qa_pairs[:MAX_PAIRS], 1):
         question = pair["question"]
@@ -194,7 +194,7 @@ async def build_cache(qa_pairs: list[dict]) -> dict:
             try:
                 chunk_texts = await retrieve_with_augmentation(retriever, question)
                 if not chunk_texts:
-                    print(f"  ✗ No chunks retrieved")
+                    print("  ✗ No chunks retrieved")
                     break
 
                 context_str = "\n\n---\n\n".join(

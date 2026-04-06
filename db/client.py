@@ -1,8 +1,6 @@
-import os
 import asyncio
 import hashlib
 import json
-import uuid
 from datetime import datetime, timezone
 from supabase import create_client, Client
 from config.settings import SUPABASE_URL, SUPABASE_KEY

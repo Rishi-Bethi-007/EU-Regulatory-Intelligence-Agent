@@ -50,7 +50,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
-from db.client import async_select, async_insert
+from db.client import async_insert
 from config.settings import OPENAI_API_KEY
 
 
@@ -148,7 +148,7 @@ async def judge_report(run: dict, llm) -> JudgeScore:
     report_excerpt = report[:6000] if len(report) > 6000 else report
 
     messages = [
-        SystemMessage(content=f"""You are a senior EU regulatory compliance expert with 15 years
+        SystemMessage(content="""You are a senior EU regulatory compliance expert with 15 years
 of experience in EU AI Act and GDPR enforcement.
 
 Your task is to evaluate an AI-generated compliance report for quality.
@@ -235,7 +235,7 @@ async def main():
     print("=" * 65)
     print(f"Judge model : {JUDGE_MODEL} (cross-model — evaluates Claude outputs)")
     print(f"Reports     : {REPORTS_TO_JUDGE} most recent completed runs")
-    print(f"Target      : overall score > 0.75")
+    print("Target      : overall score > 0.75")
     print("=" * 65)
 
     # Fetch runs
@@ -326,7 +326,7 @@ async def main():
     print(f"  completeness      : {avg['completeness']:.4f}")
     print(f"  citation_quality  : {avg['citation_quality']:.4f}")
     print(f"  eu_relevance      : {avg['eu_relevance']:.4f}")
-    print(f"  ─────────────────────────────")
+    print("  ─────────────────────────────")
     print(f"  overall           : {avg['overall']:.4f}  (target: > 0.75)")
     print(f"\n  Reports evaluated : {len(all_scores)}")
     print("=" * 65)

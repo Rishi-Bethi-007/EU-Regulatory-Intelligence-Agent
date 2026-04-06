@@ -31,7 +31,7 @@ async def run_test(goal: str, label: str) -> dict:
     final_state   = await graph.ainvoke(initial_state)
 
     # Print summary
-    print(f"\n--- RESULT SUMMARY ---")
+    print("\n--- RESULT SUMMARY ---")
     print(f"Task type      : {final_state.get('task_type', '?')}")
     print(f"Retry count    : {final_state.get('retry_count', 0)}")
     print(f"Tokens used    : {final_state.get('tokens_used', 0)}")
@@ -61,7 +61,7 @@ async def run_test(goal: str, label: str) -> dict:
     has_provider = "Provider" in final_output or "provider" in final_output
     has_nextsteps = "Next Steps" in final_output or "next steps" in final_output.lower()
 
-    print(f"\n--- VISUAL ELEMENTS ---")
+    print("\n--- VISUAL ELEMENTS ---")
     print(f"Obligations table  : {'✓' if has_table else '✗'}")
     print(f"Mermaid flowchart  : {'✓' if has_mermaid else '✗'}")
     print(f"Risk badge         : {'✓' if has_badge else '✗'}")
@@ -76,7 +76,7 @@ async def run_test(goal: str, label: str) -> dict:
         filters={"research_run_id": run_id},
         columns="agent_name, status, decision_trace",
     )
-    print(f"\n--- AGENT TASKS ---")
+    print("\n--- AGENT TASKS ---")
     for task in agent_tasks:
         has_trace = bool(task.get("decision_trace"))
         print(f"  {task['agent_name']:<15} status={task['status']:<12} trace={'✓' if has_trace else '✗'}")
@@ -84,7 +84,7 @@ async def run_test(goal: str, label: str) -> dict:
     # Check goal correctness
     original_goal = final_state.get("original_goal", "")
     report_goal_ok = goal[:50].lower() in final_output.lower()
-    print(f"\n--- GOAL VERIFICATION ---")
+    print("\n--- GOAL VERIFICATION ---")
     print(f"Original goal preserved : {'✓' if original_goal == goal else '✗'}")
     print(f"Report contains goal    : {'✓' if report_goal_ok else '✗'}")
     print(f"original_goal           : {original_goal[:80]}...")
@@ -95,7 +95,7 @@ async def run_test(goal: str, label: str) -> dict:
         safe_label = label.replace(" ", "_").replace("—", "-")[:40]
         report_path = REPORTS_DIR / f"{safe_label}.md"
         report_path.write_text(final_output, encoding="utf-8")
-        print(f"\n--- FULL REPORT SAVED ---")
+        print("\n--- FULL REPORT SAVED ---")
         print(f"Path: {report_path}")
 
     # Print A2A task flow
@@ -111,7 +111,7 @@ async def run_test(goal: str, label: str) -> dict:
                 last_msg = msgs[-1]
                 print(f"    └─ [{last_msg.get('role','?')}] {last_msg.get('text','')[:80]}")
 
-    print(f"\n--- FIRST 2000 CHARS OF REPORT ---")
+    print("\n--- FIRST 2000 CHARS OF REPORT ---")
     print(final_output[:2000])
 
     return final_state

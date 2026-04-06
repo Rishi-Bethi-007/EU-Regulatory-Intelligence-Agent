@@ -28,7 +28,6 @@ SDK: a2a-sdk 0.3.x
 
 import uuid
 from datetime import datetime, timezone
-from typing import Any
 
 from a2a.types import (
     AgentCard,

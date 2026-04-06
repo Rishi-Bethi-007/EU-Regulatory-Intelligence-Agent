@@ -36,7 +36,6 @@ import httpx
 from api.main import app
 from db.client import (
     log_audit_event,
-    verify_audit_chain,
     async_insert,
     async_select,
     get_client,
@@ -168,7 +167,7 @@ async def test_3_gdpr_art17_delete_endpoint(client: httpx.AsyncClient):
     if not data["erased"]:
         fail("Response says erased=false")
 
-    ok(f"Endpoint returned erased=True")
+    ok("Endpoint returned erased=True")
     ok(f"runs_anonymised={data['runs_anonymised']}, "
        f"chunks_deleted={data['chunks_deleted']}, "
        f"docs_deleted={data['docs_deleted']}, "

@@ -23,18 +23,15 @@ Task types the Planner recognises:
 The task_type determines which conditional edges fire in the LangGraph orchestrator.
 """
 
-import time
-from typing import TypedDict
 
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
-from compliance.xai import DecisionTrace, build_planner_trace, TraceTimer
+from compliance.xai import build_planner_trace, TraceTimer
 from db.client import log_agent_task_start, log_agent_task_complete, log_audit_event
 from tools.a2a_agents import (
     A2ADispatcher,
-    AGENT_REGISTRY,
     SKILL_TASK_DECOMPOSITION,
     SKILL_REGULATORY_RESEARCH,
     SKILL_REGULATORY_ANALYSIS,

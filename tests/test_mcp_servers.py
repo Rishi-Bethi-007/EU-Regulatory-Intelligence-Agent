@@ -83,7 +83,7 @@ def test_citation_formatter():
             if not has_org:
                 print(f"       FAIL: expected org '{case['expected_org']}' not in citation")
             if not has_url:
-                print(f"       FAIL: URL not in citation")
+                print("       FAIL: URL not in citation")
 
     return all_passed
 

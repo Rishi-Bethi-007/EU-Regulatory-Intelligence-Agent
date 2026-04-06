@@ -24,7 +24,7 @@ Why this matters for the portfolio:
 
 from __future__ import annotations
 
-import time 
+import time
 from datetime import datetime, timezone
 from typing import Any
 from pydantic import BaseModel, Field

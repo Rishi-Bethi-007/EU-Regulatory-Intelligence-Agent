@@ -100,7 +100,7 @@ async def try_html_ingest(url: str, label: str) -> bool:
     from langchain_community.document_loaders import WebBaseLoader
     from langchain_experimental.text_splitter import SemanticChunker
     from langchain_huggingface import HuggingFaceEmbeddings
-    from db.client import async_insert, log_audit_event
+    from db.client import log_audit_event
 
     print(f"  Trying HTML: {label}")
     print(f"  URL        : {url[:80]}")
@@ -212,7 +212,7 @@ async def main():
         else:
             pdf_bytes = await try_pdf_download(source["url"], source["label"])
             if pdf_bytes:
-                print(f"  Ingesting PDF...")
+                print("  Ingesting PDF...")
                 try:
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                         tmp.write(pdf_bytes)

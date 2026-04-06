@@ -274,7 +274,7 @@ async def synthesizer_node(state: dict) -> dict:
 The system has been classified as {risk_level} with {len(obligations)} verified obligations.
 Include all sections including the risk classification ladder and obligations table."""
             else:
-                report_instructions = f"""Write a regulatory summary report.
+                report_instructions = """Write a regulatory summary report.
 No specific AI system was described so risk classification cannot be assigned.
 Show the risk ladder as a reference tool and explain how the SME would use it.
 Focus on explaining what the regulation requires in clear, plain language.
@@ -429,7 +429,7 @@ RETRIES: {retry_count}/2
             trace.reasoning_steps = [
                 f"has_analyst={has_analyst}, risk_level={risk_level}",
                 f"Obligations: {len(obligations)}",
-                f"Built visuals: risk ladder, flowchart, obligations table",
+                "Built visuals: risk ladder, flowchart, obligations table",
                 f"Citations extracted: {citation_count}",
                 f"Confidence: {confidence_summary}",
                 f"Generated {len(final_report)} char report",

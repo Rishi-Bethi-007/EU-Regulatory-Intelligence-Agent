@@ -122,11 +122,11 @@ async def download_and_ingest(doc: dict, index: int, total: int) -> bool:
 
     # Check for duplicates
     if await already_ingested(title):
-        print(f"         SKIP — already in corpus")
+        print("         SKIP — already in corpus")
         return True
 
     # Download PDF
-    print(f"         Downloading...")
+    print("         Downloading...")
     try:
         async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
             response = await client.get(url)
@@ -195,7 +195,7 @@ async def main():
         print("  uv run python scripts/run_ragas_baseline.py")
     else:
         failed = [t for t, s in results if not s]
-        print(f"\nFailed documents — retry manually:")
+        print("\nFailed documents — retry manually:")
         for t in failed:
             print(f"  - {t}")
 

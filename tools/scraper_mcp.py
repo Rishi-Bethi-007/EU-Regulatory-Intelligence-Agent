@@ -161,13 +161,20 @@ def _extract_text_structured(root) -> str:
         text = el.get_text(separator=" ", strip=True)
         if not text or len(text) < 15:
             continue
-        if   el.name == "h1": lines.append(f"\n# {text}\n")
-        elif el.name == "h2": lines.append(f"\n## {text}\n")
-        elif el.name == "h3": lines.append(f"\n### {text}\n")
-        elif el.name == "h4": lines.append(f"\n#### {text}\n")
-        elif el.name == "li": lines.append(f"- {text}")
-        elif el.name in ("td", "th"): lines.append(f"| {text} |")
-        else: lines.append(text)
+        if el.name == "h1":
+            lines.append(f"\n# {text}\n")
+        elif el.name == "h2":
+            lines.append(f"\n## {text}\n")
+        elif el.name == "h3":
+            lines.append(f"\n### {text}\n")
+        elif el.name == "h4":
+            lines.append(f"\n#### {text}\n")
+        elif el.name == "li":
+            lines.append(f"- {text}")
+        elif el.name in ("td", "th"):
+            lines.append(f"| {text} |")
+        else:
+            lines.append(text)
 
     return "\n".join(lines)
 
@@ -175,7 +182,7 @@ def _extract_text_structured(root) -> str:
 def _clean(text: str) -> str:
     """Collapse blank lines, remove symbol-only lines."""
     text  = re.sub(r"\n{3,}", "\n\n", text)
-    lines = [l for l in text.split("\n") if re.search(r"[a-zA-Z0-9]", l)]
+    lines = [line for line in text.split("\n") if re.search(r"[a-zA-Z0-9]", line)]
     return "\n".join(lines).strip()
 
 

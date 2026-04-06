@@ -25,7 +25,7 @@ from agents.critic      import critic_node
 from agents.synthesizer import synthesizer_node
 from tools.a2a_agents   import A2ADispatcher
 from config.settings    import MAX_RETRIES
-from compliance.risk_classifier import classify_risk, RiskLevel
+from compliance.risk_classifier import classify_risk
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -159,7 +159,7 @@ async def risk_classifier_node(state: OrchestratorState) -> OrchestratorState:
     goal   = state["goal"]
     run_id = state.get("run_id", "")
 
-    print(f"\n[RiskClassifier] Classifying goal...")
+    print("\n[RiskClassifier] Classifying goal...")
     print(f"[RiskClassifier] Goal: {goal[:100]}...")
 
     assessment = await classify_risk(goal=goal, run_id=run_id)
@@ -172,7 +172,7 @@ async def risk_classifier_node(state: OrchestratorState) -> OrchestratorState:
         print(f"[RiskClassifier] Articles: {', '.join(assessment.applicable_articles)}")
 
     if assessment.is_blocked():
-        print(f"\n[RiskClassifier] 🚫 BLOCKED — UNACCEPTABLE risk. No agents will run.")
+        print("\n[RiskClassifier] 🚫 BLOCKED — UNACCEPTABLE risk. No agents will run.")
         error_msg = (
             f"This research goal has been classified as UNACCEPTABLE under "
             f"EU AI Act Article 5 (prohibited AI practices) and cannot be processed. "
@@ -223,7 +223,7 @@ def route_after_researcher(state: OrchestratorState) -> Literal["analyst", "synt
 
     task_type = state.get("task_type", "comprehensive")
     if task_type == "comprehensive":
-        print(f"[Router] task_type=comprehensive → Analyst")
+        print("[Router] task_type=comprehensive → Analyst")
         return "analyst"
     else:
         print(f"[Router] task_type={task_type} → restore_goal → Synthesizer")

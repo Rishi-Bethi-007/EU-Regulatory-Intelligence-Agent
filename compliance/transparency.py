@@ -229,7 +229,6 @@ def compute_transparency_score(run_metadata: dict) -> tuple[int, dict]:
         Tuple of (score: int, breakdown: dict) where breakdown explains
         which dimensions passed and which failed.
     """
-    from compliance.risk_classifier import RISK_EMOJI
 
     score     = 0
     breakdown = {}

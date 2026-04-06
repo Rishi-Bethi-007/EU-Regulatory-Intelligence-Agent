@@ -108,7 +108,7 @@ async def ingest_document(
     print(f"[Ingest] PII scrubbed across {len(raw_docs)} pages")
 
     # ── Step 4: Semantic chunking ─────────────────────────────────────────────
-    print(f"[Ingest] Chunking with SemanticChunker...")
+    print("[Ingest] Chunking with SemanticChunker...")
     splitter = SemanticChunker(
         _embedder,
         breakpoint_threshold_type="percentile"
@@ -123,7 +123,7 @@ async def ingest_document(
     print(f"[Ingest] Embedding {len(chunks)} chunks...")
     texts      = [chunk.page_content for chunk in chunks]
     embeddings = await asyncio.to_thread(lambda: _embedder.embed_documents(texts))
-    print(f"[Ingest] Embeddings generated ✓")
+    print("[Ingest] Embeddings generated ✓")
 
     # ── Step 6: Insert documents row FIRST (parent before children) ───────────
     # FK constraint: document_chunks.document_id → documents.id

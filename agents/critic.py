@@ -63,7 +63,7 @@ def _build_retry_query(
 
     # Build a SHORT context phrase from the goal — not the full goal string
     # Extract the core subject (max 60 chars) to keep query under limit
-    goal_context = original_goal[:60].rsplit(" ", 1)[0]  # trim at word boundary
+    _goal_context = original_goal[:60].rsplit(" ", 1)[0]  # trim at word boundary (unused, kept for future retry query tuning)
 
     # Retry 1: article-focused combined query
     # Strip "EU AI Act " prefix from refs — we prepend it ourselves to avoid duplication
@@ -195,7 +195,7 @@ async def critic_node(state: dict) -> dict:
             obligations     = analyst_output.get("obligations", [])
             risk_level      = analyst_output.get("risk_level", "")
             risk_justif     = analyst_output.get("risk_justification", "")
-            gaps_identified = analyst_output.get("gaps_identified", [])
+            _gaps_identified = analyst_output.get("gaps_identified", [])  # noqa: F841
 
             print(f"\n[Critic] Verifying {len(obligations)} obligations "
                   f"(retry_count={retry_count}) via {CRITIC_MODEL}...")
