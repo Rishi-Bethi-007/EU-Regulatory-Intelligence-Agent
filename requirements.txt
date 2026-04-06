@@ -1,43 +1,21 @@
-# Core
-anthropic>=0.40.0
-openai>=1.50.0
-python-dotenv>=1.0.0
-
-# RAG / Vector Store
-langchain>=0.3.0
-langchain-community>=0.3.0
-langchain-anthropic>=0.3.0
-langchain-openai>=0.2.0
-chromadb>=0.5.0
-faiss-cpu>=1.8.0
-tiktoken>=0.7.0
-
-# Document processing
-pypdf>=4.0.0
-python-docx>=1.1.0
-unstructured>=0.15.0
-beautifulsoup4>=4.12.0
-requests>=2.32.0
-httpx>=0.27.0
-
-# Streamlit UI
-streamlit>=1.40.0
-
-# API
-fastapi>=0.115.0
-uvicorn[standard]>=0.32.0
-pydantic>=2.9.0
-
-# Database
-sqlalchemy>=2.0.0
-alembic>=1.13.0
-psycopg2-binary>=2.9.0
-
-# Evals
-deepeval>=1.0.0
-
-# Dev / testing
-pytest>=8.3.0
-pytest-asyncio>=0.24.0
-black>=24.10.0
-ruff>=0.7.0
+# ── DEPRECATED — do not use this file ────────────────────────────────────────
+#
+# This project uses pyproject.toml + uv for dependency management.
+#
+# To install dependencies:
+#   uv sync              (installs all deps including dev)
+#   uv sync --no-dev     (production deps only, same as Docker)
+#
+# To add a dependency:
+#   uv add <package>
+#
+# Docker uses:
+#   uv sync --frozen --no-dev
+#
+# This file exists only for legacy CI tools that require a requirements.txt.
+# It is auto-generated from pyproject.toml and should not be edited manually.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# To regenerate from pyproject.toml:
+#   uv export --no-dev --output-file requirements.txt
+# ─────────────────────────────────────────────────────────────────────────────

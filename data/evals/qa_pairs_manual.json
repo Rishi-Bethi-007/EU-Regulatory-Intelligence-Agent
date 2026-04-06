@@ -1,0 +1,142 @@
+[
+  {
+    "id": "en_aiact_01",
+    "language": "en",
+    "source": "EU AI Act",
+    "question": "What are the obligations of providers of high-risk AI systems under Article 16 of the EU AI Act?",
+    "ground_truth": "Providers of high-risk AI systems must establish a quality management system, draw up technical documentation, ensure the system undergoes a conformity assessment, register the system in the EU database, affix CE marking, draw up an EU declaration of conformity, and take corrective actions when the system is not in conformity. They must also cooperate with national authorities and implement post-market monitoring."
+  },
+  {
+    "id": "en_aiact_02",
+    "language": "en",
+    "source": "EU AI Act",
+    "question": "What categories of AI systems are prohibited under the EU AI Act?",
+    "ground_truth": "The EU AI Act prohibits AI systems that deploy subliminal techniques to manipulate behaviour, exploit vulnerabilities of specific groups, use real-time remote biometric identification in public spaces by law enforcement (with limited exceptions), create social scoring systems by public authorities, and use AI to infer emotions in workplaces and educational institutions. These are considered unacceptable risk AI practices."
+  },
+  {
+    "id": "en_aiact_03",
+    "language": "en",
+    "source": "EU AI Act",
+    "question": "What is Annex III of the EU AI Act and what does it list?",
+    "ground_truth": "Annex III lists the high-risk AI system categories that are subject to the strict obligations in Chapter III of the EU AI Act. These include AI used in biometrics, critical infrastructure, education, employment, essential services, law enforcement, migration and border control, and administration of justice. Any AI system falling into these categories must comply with the full high-risk AI obligations."
+  },
+  {
+    "id": "en_aiact_04",
+    "language": "en",
+    "source": "EU AI Act",
+    "question": "What does Article 13 of the EU AI Act require regarding transparency for high-risk AI systems?",
+    "ground_truth": "Article 13 requires that high-risk AI systems are designed and developed in a way that ensures their operation is sufficiently transparent to enable deployers to interpret the system's output and use it appropriately. Providers must supply an instructions-for-use document including the system's intended purpose, level of accuracy, known limitations, human oversight measures, and the data used for training."
+  },
+  {
+    "id": "en_aiact_05",
+    "language": "en",
+    "source": "EU AI Act",
+    "question": "What is the role of notified bodies under the EU AI Act conformity assessment process?",
+    "ground_truth": "Notified bodies are independent third-party organisations designated by EU member states to carry out conformity assessments for certain high-risk AI systems. They verify that the AI system meets the technical requirements set out in the EU AI Act. Their involvement is mandatory for high-risk AI systems listed in Annex III where self-assessment is not permitted, such as biometric identification systems."
+  },
+  {
+    "id": "en_aiact_06",
+    "language": "en",
+    "source": "EU AI Act",
+    "question": "What post-market monitoring obligations apply to providers of high-risk AI systems?",
+    "ground_truth": "Providers must establish and document a post-market monitoring system proportionate to the nature of the AI technology and its risks. The system must actively and systematically collect, document, and analyse data on the performance of the AI system throughout its lifetime. Providers must report serious incidents and malfunctions to market surveillance authorities and take corrective actions when non-conformities are identified."
+  },
+  {
+    "id": "en_aiact_07",
+    "language": "en",
+    "source": "EU AI Act",
+    "question": "What are the requirements for human oversight of high-risk AI systems under the EU AI Act?",
+    "ground_truth": "Article 14 requires that high-risk AI systems are designed and developed to be effectively overseen by natural persons. The system must enable oversight through built-in tools that allow the operator to understand the system's capabilities and limitations, monitor operation and detect anomalies, override or interrupt the system, and not make decisions solely based on the system output if such decisions have significant effects on people."
+  },
+  {
+    "id": "en_aiact_08",
+    "language": "en",
+    "source": "EU AI Act",
+    "question": "What penalties can be imposed for violations of the EU AI Act?",
+    "ground_truth": "Violations of the EU AI Act can result in administrative fines of up to 35 million euros or 7 percent of total worldwide annual turnover for violations related to prohibited AI practices. For non-compliance with other obligations the fine is up to 15 million euros or 3 percent of turnover. For supplying incorrect information to authorities the fine is up to 7.5 million euros or 1 percent of turnover. SMEs and startups benefit from proportionate application."
+  },
+  {
+    "id": "en_gdpr_01",
+    "language": "en",
+    "source": "GDPR",
+    "question": "What are the six lawful bases for processing personal data under GDPR Article 6?",
+    "ground_truth": "The six lawful bases under GDPR Article 6 are: consent of the data subject, performance of a contract, compliance with a legal obligation, protection of vital interests, performance of a task carried out in the public interest, and legitimate interests pursued by the controller or a third party, unless overridden by the interests of the data subject."
+  },
+  {
+    "id": "en_gdpr_02",
+    "language": "en",
+    "source": "GDPR",
+    "question": "What rights does GDPR Article 17 give to data subjects regarding erasure of their personal data?",
+    "ground_truth": "Article 17 gives data subjects the right to obtain erasure of their personal data without undue delay when the data is no longer necessary for the purpose it was collected, the data subject withdraws consent and there is no other legal basis, the data subject objects and there are no overriding legitimate grounds, the data has been unlawfully processed, or erasure is required to comply with a legal obligation. The controller must also inform other controllers who received the data."
+  },
+  {
+    "id": "en_gdpr_03",
+    "language": "en",
+    "source": "GDPR",
+    "question": "What does the GDPR principle of data minimisation require under Article 5?",
+    "ground_truth": "Article 5(1)(c) requires that personal data must be adequate, relevant, and limited to what is necessary in relation to the purposes for which they are processed. This means organisations must only collect and process the minimum amount of personal data needed for the specified purpose. Collecting more data than necessary is a violation of this principle."
+  },
+  {
+    "id": "en_gdpr_04",
+    "language": "en",
+    "source": "GDPR",
+    "question": "When is a Data Protection Impact Assessment required under GDPR Article 35?",
+    "ground_truth": "A DPIA is required when processing is likely to result in a high risk to the rights and freedoms of natural persons. This includes systematic and extensive profiling with significant effects, large-scale processing of special categories of data, and systematic monitoring of publicly accessible areas. Supervisory authorities publish lists of processing activities that require a DPIA. If the DPIA indicates high residual risk, prior consultation with the supervisory authority is required."
+  },
+  {
+    "id": "en_gdpr_05",
+    "language": "en",
+    "source": "GDPR",
+    "question": "What are the requirements for valid consent under GDPR?",
+    "ground_truth": "Valid consent under GDPR must be freely given, specific, informed, and unambiguous. It must be given through a clear affirmative action. Pre-ticked boxes, silence, or inactivity do not constitute valid consent. Data subjects must be able to withdraw consent at any time as easily as they gave it. Where consent is given in the context of a written declaration, it must be clearly distinguishable from other matters."
+  },
+  {
+    "id": "en_gdpr_06",
+    "language": "en",
+    "source": "GDPR",
+    "question": "What are the obligations of a data processor under GDPR Article 28?",
+    "ground_truth": "Data processors must only process personal data on documented instructions from the controller. They must ensure persons authorised to process data are bound by confidentiality. They must implement appropriate technical and organisational security measures, assist the controller with data subject rights requests, delete or return data at the end of the contract, and make available information necessary to demonstrate compliance. Sub-processors require prior written authorisation from the controller."
+  },
+  {
+    "id": "sv_01",
+    "language": "sv",
+    "source": "EU AI Act Swedish",
+    "question": "Vad säger AI-förordningen om riskklassificering av AI-system?",
+    "ground_truth": "AI-förordningen delar in AI-system i fyra risknivåer: oacceptabel risk (förbjudna system), hög risk (system som kräver strikt reglering och godkännande), begränsad risk (system med transparenskrav), och minimal risk (system med inga specifika krav). Hög-risk system listas i Bilaga III och inkluderar biometri, kritisk infrastruktur, utbildning, anställning och rättsväsende."
+  },
+  {
+    "id": "sv_02",
+    "language": "sv",
+    "source": "GDPR Swedish",
+    "question": "Vilka krav ställer GDPR på behandling av personuppgifter i AI-system?",
+    "ground_truth": "GDPR kräver att behandling av personuppgifter i AI-system har en rättslig grund enligt Artikel 6. Principerna om uppgiftsminimering och ändamålsbegränsning innebär att enbart nödvändiga uppgifter får behandlas för specificerade syften. Vid automatiserat beslutsfattande med rättslig verkan ger Artikel 22 registrerade rätt till mänsklig granskning. Konsekvensbedömning avseende dataskydd kan krävas vid hög risk."
+  },
+  {
+    "id": "sv_03",
+    "language": "sv",
+    "source": "Swedish Market",
+    "question": "Hur vägleder IMY svenska organisationer om användning av generativ AI?",
+    "ground_truth": "IMY betonar att organisationer som använder generativ AI måste identifiera den rättsliga grunden för personuppgiftsbehandling och genomföra en konsekvensbedömning vid hög risk. Organisationer måste också bedöma om AI-leverantören agerar som personuppgiftsbiträde och säkerställa att ett biträdesavtal finns. Transparens mot de registrerade om hur deras uppgifter används i AI-system krävs."
+  },
+  {
+    "id": "de_01",
+    "language": "de",
+    "source": "EU AI Act German",
+    "question": "Welche Pflichten haben Anbieter von Hochrisiko-KI-Systemen nach der EU-KI-Verordnung?",
+    "ground_truth": "Anbieter von Hochrisiko-KI-Systemen müssen ein Qualitätsmanagementsystem einrichten, technische Dokumentation erstellen, ein Konformitätsbewertungsverfahren durchführen, das System in der EU-Datenbank registrieren, die CE-Kennzeichnung anbringen und eine EU-Konformitätserklärung ausstellen. Sie müssen auch ein Post-Market-Monitoring-System betreiben und schwerwiegende Vorfälle den Behörden melden."
+  },
+  {
+    "id": "de_02",
+    "language": "de",
+    "source": "GDPR German",
+    "question": "Was sind die Anforderungen der DSGVO an die Transparenz bei automatisierten Entscheidungen?",
+    "ground_truth": "Artikel 22 DSGVO gibt betroffenen Personen das Recht, nicht einer ausschließlich auf automatisierter Verarbeitung beruhenden Entscheidung unterworfen zu werden, die ihnen gegenüber rechtliche Wirkung entfaltet. Verantwortliche müssen aussagekräftige Informationen über die involvierte Logik sowie die Bedeutung und Tragweite der Verarbeitung bereitstellen. Betroffene haben das Recht auf menschliche Überprüfung und Anfechtung der Entscheidung."
+  },
+  {
+    "id": "de_03",
+    "language": "de",
+    "source": "German Market",
+    "question": "Wie unterstützt die deutsche KI-Strategie Unternehmen bei der Implementierung von KI-Systemen?",
+    "ground_truth": "Die nationale KI-Strategie Deutschlands fördert die Entwicklung und Nutzung von KI durch Investitionen in Forschung und Entwicklung, die Schaffung von Testumgebungen und Reallaboren, die Entwicklung von Standards und Normen, die Unterstützung von KMU bei der KI-Adoption und die Förderung von Kompetenzzentren. Die Strategie betont die Bedeutung von vertrauenswürdiger und erklärbarer KI im Einklang mit europäischen Werten."
+  }
+]

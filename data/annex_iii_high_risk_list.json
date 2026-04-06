@@ -1,0 +1,103 @@
+[
+  {
+    "id": 1,
+    "category": "Biometric identification and categorisation of natural persons",
+    "article_reference": "Annex III, Point 1",
+    "examples": [
+      "Real-time remote biometric identification in public spaces",
+      "Emotion recognition systems",
+      "Biometric categorisation inferring race, political opinions, religion",
+      "Post-remote biometric identification with law enforcement exceptions"
+    ],
+    "notes": "Real-time biometric ID in public spaces is PROHIBITED under Article 5 except for specific law enforcement purposes with judicial authorisation."
+  },
+  {
+    "id": 2,
+    "category": "Management and operation of critical infrastructure",
+    "article_reference": "Annex III, Point 2",
+    "examples": [
+      "AI safety components for electricity grid management",
+      "Water and gas supply infrastructure",
+      "Road traffic management",
+      "Digital infrastructure safety",
+      "Critical digital infrastructure cybersecurity"
+    ],
+    "notes": "Only AI used as a safety component qualifies. General monitoring tools may not."
+  },
+  {
+    "id": 3,
+    "category": "Education and vocational training",
+    "article_reference": "Annex III, Point 3",
+    "examples": [
+      "Automated exam scoring that determines access to education",
+      "Student admission decision systems",
+      "Proctoring systems used to detect prohibited behaviour",
+      "Assessment of learning outcomes determining progression"
+    ],
+    "notes": "AI that merely supports teachers without making binding decisions may be LIMITED_RISK."
+  },
+  {
+    "id": 4,
+    "category": "Employment, workers management and access to self-employment",
+    "article_reference": "Annex III, Point 4",
+    "examples": [
+      "Automated CV screening and candidate shortlisting",
+      "AI interview assessment tools",
+      "Task allocation and monitoring of performance",
+      "Promotion and termination decision support",
+      "Psychometric testing for hiring"
+    ],
+    "notes": "This is the most common Annex III category for HR-tech products."
+  },
+  {
+    "id": 5,
+    "category": "Access to and enjoyment of essential private and public services and benefits",
+    "article_reference": "Annex III, Point 5",
+    "examples": [
+      "Credit scoring and creditworthiness assessment",
+      "Life and health insurance risk classification",
+      "Emergency services dispatch prioritisation",
+      "Benefits and social assistance eligibility",
+      "Evaluation of essential public services"
+    ],
+    "notes": "Covers both private (insurance, credit) and public (welfare, emergency) essential services."
+  },
+  {
+    "id": 6,
+    "category": "Law enforcement",
+    "article_reference": "Annex III, Point 6",
+    "examples": [
+      "Predictive policing tools",
+      "Polygraph and lie detection systems",
+      "Crime pattern analysis for individual risk assessment",
+      "AI evaluation of evidence reliability in criminal proceedings",
+      "Profiling in the context of crime detection"
+    ],
+    "notes": "Any AI used by law enforcement to assess individuals or predict crime falls here."
+  },
+  {
+    "id": 7,
+    "category": "Migration, asylum and border control management",
+    "article_reference": "Annex III, Point 7",
+    "examples": [
+      "Visa and asylum application risk assessment",
+      "Border surveillance systems",
+      "Verification of travel documents authenticity",
+      "Detection of individuals at irregular border crossing",
+      "Migration risk forecasting"
+    ],
+    "notes": "Often intersects with Article 5 prohibitions on biometric surveillance."
+  },
+  {
+    "id": 8,
+    "category": "Administration of justice and democratic processes",
+    "article_reference": "Annex III, Point 8",
+    "examples": [
+      "AI to assist courts in researching and interpreting facts and law",
+      "AI influencing elections or referendums",
+      "Voter profiling and targeting",
+      "AI used for judicial or administrative decision support"
+    ],
+    "notes": "Any AI touching judicial decisions or democratic participation is HIGH_RISK by default."
+  }
+]

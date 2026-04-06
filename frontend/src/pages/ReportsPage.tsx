@@ -1,0 +1,647 @@
+import { useEffect, useState, useRef } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+import { supabase } from '../lib/supabase'
+import { getRunStatus, getAgentTasks } from '../lib/api'
+import { ResearchRun, AgentTask, DecisionTrace } from '../lib/types'
+import RiskBadge from '../components/RiskBadge'
+import MetricCard from '../components/MetricCard'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import mermaid from 'mermaid'
+
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  themeVariables: {
+    fontSize: '13px',
+    primaryColor: '#1E90FF',
+    primaryTextColor: '#fff',
+    primaryBorderColor: '#555',
+    lineColor: '#aaa',
+    background: '#0e1117',
+    mainBkg: '#161b22',
+    nodeBorder: '#555',
+    edgeLabelBackground: '#222',
+  },
+  flowchart: { useMaxWidth: true, htmlLabels: true },
+})
+
+// ─── Mermaid block ────────────────────────────────────────────────────────────
+function MermaidBlock({ code }: { code: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!ref.current) return
+    const id = `mermaid-${Math.random().toString(36).slice(2)}`
+    mermaid.render(id, code).then(({ svg }) => {
+      if (!ref.current) return
+      ref.current.innerHTML = svg
+      const svgEl = ref.current.querySelector('svg')
+      if (svgEl) {
+        svgEl.removeAttribute('width')
+        svgEl.removeAttribute('height')
+        svgEl.style.maxWidth = '100%'
+        svgEl.style.height   = 'auto'
+      }
+    }).catch(console.error)
+  }, [code])
+
+  return (
+    <div
+      ref={ref}
+      className="my-6 overflow-auto bg-gray-900 rounded-xl p-4 border border-gray-800"
+      style={{ maxHeight: '420px' }}
+    />
+  )
+}
+
+// ─── Table of contents ────────────────────────────────────────────────────────
+function TableOfContents({ text }: { text: string }) {
+  const headings = [...text.matchAll(/^#{1,3} (.+)$/gm)].map(m => m[1]).filter(h => h.length > 3)
+  if (headings.length < 3) return null
+  return (
+    <details className="mb-6 bg-gray-800 rounded-xl border border-gray-700">
+      <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-gray-300 hover:text-white">
+        📑 Table of Contents ({headings.length} sections)
+      </summary>
+      <div className="px-4 pb-3 space-y-1">
+        {headings.map((h, i) => (
+          <div key={i} className="text-sm text-blue-400 hover:text-blue-300">
+            {h.startsWith('###') ? '\u00a0\u00a0\u00a0\u00a0' : h.startsWith('##') ? '\u00a0\u00a0' : ''}• {h}
+          </div>
+        ))}
+      </div>
+    </details>
+  )
+}
+
+// ─── XAI Trace card ───────────────────────────────────────────────────────────
+function TraceCard({ name, trace }: { name: string; trace: DecisionTrace }) {
+  const [open, setOpen] = useState(false)
+  const pct   = Math.round(trace.confidence * 100)
+  const label = pct >= 80 ? 'High' : pct >= 60 ? 'Medium' : 'Low'
+  const color = pct >= 80 ? '#4ade80' : pct >= 60 ? '#facc15' : '#f87171'
+
+  const LABELS: Record<string, string> = {
+    risk_classifier: '🛡️ Risk Classifier', planner: '🗺️ Planner',
+    researcher: '🔍 Researcher',            analyst: '⚖️ Analyst',
+    critic: '🧠 Critic',                    synthesizer: '✍️ Synthesizer',
+  }
+
+  return (
+    <div className="border border-gray-800 rounded-xl overflow-hidden">
+      <button onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-4 py-3
+                   bg-gray-900 hover:bg-gray-800 transition-colors text-left">
+        <span className="text-sm font-medium text-gray-200">{LABELS[name] ?? name}</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs" style={{ color }}>{label} ({pct}%)</span>
+          <span className="text-gray-500 text-xs">{open ? '▲' : '▼'}</span>
+        </div>
+      </button>
+      {open && (
+        <div className="bg-gray-950 px-4 py-3 border-t border-gray-800 space-y-3">
+          <div>
+            <div className="h-2 bg-gray-800 rounded-full overflow-hidden mb-1">
+              <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+            </div>
+            <span className="text-xs" style={{ color }}>{label} confidence — {pct}%</span>
+            {trace.duration_ms > 0 && (
+              <span className="text-xs text-gray-500 ml-3">⏱ {trace.duration_ms}ms</span>
+            )}
+          </div>
+          {trace.reasoning_steps?.length > 0 && (
+            <div>
+              <div className="text-xs text-gray-400 font-medium mb-1">Reasoning:</div>
+              <ul className="space-y-1">
+                {trace.reasoning_steps.map((s, i) => (
+                  <li key={i} className="text-xs text-gray-300">• {s}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {trace.sources_used?.length > 0 && (
+            <div>
+              <div className="text-xs text-gray-400 font-medium mb-1">Sources used:</div>
+              {trace.sources_used.slice(0, 5).map((s, i) => (
+                <div key={i} className="text-xs text-blue-400 truncate">
+                  {s.startsWith('http')
+                    ? <a href={s} target="_blank" rel="noreferrer">{s.slice(0, 80)}</a>
+                    : s}
+                </div>
+              ))}
+            </div>
+          )}
+          {trace.counterfactual && (
+            <div className="bg-blue-950 border border-blue-900 rounded-lg p-3">
+              <div className="text-xs text-blue-300 font-medium mb-1">Counterfactual (EU AI Act Art. 13):</div>
+              <p className="text-xs text-blue-200">{trace.counterfactual}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── PDF export helper — pure browser, zero server round-trip ─────────────────
+/**
+ * Converts the markdown report text to a styled PDF using the browser's
+ * print engine. We inject a hidden iframe, render the report into it, then
+ * trigger window.print() scoped to that frame.  This approach:
+ *   • requires no npm packages (no jsPDF / html2canvas)
+ *   • faithfully preserves markdown prose, tables, code blocks
+ *   • gives a professional A4 layout with the EU AI Act branding header
+ *   • works offline / in a deployed app with no backend call
+ */
+function downloadReportAsPdf(
+  reportText: string,
+  runId: string,
+  riskLevel: string | null,
+  goal: string,
+) {
+  const date = new Date().toLocaleDateString('en-SE', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  })
+
+  // Light markdown → HTML conversion (good enough for PDF; no mermaid needed)
+  const mdToHtml = (md: string): string => {
+    return md
+      // Fenced code blocks (skip mermaid diagrams in PDF — replace with a note)
+      .replace(/```mermaid[\s\S]*?```/g,
+        '<div class="diagram-note">[ Interactive diagram — view in web app ]</div>')
+      .replace(/```(\w*)\n?([\s\S]*?)```/g,
+        '<pre><code class="lang-$1">$2</code></pre>')
+      // Headings
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm,  '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm,   '<h1>$1</h1>')
+      // Bold / italic
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,     '<em>$1</em>')
+      // Inline code
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      // Blockquote
+      .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+      // Horizontal rule
+      .replace(/^---$/gm, '<hr/>')
+      // Unordered list items
+      .replace(/^\s*[-*] (.+)$/gm, '<li>$1</li>')
+      // Ordered list items
+      .replace(/^\s*\d+\. (.+)$/gm, '<li>$1</li>')
+      // Wrap consecutive <li> in <ul>
+      .replace(/(<li>[\s\S]+?<\/li>)/g, (block) =>
+        block.startsWith('<li>') ? `<ul>${block}</ul>` : block)
+      // Links
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+      // Paragraphs — double newline
+      .split(/\n{2,}/)
+      .map(chunk => {
+        const trimmed = chunk.trim()
+        if (!trimmed) return ''
+        if (/^<(h[1-6]|ul|ol|pre|blockquote|hr|div)/.test(trimmed)) return trimmed
+        return `<p>${trimmed.replace(/\n/g, ' ')}</p>`
+      })
+      .join('\n')
+  }
+
+  const RISK_COLORS: Record<string, string> = {
+    UNACCEPTABLE: '#ef4444',
+    HIGH_RISK:    '#f97316',
+    LIMITED_RISK: '#eab308',
+    MINIMAL_RISK: '#22c55e',
+  }
+  const riskColor = RISK_COLORS[riskLevel ?? ''] ?? '#6b7280'
+
+  const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>EU Compliance Report — ${runId.slice(0, 8)}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 11pt;
+    line-height: 1.65;
+    color: #1a1a2e;
+    background: #fff;
+    padding: 0;
+  }
+
+  /* ── Cover strip ── */
+  .cover {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: #fff;
+    padding: 36px 48px 28px;
+    page-break-after: avoid;
+  }
+  .cover-flag { font-size: 28pt; margin-bottom: 8px; }
+  .cover-title {
+    font-size: 18pt;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+    color: #e2e8f0;
+  }
+  .cover-subtitle {
+    font-size: 9.5pt;
+    color: #94a3b8;
+    margin-bottom: 16px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 24px;
+    font-size: 8.5pt;
+    color: #94a3b8;
+  }
+  .cover-meta span { display: flex; align-items: center; gap: 4px; }
+  .risk-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 8pt;
+    font-weight: 600;
+    color: #fff;
+    background: ${riskColor};
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Goal callout ── */
+  .goal-box {
+    margin: 0;
+    padding: 16px 48px;
+    background: #f0f4ff;
+    border-left: 4px solid #3b82f6;
+    font-size: 10pt;
+    color: #1e3a5f;
+    font-style: italic;
+  }
+
+  /* ── Body ── */
+  .body { padding: 32px 48px 48px; }
+
+  h1 { font-size: 15pt; font-weight: 700; color: #1a1a2e; margin: 28px 0 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+  h2 { font-size: 13pt; font-weight: 600; color: #1e3a5f; margin: 22px 0 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+  h3 { font-size: 11.5pt; font-weight: 600; color: #374151; margin: 16px 0 6px; }
+  p  { margin-bottom: 10px; color: #374151; }
+  ul, ol { margin: 0 0 10px 20px; }
+  li { margin-bottom: 4px; color: #374151; }
+  code {
+    font-family: 'Menlo', 'Courier New', monospace;
+    font-size: 9pt;
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  pre {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 14px;
+    overflow-x: auto;
+    margin: 12px 0;
+    font-size: 8.5pt;
+  }
+  pre code { background: none; padding: 0; color: #1e3a5f; }
+  blockquote {
+    border-left: 3px solid #3b82f6;
+    padding: 8px 14px;
+    margin: 12px 0;
+    background: #eff6ff;
+    color: #1e40af;
+    font-style: italic;
+    border-radius: 0 4px 4px 0;
+  }
+  a { color: #2563eb; text-decoration: underline; }
+  hr { border: none; border-top: 1px solid #e2e8f0; margin: 18px 0; }
+  strong { font-weight: 600; color: #111827; }
+  em { font-style: italic; color: #4b5563; }
+  .diagram-note {
+    background: #fef9c3;
+    border: 1px dashed #ca8a04;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 9pt;
+    color: #713f12;
+    text-align: center;
+    margin: 12px 0;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 9.5pt; }
+  th { background: #f1f5f9; text-align: left; padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: 600; color: #1e3a5f; }
+  td { padding: 7px 10px; border: 1px solid #e2e8f0; color: #374151; }
+  tr:nth-child(even) td { background: #f8fafc; }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid #e2e8f0;
+    margin-top: 32px;
+    padding-top: 12px;
+    font-size: 8pt;
+    color: #9ca3af;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    h1, h2 { page-break-after: avoid; }
+    pre, blockquote { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-flag">🇪🇺</div>
+  <div class="cover-title">EU Regulatory Intelligence Report</div>
+  <div class="cover-subtitle">Multi-Agent EU AI Act &amp; GDPR Compliance Analysis · Swedish &amp; German SMEs</div>
+  <div class="cover-meta">
+    <span>📅 ${date}</span>
+    <span>🆔 Run ${runId.slice(0, 8)}</span>
+    <span class="risk-chip">${(riskLevel ?? 'UNKNOWN').replace('_', ' ')}</span>
+  </div>
+</div>
+
+${goal ? `<div class="goal-box"><strong>Research Query:</strong> ${goal}</div>` : ''}
+
+<div class="body">
+${mdToHtml(reportText)}
+
+<div class="footer">
+  <span>EU Regulatory Intelligence Agent · Rishi Bethi</span>
+  <span>Generated ${date} · Run ID: ${runId}</span>
+</div>
+</div>
+
+</body>
+</html>`
+
+  // Open in a new tab and trigger print dialog  
+  const win = window.open('', '_blank', 'width=900,height=700')
+  if (!win) {
+    alert('Pop-ups are blocked. Please allow pop-ups for this site and try again.')
+    return
+  }
+  win.document.write(htmlContent)
+  win.document.close()
+  // Small delay lets fonts + layout settle before print dialog
+  setTimeout(() => {
+    win.focus()
+    win.print()
+  }, 600)
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+export default function ReportsPage() {
+  const { runId: paramRunId } = useParams<{ runId: string }>()
+  const { user }   = useAuth()
+  const navigate   = useNavigate()
+  const [tab,         setTab]         = useState<'report' | 'traces' | 'download'>('report')
+  const [activeRunId, setActiveRunId] = useState<string | null>(paramRunId ?? null)
+  const [run,         setRun]         = useState<ResearchRun | null>(null)
+  const [tasks,       setTasks]       = useState<AgentTask[]>([])
+  const [recentRuns,  setRecentRuns]  = useState<ResearchRun[]>([])
+  const [pdfLoading,  setPdfLoading]  = useState(false)
+
+  useEffect(() => { fetchRecentRuns() }, [user])
+  useEffect(() => { if (activeRunId) fetchRun(activeRunId) }, [activeRunId])
+
+  async function fetchRecentRuns() {
+    if (!user) return
+    const { data } = await supabase
+      .from('research_runs')
+      .select('id, goal, risk_level, transparency_score, created_at')
+      .eq('status', 'completed')
+      .eq('user_id', user.id)
+      .not('goal', 'like', '[ERASED%]')
+      .order('created_at', { ascending: false })
+      .limit(10)
+    setRecentRuns(data ?? [])
+    if (!activeRunId && data?.[0]) setActiveRunId(data[0].id)
+  }
+
+  async function fetchRun(id: string) {
+    const [status, agentsRes] = await Promise.all([
+      getRunStatus(id),
+      getAgentTasks(id),
+    ])
+    setRun(status)
+    setTasks(agentsRes.agents ?? [])
+  }
+
+  function handlePdfDownload() {
+    if (!run || !activeRunId) return
+    setPdfLoading(true)
+    try {
+      downloadReportAsPdf(
+        run.result ?? '',
+        activeRunId,
+        run.risk_level,
+        run.goal ?? '',
+      )
+    } finally {
+      // Give the new window time to open before resetting
+      setTimeout(() => setPdfLoading(false), 1000)
+    }
+  }
+
+  const taskMap    = Object.fromEntries(tasks.map(t => [t.agent_name, t]))
+  const reportText = run?.result ?? ''
+  const charCount  = reportText.length
+  const readMin    = Math.max(1, Math.round(charCount / 1200))
+
+  const TABS = [
+    { key: 'report',   label: `📄 Report (${charCount.toLocaleString()} chars · ~${readMin}m read)` },
+    { key: 'traces',   label: '🧠 XAI Traces' },
+    { key: 'download', label: '📥 Download' },
+  ]
+
+  return (
+    <div className="flex min-h-screen">
+      {/* ── Sidebar ── */}
+      <aside className="w-64 bg-gray-900 border-r border-gray-800 p-4 shrink-0">
+        <h2 className="text-sm font-semibold text-gray-400 mb-3">📂 Recent Runs</h2>
+        <div className="space-y-2">
+          {recentRuns.map(r => {
+            const isActive = r.id === activeRunId
+            const EMOJI: Record<string, string> = {
+              UNACCEPTABLE: '🚫', HIGH_RISK: '🔴', LIMITED_RISK: '🟡', MINIMAL_RISK: '🟢'
+            }
+            return (
+              <button
+                key={r.id}
+                onClick={() => { setActiveRunId(r.id); navigate(`/reports/${r.id}`) }}
+                className={`w-full text-left rounded-lg p-2.5 text-xs transition-colors border ${
+                  isActive
+                    ? 'bg-blue-900 border-blue-700 text-white'
+                    : 'bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600'
+                }`}
+              >
+                <div className="truncate mb-1">{(r.goal ?? '').slice(0, 40)}...</div>
+                <div className="flex items-center gap-1.5 text-gray-400">
+                  <span>{EMOJI[r.risk_level ?? ''] ?? '⚪'}</span>
+                  <span>📊 {r.transparency_score ?? 0}/100</span>
+                  <span>{r.created_at?.slice(0, 10)}</span>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </aside>
+
+      {/* ── Main ── */}
+      <div className="flex-1 p-8 overflow-auto">
+        {!activeRunId ? (
+          <div className="text-center text-gray-500 mt-20">
+            <div className="text-5xl mb-4">📋</div>
+            <p>
+              No run selected.{' '}
+              <button className="text-blue-400 hover:text-blue-300" onClick={() => navigate('/')}>
+                Start a research query
+              </button>{' '}
+              or select a run from the sidebar.
+            </p>
+          </div>
+        ) : !run ? (
+          <div className="text-gray-400 text-center mt-20">Loading report...</div>
+        ) : (
+          <>
+            {/* Metrics row */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <MetricCard label="Tokens"   value={(run.token_count ?? 0).toLocaleString()} />
+              <MetricCard label="Cost"     value={`$${Number(run.cost_usd ?? 0).toFixed(4)}`} />
+              <MetricCard label="Duration" value={`${((run.duration_ms ?? 0) / 1000).toFixed(1)}s`} />
+              <MetricCard label="Risk"     value={run.risk_level?.replace('_', ' ') ?? 'N/A'} />
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-1 bg-gray-800 rounded-lg p-1 mb-6 overflow-x-auto">
+              {TABS.map(t => (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key as any)}
+                  className={`whitespace-nowrap px-3 py-2 rounded-md text-xs font-medium transition-colors ${
+                    tab === t.key ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* ── Report tab ── */}
+            {tab === 'report' && (
+              <div>
+                <TableOfContents text={reportText} />
+                <div className="report-content">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      code({ className, children }: any) {
+                        const lang = /language-(\w+)/.exec(className ?? '')?.[1]
+                        const code = String(children).replace(/\n$/, '')
+                        if (lang === 'mermaid') return <MermaidBlock code={code} />
+                        return <code className={className}>{children}</code>
+                      },
+                    }}
+                  >
+                    {reportText}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            )}
+
+            {/* ── Traces tab ── */}
+            {tab === 'traces' && (
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-white">EU AI Act Art. 13 — Explainability Traces</h3>
+                <p className="text-sm text-gray-400 mb-4">
+                  Every agent produced a decision trace recording reasoning steps,
+                  sources used, confidence level, and a counterfactual explanation.
+                </p>
+                {['risk_classifier', 'planner', 'researcher', 'analyst', 'critic', 'synthesizer'].map(name => {
+                  const task = taskMap[name]
+                  if (!task?.decision_trace) return null
+                  return <TraceCard key={name} name={name} trace={task.decision_trace} />
+                })}
+              </div>
+            )}
+
+            {/* ── Download tab ── */}
+            {tab === 'download' && (
+              <div className="max-w-lg space-y-4">
+                <h3 className="text-lg font-semibold text-white">Download Report</h3>
+                <p className="text-sm text-gray-400">
+                  Export the full compliance report in your preferred format.
+                </p>
+
+                {/* Markdown */}
+                <div className="card flex items-start gap-4">
+                  <div className="text-3xl">📝</div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-white mb-1">Markdown (.md)</div>
+                    <div className="text-xs text-gray-400 mb-3">
+                      Raw report with all headings, tables, code blocks, and Mermaid diagrams.
+                      Best for editing or pasting into Notion / Confluence.
+                    </div>
+                    <a
+                      href={`data:text/markdown;charset=utf-8,${encodeURIComponent(reportText)}`}
+                      download={`eu_compliance_report_${activeRunId?.slice(0, 8)}.md`}
+                      className="btn-secondary text-xs inline-block"
+                    >
+                      ⬇ Download .md
+                    </a>
+                  </div>
+                </div>
+
+                {/* PDF */}
+                <div className="card flex items-start gap-4 border-blue-800">
+                  <div className="text-3xl">📄</div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-white mb-1">
+                      PDF Report
+                      <span className="ml-2 text-xs bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full font-normal">
+                        Recommended for sharing
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-400 mb-3">
+                      Professionally formatted A4 PDF with cover page, EU AI Act risk badge,
+                      branding header, and full report body. Opens in a new tab — use{' '}
+                      <kbd className="bg-gray-700 text-gray-200 px-1.5 py-0.5 rounded text-xs">
+                        Ctrl+P
+                      </kbd>{' '}
+                      /{' '}
+                      <kbd className="bg-gray-700 text-gray-200 px-1.5 py-0.5 rounded text-xs">
+                        ⌘+P
+                      </kbd>{' '}
+                      → Save as PDF. Mermaid diagrams are replaced with a note (use Markdown for interactive version).
+                    </div>
+                    <button
+                      onClick={handlePdfDownload}
+                      disabled={pdfLoading}
+                      className="btn-primary text-xs"
+                    >
+                      {pdfLoading ? '⏳ Opening...' : '⬇ Export as PDF'}
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-600 mt-2 font-mono">
+                  Run ID: {activeRunId} · {charCount.toLocaleString()} chars
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

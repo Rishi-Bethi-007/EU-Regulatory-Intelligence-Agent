@@ -1,33 +1,57 @@
-# Environment
+# ── Secrets — NEVER commit ───────────────────────────────────────────────────
 .env
 .env.local
+.env.*
 
-# Python
-venv/
+# ── Python ────────────────────────────────────────────────────────────────────
 .venv/
+venv/
 __pycache__/
 *.py[cod]
 *.egg-info/
 dist/
 build/
 .eggs/
-
-# Data
-data/
-
-# IDE
-.vscode/
-.idea/
-*.DS_Store
-
-# Testing
 .pytest_cache/
 .coverage
 htmlcov/
+.deepeval/
 
-# Streamlit
-.streamlit/secrets.toml
+# ── Data — too large, not needed in git ──────────────────────────────────────
+# The corpus is ingested into Supabase. These local files are source-only.
+data/evals/ragas_dataset_cache.json
+data/regulatory/
+data/swedish/
+data/german/
+data/Category*/
+data/test_reports/
 
-# Misc
+# ── Large binary files in project root ───────────────────────────────────────
+*.pdf
+*.apk
+*.docx
+*.png
+*.jpg
+*.jpeg
+RAGAS_PAHSE2.png
+"query (hybrid retrival).png"
+Blog.docx
+euaiact.pdf
+
+# ── Frontend ──────────────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.DS_Store
+*.swp
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
 *.log
 *.tmp
+
+# ── Project planning docs (local only) ───────────────────────────────────────
+project flows/

@@ -1,0 +1,73 @@
+{
+  "family": "eu-reg-agent-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::719982590161:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::719982590161:role/research-agent-task-role",
+  "containerDefinitions": [
+    {
+      "name": "eu-reg-agent",
+      "image": "719982590161.dkr.ecr.eu-north-1.amazonaws.com/eu-reg-agent:latest",
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        { "name": "ENVIRONMENT",          "value": "production" },
+        { "name": "LANGCHAIN_TRACING_V2", "value": "true" },
+        { "name": "LANGCHAIN_PROJECT",    "value": "eu-reg-agent-prod" }
+      ],
+      "secrets": [
+        {
+          "name": "ANTHROPIC_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:719982590161:secret:research-agent/anthropic-key-dnGJ51"
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:719982590161:secret:research-agent/openai-key-bMSQBN"
+        },
+        {
+          "name": "SUPABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:719982590161:secret:research-agent/supabase-url-SUJouC"
+        },
+        {
+          "name": "SUPABASE_SERVICE_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:719982590161:secret:research-agent/supabase-service-key-T7gP5i"
+        },
+        {
+          "name": "SUPABASE_ANON_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:719982590161:secret:research-agent/supabase-anon-key-cu7dZz"
+        },
+        {
+          "name": "TAVILY_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:719982590161:secret:research-agent/tavily-key-6aTUr0"
+        },
+        {
+          "name": "LANGCHAIN_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:719982590161:secret:research-agent/langchain-key-Sawmnl"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group":         "/ecs/eu-reg-agent",
+          "awslogs-region":        "eu-north-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group":  "true"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}

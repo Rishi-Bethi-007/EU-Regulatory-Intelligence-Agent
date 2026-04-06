@@ -1,0 +1,22 @@
+{
+  "run_date": "2026-03-31T18:34:15.107337+00:00",
+  "experiment": "augmented_top15_threshold055",
+  "method": "direct_haiku_judge_augmented",
+  "chunker": "SemanticChunker(breakpoint_threshold_type=percentile)",
+  "embedder": "intfloat/multilingual-e5-large",
+  "retriever": "HybridRetriever(top_k=15, match_threshold=0.55)",
+  "judge_llm": "claude-haiku-4-5",
+  "pairs_evaluated": 20,
+  "language_breakdown": {
+    "en": 14,
+    "sv": 3,
+    "de": 3
+  },
+  "scores": {
+    "faithfulness": 0.4188,
+    "context_precision": 0.5917,
+    "answer_relevancy": 0.78
+  },
+  "target_faithfulness": 0.75,
+  "passed": false
+}

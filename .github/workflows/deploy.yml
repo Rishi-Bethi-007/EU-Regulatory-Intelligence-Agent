@@ -1,0 +1,197 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# .github/workflows/deploy.yml
+#
+# CI/CD Pipeline — EU Regulatory Intelligence Agent
+#
+# Trigger: every push to any branch (test job), main branch only (build + deploy)
+#
+# Jobs:
+#   1. test        — ruff lint + pytest (every push, every branch)
+#   2. build-push  — docker build → tag with git SHA → push to ECR (main only)
+#   3. deploy      — force new ECS deployment (main only, needs build-push)
+#
+# Required GitHub Secrets (Settings → Secrets → Actions):
+#   AWS_ACCESS_KEY_ID      — IAM user: research-agent-deploy
+#   AWS_SECRET_ACCESS_KEY  — IAM user: research-agent-deploy
+#   ECR_REGISTRY           — {account_id}.dkr.ecr.eu-north-1.amazonaws.com
+#   ECR_REPOSITORY         — eu-reg-agent
+#   ECS_CLUSTER            — eu-reg-agent
+#   ECS_SERVICE            — eu-reg-agent-service
+#
+#   API keys (used by pytest integration tests):
+#   ANTHROPIC_API_KEY
+#   OPENAI_API_KEY
+#   SUPABASE_URL
+#   SUPABASE_SERVICE_KEY
+#   TAVILY_API_KEY
+#   LANGCHAIN_API_KEY
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: CI/CD — Test, Build, Deploy
+
+on:
+  push:
+    branches: ["**"]          # test runs on every branch
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION:      eu-north-1
+  PYTHON_VERSION:  "3.13"
+
+jobs:
+  # ── Job 1: Test + Lint ──────────────────────────────────────────────────────
+  # Runs on every push to every branch.
+  # Blocks build + deploy if any test or lint check fails.
+  test:
+    name: Test + Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.6.6"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Lint with ruff
+        run: uv run ruff check . --select E,W,F --output-format=github
+
+      - name: Run tests
+        env:
+          ANTHROPIC_API_KEY:   ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY:      ${{ secrets.OPENAI_API_KEY }}
+          SUPABASE_URL:        ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          TAVILY_API_KEY:      ${{ secrets.TAVILY_API_KEY }}
+          LANGCHAIN_API_KEY:   ${{ secrets.LANGCHAIN_API_KEY }}
+          LANGCHAIN_TRACING_V2: "false"   # disable tracing in CI to avoid noise
+          ENVIRONMENT:         "test"
+        run: uv run pytest tests/ -v --tb=short -x
+
+  # ── Job 2: Build + Push to ECR ─────────────────────────────────────────────
+  # Runs on main branch only, after test passes.
+  # Tags every image with the git SHA for full traceability.
+  # "Which code is running in prod?" → check the ECR image tag.
+  build-push:
+    name: Build + Push to ECR
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to ECR
+        id: build-image
+        env:
+          ECR_REGISTRY:   ${{ secrets.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG:      ${{ github.sha }}
+        run: |
+          # Tag with git SHA (immutable — every running container traces to exact commit)
+          # Also tag as 'latest' for convenience
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+                       -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "✓ Pushed $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+  # ── Job 3: Deploy to ECS Fargate ───────────────────────────────────────────
+  # Forces ECS to pull the new image and restart the task.
+  # ECS Fargate handles the zero-downtime rollout automatically.
+  deploy:
+    name: Deploy to ECS Fargate
+    runs-on: ubuntu-latest
+    needs: build-push
+    if: github.ref == 'refs/heads/main'
+    environment: production   # enables manual approval gate in GitHub UI if desired
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Force new ECS deployment
+        env:
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+          ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+          echo "✓ Triggered new deployment on $ECS_CLUSTER/$ECS_SERVICE"
+
+      - name: Wait for ECS service to stabilise
+        env:
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+          ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+        run: |
+          echo "Waiting for ECS service to stabilise (new task healthy)..."
+          aws ecs wait services-stable \
+            --cluster $ECS_CLUSTER \
+            --services $ECS_SERVICE \
+            --region ${{ env.AWS_REGION }}
+
+          echo "✓ ECS service stable — deployment complete"
+          echo "Deployed image: ${{ needs.build-push.outputs.image }}"
+
+      - name: Log deployment to audit trail
+        env:
+          SUPABASE_URL:        ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          # Record the deployment in the Supabase audit_events table
+          # This means every production deployment is in the same immutable
+          # audit chain as GDPR erasure events and agent runs — a nice detail
+          curl -s -X POST "$SUPABASE_URL/rest/v1/audit_events" \
+            -H "apikey: $SUPABASE_SERVICE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"event_type\": \"ecs_deployment\",
+              \"payload\": {
+                \"git_sha\": \"${{ github.sha }}\",
+                \"actor\": \"${{ github.actor }}\",
+                \"branch\": \"${{ github.ref_name }}\",
+                \"image\": \"${{ needs.build-push.outputs.image }}\",
+                \"cluster\": \"${{ secrets.ECS_CLUSTER }}\",
+                \"service\": \"${{ secrets.ECS_SERVICE }}\"
+              }
+            }" || echo "Audit log write failed — non-blocking"
+
+          echo "✓ Deployment logged to audit_events"

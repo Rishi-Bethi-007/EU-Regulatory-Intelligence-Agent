@@ -1,0 +1,80 @@
+{
+  "run_date": "2026-04-01T18:00:31.554643+00:00",
+  "judge_model": "gpt-4o",
+  "reports_evaluated": 5,
+  "avg_scores": {
+    "factual_accuracy": 0.66,
+    "completeness": 0.66,
+    "citation_quality": 0.48,
+    "eu_relevance": 0.8,
+    "overall": 0.6475
+  },
+  "individual_scores": [
+    {
+      "run_id": "9cb3454f-ce50-4be5-a352-617308c231ea",
+      "goal": "A Swedish fintech company wants to use AI to automate loan application decisions",
+      "risk_level": "HIGH_RISK",
+      "factual_accuracy": 0.8,
+      "completeness": 0.7,
+      "citation_quality": 0.6,
+      "eu_relevance": 0.9,
+      "overall_score": 0.74,
+      "strengths": "The report correctly identifies the AI application as high-risk under Annex III, providing targeted obligations such as conducting DPIAs and establishing human oversight. It clearly outlines several specific compliance actions related to the EU AI Act and GDPR.",
+      "weaknesses": "There are factual inaccuracies regarding specific articles: technical documentation under EU AI Act Article 11 should be Article 18/19, and the too-broad claim around Article 13 instead of focusing more on explainability requirements such as Article 15. The report doesn't cover all high-risk obligations such as CE marking and quality management procedures comprehensively. Citations are sometimes vague or incomplete.",
+      "summary": "The report provides a solid foundation for understanding high-risk AI obligations, but it lacks complete and precise citations and a few key obligations, leading to minor factual inaccuracies."
+    },
+    {
+      "run_id": "40ee1c96-a8ee-4684-a71d-89e8c591a1a2",
+      "goal": "What is the difference between a provider and a deployer under the EU AI Act, an",
+      "risk_level": "HIGH_RISK",
+      "factual_accuracy": 0.6,
+      "completeness": 0.5,
+      "citation_quality": 0.4,
+      "eu_relevance": 0.7,
+      "overall_score": 0.555,
+      "strengths": "The report correctly identifies the roles of provider and deployer under the EU AI Act and highlights the importance of classification. It provides insightful context specific to a Swedish SaaS company, enhancing EU relevance.",
+      "weaknesses": "The report contains inaccuracies in article attributions and lacks specific coverage of key HIGH_RISK obligations such as post-market monitoring (Article 72), quality management system (Article 17), and registration (Article 49). Citations to articles are often ambiguous or incorrect.",
+      "summary": "The report provides a good general overview but suffers from inaccuracies in article references and incomplete coverage of high-risk obligations."
+    },
+    {
+      "run_id": "32335d1f-ab46-4b13-a617-03b772d82bfd",
+      "goal": "What is the difference between a provider and a deployer under the EU AI Act, an",
+      "risk_level": "HIGH_RISK",
+      "factual_accuracy": 0.5,
+      "completeness": 0.5,
+      "citation_quality": 0.3,
+      "eu_relevance": 0.7,
+      "overall_score": 0.5025,
+      "strengths": "The report provides a clear distinction between the roles of 'provider' and 'deployer' under the EU AI Act, which is crucial for understanding compliance responsibilities. Additionally, it offers insights into specific obligations related to Swedish labor law, which enhances its relevance to a Swedish company.",
+      "weaknesses": "There are inaccuracies in article citations; for instance, Article 26 is repeatedly referenced incorrectly for various obligations applicable to deployers. Moreover, some crucial high-risk obligations like conformity assessment (Art. 43), CE marking (Art. 48), and post-market monitoring (Art. 72) are not adequately covered. Article references are often vague or incorrectly applied, reducing the precision of the guidance.",
+      "summary": "The report outlines key differences between providers and deployers but lacks complete and accurate coverage of specific obligations with properly cited articles."
+    },
+    {
+      "run_id": "644e1e0b-5d8c-4d81-86f0-b8f08be2c0b9",
+      "goal": "A Swedish HR tech startup is building an AI system that automatically screens CV",
+      "risk_level": "HIGH_RISK",
+      "factual_accuracy": 0.6,
+      "completeness": 0.8,
+      "citation_quality": 0.5,
+      "eu_relevance": 0.8,
+      "overall_score": 0.665,
+      "strengths": "The report correctly identifies the AI system as high-risk under Annex III, point 4(a) of the EU AI Act. It also covers most major compliance elements that a high-risk system must address, such as risk management, data quality, and human oversight.",
+      "weaknesses": "The report inaccurately cites obligations from the wrong article numbers (e.g., Articles 9, 10, and 11 do not pertain to the specified obligations). It also misses post-market monitoring requirements and assigns a fictional registration obligation to Article 51 instead of Article 49.",
+      "summary": "While the report correctly identifies the AI system as high-risk and outlines many essential obligations, some article references are incorrect, and post-market monitoring is not addressed."
+    },
+    {
+      "run_id": "c6262312-b0a5-4b34-9bda-4f2596886bfd",
+      "goal": "A Swedish HR tech startup is building an AI system that automatically screens CV",
+      "risk_level": "HIGH_RISK",
+      "factual_accuracy": 0.8,
+      "completeness": 0.8,
+      "citation_quality": 0.6,
+      "eu_relevance": 0.9,
+      "overall_score": 0.775,
+      "strengths": "The report correctly identifies the system as HIGH-RISK and references GDPR requirements such as DPIA and privacy notices. It also mentions various AI Act provider obligations like risk management and human oversight.",
+      "weaknesses": "There is some confusion with article numbers, citing Article 9 for risk management when it's Article 17; misses the need for post-market monitoring (Art. 72); the citations could be more precise and cover all relevant articles.",
+      "summary": "The report effectively identifies the system's HIGH-RISK status and outlines major compliance obligations, but has some inaccuracies and could improve in citation precision."
+    }
+  ],
+  "passed": false
+}

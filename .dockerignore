@@ -1,0 +1,56 @@
+# ── Python build artefacts ────────────────────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+.deepeval/
+
+# ── Secrets — NEVER in the image ─────────────────────────────────────────────
+.env
+.env.local
+.env.*
+
+# ── Data subdirectories — corpus PDFs are in Supabase, not needed at runtime ─
+# KEEP: data/annex_iii_high_risk_list.json — loaded by compliance/risk_classifier.py
+# KEEP: data/evals/ — eval scripts reference these paths
+data/regulatory/
+data/swedish/
+data/german/
+data/Category*/
+data/test_reports/
+
+# ── Large binary files ────────────────────────────────────────────────────────
+*.pdf
+*.apk
+*.png
+*.jpg
+*.jpeg
+
+# ── Docs ─────────────────────────────────────────────────────────────────────
+*.docx
+project flows/
+Blog.docx
+RAGAS_PAHSE2.png
+
+# ── Frontend — built separately, deployed to Vercel ──────────────────────────
+frontend/
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+.git/
+.github/
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.DS_Store
+
+# ── Tests — not needed at runtime ────────────────────────────────────────────
+tests/
+
+# ── Eval scripts — not needed at runtime ─────────────────────────────────────
+evals/
+
+# NOTE: uv.lock IS included — required for `uv sync --frozen` reproducible builds
+# NOTE: pyproject.toml IS included — uv needs it to resolve the environment

@@ -1,0 +1,40 @@
+/*
+  print.css — minimal browser print resets for the main app.
+
+  NOTE: PDF export in ReportsPage opens a NEW WINDOW with its own complete
+  HTML+CSS document and calls window.print() there. That approach gives full
+  control over the PDF layout without affecting the main app's print styles.
+
+  This file only handles edge cases where the user manually triggers Ctrl+P
+  on the main app shell (e.g. printing a compliance checklist from the
+  CompliancePage). It hides navigation chrome and lets the browser render
+  the main content area cleanly.
+*/
+
+@media print {
+  /* Hide app chrome */
+  aside,
+  nav,
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  footer {
+    display: none !important;
+  }
+
+  /* Let main content fill the page */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  main {
+    margin-left: 0 !important;
+  }
+
+  /* Reasonable page margins */
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+}
