@@ -1,1 +1,1 @@
-{"routes":[{"src":"/assets/(.*)","dest":"/assets/$1"},{"src":"/(.*)\\.(.*)","dest":"/$1.$2"},{"src":"/(.*)","dest":"/index.html"}]}
+{"framework":"vite","rewrites":[{"source":"/((?!assets/).*)","destination":"/index.html"}]}
