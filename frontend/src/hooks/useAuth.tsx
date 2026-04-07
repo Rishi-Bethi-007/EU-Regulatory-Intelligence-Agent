@@ -6,6 +6,7 @@ interface AuthContextType {
   user:    User | null
   session: Session | null
   loading: boolean
+  isAdmin: boolean
   signIn:  (email: string, password: string) => Promise<void>
   signUp:  (email: string, password: string) => Promise<{ needsVerification: boolean }>
   signOut: () => Promise<void>
@@ -17,29 +18,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user,    setUser]    = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  async function checkAdminRole(userId: string) {
+    const { data } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .single()
+    setIsAdmin(data?.role === 'admin')
+  }
 
   useEffect(() => {
-    // Step 1: Check for an existing session in localStorage
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
+      if (session?.user) checkAdminRole(session.user.id)
       setLoading(false)
     })
 
-    // Step 2: Listen for ALL auth state changes
-    // This fires for:
-    //   - Email/password sign in
-    //   - Google OAuth callback (SIGNED_IN fires when Supabase parses the URL hash)
-    //   - Token refresh (TOKEN_REFRESHED)
-    //   - Sign out (SIGNED_OUT)
-    //   - Initial session detection (INITIAL_SESSION)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
+      if (session?.user) checkAdminRole(session.user.id)
+      else setIsAdmin(false)
       setLoading(false)
 
-      // Clean up the URL hash after OAuth redirect so the token
-      // doesn't stay visible in the browser address bar
       if (event === 'SIGNED_IN' && window.location.hash) {
         window.history.replaceState(null, '', window.location.pathname)
       }
@@ -64,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isAdmin, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   )
