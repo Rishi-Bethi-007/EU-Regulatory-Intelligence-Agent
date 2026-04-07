@@ -1,4 +1,4 @@
-const API_BASE = '/api'
+const API_BASE = (import.meta.env.VITE_API_URL ?? '') + '/api'
 
 export async function startResearch(goal: string, userId: string): Promise<{ run_id: string }> {
   const res = await fetch(`${API_BASE}/research`, {
