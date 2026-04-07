@@ -36,15 +36,15 @@ export default function App() {
     <Routes>
       <Route path="/auth" element={<AuthPageWrapper />} />
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route index element={<HomePage />} />
-        <Route path="progress/:runId" element={<ProgressPage />} />
-        <Route path="reports" element={<ReportsPage />} />
-        <Route path="reports/:runId" element={<ReportsPage />} />
-        <Route path="documents" element={<DocumentsPage />} />
-        <Route path="evals" element={<EvalsPage />} />
-        <Route path="compliance" element={<CompliancePage />} />
-        <Route path="compliance/:runId" element={<CompliancePage />} />
-      </Route>
+      <Route index element={<HomePage />} />
+      <Route path="progress/:runId" element={<ProgressPage />} />
+      <Route path="reports" element={<ReportsPage />} />
+      <Route path="reports/:runId" element={<ReportsPage />} />
+      <Route path="documents" element={<DocumentsPage />} />
+      <Route path="evals" element={<EvalsPage />} />
+      <Route path="compliance" element={<CompliancePage />} />
+      <Route path="compliance/:runId" element={<CompliancePage />} />
+  </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

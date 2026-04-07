@@ -55,3 +55,6 @@ frontend/.env
 
 # ── Project planning docs (local only) ───────────────────────────────────────
 project flows/
+
+.vercel
+.env*.local
