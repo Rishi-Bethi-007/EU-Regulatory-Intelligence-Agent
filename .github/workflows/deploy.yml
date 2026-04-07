@@ -159,30 +159,30 @@ jobs:
 
           echo "✓ Triggered new deployment on $ECS_CLUSTER/$ECS_SERVICE"
 
-       - name: Wait for ECS service to stabilise
-            env:
-              ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
-              ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
-            run: |
-              echo "Waiting for ECS service to stabilise (new task healthy)..."
-              for i in $(seq 1 60); do
-                STATUS=$(aws ecs describe-services \
-                  --cluster $ECS_CLUSTER \
-                  --services $ECS_SERVICE \
-                  --region ${{ env.AWS_REGION }} \
-                  --query "services[0].deployments[0].rolloutState" \
-                  --output text)
-                echo "Attempt $i: $STATUS"
-                if [ "$STATUS" = "COMPLETED" ]; then
-                  echo "✓ ECS service stable — deployment complete"
-                  echo "Deployed image: ${{ needs.build-push.outputs.image }}"
-                  exit 0
-                fi
-                sleep 15
-              done
-              echo "⚠ Deployment still in progress after 15 minutes, but service is running"git add .github/workflows/deploy.yml
+      - name: Wait for ECS service to stabilise
+        env:
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+          ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+        run: |
+          echo "Waiting for ECS service to stabilise (new task healthy)..."
+          for i in $(seq 1 60); do
+            STATUS=$(aws ecs describe-services \
+              --cluster $ECS_CLUSTER \
+              --services $ECS_SERVICE \
+              --region ${{ env.AWS_REGION }} \
+              --query "services[0].deployments[0].rolloutState" \
+              --output text)
+            echo "Attempt $i: $STATUS"
+            if [ "$STATUS" = "COMPLETED" ]; then
+              echo "✓ ECS service stable — deployment complete"
               echo "Deployed image: ${{ needs.build-push.outputs.image }}"
               exit 0
+            fi
+            sleep 15
+          done
+          echo "⚠ Deployment still in progress after 15 minutes, but service is running"
+          echo "Deployed image: ${{ needs.build-push.outputs.image }}"
+          exit 0
 
       - name: Log deployment to audit trail
         env:
