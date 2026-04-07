@@ -145,16 +145,39 @@ function TraceCard({ name, trace }: { name: string; trace: DecisionTrace }) {
   )
 }
 
-// ─── PDF export helper — pure browser, zero server round-trip ─────────────────
-/**
- * Converts the markdown report text to a styled PDF using the browser's
- * print engine. We inject a hidden iframe, render the report into it, then
- * trigger window.print() scoped to that frame.  This approach:
- *   • requires no npm packages (no jsPDF / html2canvas)
- *   • faithfully preserves markdown prose, tables, code blocks
- *   • gives a professional A4 layout with the EU AI Act branding header
- *   • works offline / in a deployed app with no backend call
- */
+// ─── Pre-render Mermaid → SVG before PDF generation ────────────────────────
+// Mermaid renders into the live DOM at runtime. window.print() in a new
+// window fires before Mermaid initialises there, so diagrams are blank.
+// Fix: render all Mermaid blocks to SVG strings HERE (in the current window),
+// then inject them as inline SVG into the PDF HTML — fully static, no JS needed.
+async function preRenderMermaidBlocks(markdown: string): Promise<string> {
+  const mermaidRegex = /```mermaid\n([\s\S]*?)```/g
+  const replacements: Array<{ original: string; svg: string }> = []
+  let match
+
+  while ((match = mermaidRegex.exec(markdown)) !== null) {
+    const original = match[0]
+    const code = match[1].trim()
+    const id = `pdf-mermaid-${replacements.length}-${Math.random().toString(36).slice(2)}`
+    try {
+      const { svg } = await mermaid.render(id, code)
+      const scaledSvg = svg
+        .replace(/width="[^"]+"/, 'width="100%"')
+        .replace(/height="[^"]+"/, 'height="auto" style="max-width:100%;display:block;margin:16px 0"')
+      replacements.push({ original, svg: scaledSvg })
+    } catch {
+      replacements.push({ original, svg: '<div class="diagram-note">[ Diagram could not be rendered ]</div>' })
+    }
+  }
+
+  let result = markdown
+  for (const { original, svg } of replacements) {
+    // Replace the first occurrence each time (handles duplicates safely)
+    result = result.replace(original, `\n\n${svg}\n\n`)
+  }
+  return result
+}
+
 function downloadReportAsPdf(
   reportText: string,
   runId: string,
@@ -165,10 +188,12 @@ function downloadReportAsPdf(
     year: 'numeric', month: 'long', day: 'numeric'
   })
 
-  // Light markdown → HTML conversion (good enough for PDF; no mermaid needed)
+  // Light markdown → HTML conversion.
+  // Mermaid blocks are pre-rendered to inline SVG before this function is called.
+  // The fallback regex only fires if pre-rendering failed.
   const mdToHtml = (md: string): string => {
     return md
-      // Fenced code blocks (skip mermaid diagrams in PDF — replace with a note)
+      // Fallback: any mermaid fences that weren't pre-rendered
       .replace(/```mermaid[\s\S]*?```/g,
         '<div class="diagram-note">[ Interactive diagram — view in web app ]</div>')
       .replace(/```(\w*)\n?([\s\S]*?)```/g,
@@ -437,10 +462,21 @@ export default function ReportsPage() {
     setTasks(agentsRes.agents ?? [])
   }
 
-  function handlePdfDownload() {
+  async function handlePdfDownload() {
     if (!run || !activeRunId) return
     setPdfLoading(true)
     try {
+      // Pre-render Mermaid diagrams to SVG so they appear in the PDF
+      const preRenderedText = await preRenderMermaidBlocks(run.result ?? '')
+      downloadReportAsPdf(
+        preRenderedText,
+        activeRunId,
+        run.risk_level,
+        run.goal ?? '',
+      )
+    } catch (err) {
+      console.error('PDF generation error:', err)
+      // Fallback: render without pre-rendered diagrams
       downloadReportAsPdf(
         run.result ?? '',
         activeRunId,
@@ -448,8 +484,7 @@ export default function ReportsPage() {
         run.goal ?? '',
       )
     } finally {
-      // Give the new window time to open before resetting
-      setTimeout(() => setPdfLoading(false), 1000)
+      setTimeout(() => setPdfLoading(false), 1200)
     }
   }
 
@@ -622,7 +657,7 @@ export default function ReportsPage() {
                       <kbd className="bg-gray-700 text-gray-200 px-1.5 py-0.5 rounded text-xs">
                         ⌘+P
                       </kbd>{' '}
-                      → Save as PDF. Mermaid diagrams are replaced with a note (use Markdown for interactive version).
+                      → Save as PDF. Architecture diagrams are rendered inline.
                     </div>
                     <button
                       onClick={handlePdfDownload}

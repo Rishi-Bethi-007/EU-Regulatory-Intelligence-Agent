@@ -408,6 +408,7 @@ async def save_to_supabase(output: dict, scores: dict):
             "answer_relevancy":  scores["answer_relevancy"],
             "context_precision": scores["context_precision"],
             "passed_target":     output["passed"],
+            "evaluated_at":      output["run_date"],
             "metadata": {
                 "judge_llm":       output["judge_llm"],
                 "embedder":        output["embedder"],
