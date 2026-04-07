@@ -188,8 +188,8 @@ async def log_agent_task_complete(
 
 # ── SHA-256 Audit chain ────────────────────────────────────────
 
-def _compute_hash(previous_hash: str, event_type: str, payload: dict) -> str:
-    raw = previous_hash + event_type + json.dumps(payload, sort_keys=True)
+def _compute_hash(previous_hash: str | None, event_type: str, payload: dict) -> str:
+    raw = (previous_hash or "") + event_type + json.dumps(payload, sort_keys=True)
     return hashlib.sha256(raw.encode()).hexdigest()
 
 
