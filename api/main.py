@@ -39,11 +39,9 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://eu-regulatory-intelligence-agent.vercel.app",
-        "http://localhost:5173",   # Vite dev server
-        "http://localhost:3000",   # fallback
-        "http://127.0.0.1:5173",
-        os.environ.get("FRONTEND_URL", ""),  # production URL from .env
+        "https://reguliq.eu",
+        "https://www.reguliq.eu",
+        "https://eu-reg-intelligence.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
