@@ -25,10 +25,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user, isAdmin, loading } = useAuth()
-  if (loading) return (
+  const { user, isAdmin, loading, adminLoading } = useAuth()
+
+  // Wait for BOTH auth and the role check to finish before deciding
+  if (loading || adminLoading) return (
     <div className="flex items-center justify-center min-h-screen bg-gray-950">
-      <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+        <div className="text-gray-500 text-xs">Verifying access...</div>
+      </div>
     </div>
   )
   if (!user) return <Navigate to="/auth" replace />

@@ -12,7 +12,7 @@ const NAV = [
 ]
 
 export default function Layout() {
-  const { user, signOut } = useAuth()
+  const { user, isAdmin, signOut } = useAuth()
   const navigate = useNavigate()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -90,6 +90,24 @@ export default function Layout() {
               {!collapsed && <span className="truncate">{label}</span>}
             </NavLink>
           ))}
+
+          {/* Admin link — only visible to admins */}
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              onClick={() => setMobileOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-red-700 text-white'
+                    : 'text-red-400 hover:text-white hover:bg-red-900'
+                }`
+              }
+            >
+              <span className="text-base flex-shrink-0">⚙️</span>
+              {!collapsed && <span className="truncate">Admin</span>}
+            </NavLink>
+          )}
         </nav>
 
         {/* User + sign out */}
