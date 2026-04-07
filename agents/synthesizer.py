@@ -20,6 +20,7 @@ Citation quality fix (2026-04-01):
 """
 
 import re
+import time
 from datetime import datetime, timezone
 
 from langchain_anthropic import ChatAnthropic
@@ -216,6 +217,7 @@ async def synthesizer_node(state: dict) -> dict:
         },
     )
 
+    run_start_ms = time.monotonic()
     trace = build_synthesizer_trace(run_id)
 
     with TraceTimer(trace):
@@ -447,7 +449,7 @@ RETRIES: {retry_count}/2
                 result=final_report,
                 token_count=total_run_tokens,
                 cost_usd=total_run_cost,
-                duration_ms=trace.duration_ms,
+                duration_ms=int((time.monotonic() - run_start_ms) * 1000),
             )
 
             await async_update(
