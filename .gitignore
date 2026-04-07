@@ -40,7 +40,7 @@ euaiact.pdf
 
 # ── Frontend ──────────────────────────────────────────────────────────────────
 frontend/node_modules/
-frontend/dist/
+# frontend/dist/ — committed so Vercel can deploy without a build step
 frontend/.env
 
 # ── IDE ───────────────────────────────────────────────────────────────────────
