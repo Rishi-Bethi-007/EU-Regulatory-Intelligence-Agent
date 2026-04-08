@@ -4,42 +4,42 @@
 
 @layer base {
   body {
-    @apply bg-gray-950 text-gray-100 antialiased;
+    @apply bg-gray-50 text-gray-900 antialiased;
   }
-  
+
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { @apply bg-gray-900; }
-  ::-webkit-scrollbar-thumb { @apply bg-gray-700 rounded-full; }
-  ::-webkit-scrollbar-thumb:hover { @apply bg-gray-600; }
+  ::-webkit-scrollbar-track { @apply bg-gray-100; }
+  ::-webkit-scrollbar-thumb { @apply bg-gray-300 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-gray-400; }
 }
 
 @layer components {
   .card {
-    @apply bg-gray-900 border border-gray-800 rounded-xl p-6;
+    @apply bg-white border border-gray-200 rounded-xl p-6 shadow-sm;
   }
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg
            transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .btn-secondary {
-    @apply bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium px-4 py-2 rounded-lg
-           transition-colors border border-gray-700;
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium px-4 py-2 rounded-lg
+           transition-colors border border-gray-300;
   }
   .btn-danger {
-    @apply bg-red-900 hover:bg-red-800 text-red-200 font-medium px-4 py-2 rounded-lg
-           transition-colors border border-red-800;
+    @apply bg-red-50 hover:bg-red-100 text-red-700 font-medium px-4 py-2 rounded-lg
+           transition-colors border border-red-200;
   }
   .input {
-    @apply w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100
-           placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1
+    @apply w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900
+           placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1
            focus:ring-blue-500 transition-colors;
   }
   .badge {
     @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
   .metric-card {
-    @apply bg-gray-900 border border-gray-800 rounded-xl p-4 text-center;
+    @apply bg-white border border-gray-200 rounded-xl p-4 text-center shadow-sm;
   }
 }
 
@@ -50,20 +50,20 @@
 }
 
 /* Markdown report styles */
-.report-content h1 { @apply text-2xl font-bold text-white mt-8 mb-4; }
-.report-content h2 { @apply text-xl font-bold text-white mt-6 mb-3 border-b border-gray-800 pb-2; }
-.report-content h3 { @apply text-lg font-semibold text-gray-100 mt-4 mb-2; }
-.report-content p  { @apply text-gray-300 leading-relaxed mb-3; }
-.report-content ul { @apply list-disc list-inside text-gray-300 mb-3 space-y-1; }
-.report-content ol { @apply list-decimal list-inside text-gray-300 mb-3 space-y-1; }
-.report-content li { @apply text-gray-300; }
-.report-content strong { @apply text-white font-semibold; }
-.report-content code { @apply bg-gray-800 text-blue-300 px-1.5 py-0.5 rounded text-sm font-mono; }
-.report-content pre  { @apply bg-gray-800 rounded-lg p-4 overflow-x-auto mb-4; }
+.report-content h1 { @apply text-2xl font-bold text-gray-900 mt-8 mb-4; }
+.report-content h2 { @apply text-xl font-bold text-gray-900 mt-6 mb-3 border-b border-gray-200 pb-2; }
+.report-content h3 { @apply text-lg font-semibold text-gray-800 mt-4 mb-2; }
+.report-content p  { @apply text-gray-700 leading-relaxed mb-3; }
+.report-content ul { @apply list-disc list-inside text-gray-700 mb-3 space-y-1; }
+.report-content ol { @apply list-decimal list-inside text-gray-700 mb-3 space-y-1; }
+.report-content li { @apply text-gray-700; }
+.report-content strong { @apply text-gray-900 font-semibold; }
+.report-content code { @apply bg-gray-100 text-blue-700 px-1.5 py-0.5 rounded text-sm font-mono; }
+.report-content pre  { @apply bg-gray-100 rounded-lg p-4 overflow-x-auto mb-4; }
 .report-content pre code { @apply bg-transparent p-0; }
 .report-content table { @apply w-full border-collapse mb-4 text-sm; }
-.report-content th { @apply text-left text-gray-400 font-medium border-b border-gray-700 pb-2 px-3; }
-.report-content td { @apply text-gray-300 border-b border-gray-800 py-2 px-3; }
-.report-content blockquote { @apply border-l-4 border-blue-500 pl-4 text-gray-400 italic my-4; }
-.report-content hr { @apply border-gray-800 my-6; }
-.report-content a  { @apply text-blue-400 hover:text-blue-300 underline; }
+.report-content th { @apply text-left text-gray-500 font-medium border-b border-gray-200 pb-2 px-3; }
+.report-content td { @apply text-gray-700 border-b border-gray-100 py-2 px-3; }
+.report-content blockquote { @apply border-l-4 border-blue-500 pl-4 text-gray-500 italic my-4; }
+.report-content hr { @apply border-gray-200 my-6; }
+.report-content a  { @apply text-blue-600 hover:text-blue-700 underline; }

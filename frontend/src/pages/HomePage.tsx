@@ -44,7 +44,7 @@ export default function HomePage() {
     setError(''); setLoading(true)
     try {
       const { run_id } = await startResearch(goal.trim(), user.id)
-      navigate(`/progress/${run_id}`)
+      navigate(`/app/progress/${run_id}`)
     } catch (e: any) {
       setError(e.message ?? 'Failed to start research.')
     } finally {
@@ -108,7 +108,7 @@ export default function HomePage() {
             {recentRuns.map(run => (
               <div key={run.id}
                 className="card hover:border-gray-700 cursor-pointer transition-colors"
-                onClick={() => navigate(`/reports/${run.id}`)}>
+                onClick={() => navigate(`/app/reports/${run.id}`)}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-200 truncate">{run.goal}</p>

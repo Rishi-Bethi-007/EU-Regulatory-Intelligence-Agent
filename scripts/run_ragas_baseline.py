@@ -1,6 +1,5 @@
 """
-scripts/run_ragas_baseline.py
-
+scripts/run_ragas_baseline.pycd "C:\Users\rishi\LU\AI Engg\PROJECTS\eu-regulatory-intelligence-agent"
 Computes RAG evaluation metrics without using RAGAS's internal threading.
 
 Why not use RAGAS evaluate() directly:

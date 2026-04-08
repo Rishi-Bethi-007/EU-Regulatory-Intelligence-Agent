@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
 import Layout from './components/Layout'
 import AuthPage from './pages/AuthPage'
+import LandingPage from './pages/LandingPage'
 import HomePage from './pages/HomePage'
 import ProgressPage from './pages/ProgressPage'
 import ReportsPage from './pages/ReportsPage'
@@ -26,8 +27,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, loading, adminLoading } = useAuth()
-
-  // Wait for BOTH auth and the role check to finish before deciding
   if (loading || adminLoading) return (
     <div className="flex items-center justify-center min-h-screen bg-gray-950">
       <div className="flex flex-col items-center gap-3">
@@ -44,8 +43,12 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Routes>
+      {/* Public landing — no auth required */}
+      <Route path="/landing" element={<LandingPage />} />
       <Route path="/auth" element={<AuthPageWrapper />} />
-      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+
+      {/* App root — authenticated users go straight to /app */}
+      <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<HomePage />} />
         <Route path="progress/:runId" element={<ProgressPage />} />
         <Route path="reports" element={<ReportsPage />} />
@@ -56,9 +59,25 @@ export default function App() {
         <Route path="compliance/:runId" element={<CompliancePage />} />
         <Route path="admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
       </Route>
+
+      {/* Root: unauthenticated → landing, authenticated → app */}
+      <Route path="/" element={<RootRedirect />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
+}
+
+function RootRedirect() {
+  const { user, loading } = useAuth()
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-950">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="text-gray-400 text-sm">Loading...</div>
+      </div>
+    </div>
+  )
+  return user ? <Navigate to="/app" replace /> : <Navigate to="/landing" replace />
 }
 
 function AuthPageWrapper() {
@@ -71,6 +90,6 @@ function AuthPageWrapper() {
       </div>
     </div>
   )
-  if (user) return <Navigate to="/" replace />
+  if (user) return <Navigate to="/app" replace />
   return <AuthPage />
 }
