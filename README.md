@@ -2,7 +2,13 @@
 
 > **Live demo:** [reguliq.eu](https://www.reguliq.eu) &nbsp;·&nbsp; **API:** [api.reguliq.eu/health](https://api.reguliq.eu/health) &nbsp;·&nbsp; **Stack:** LangGraph · FastAPI · React/Vite · Supabase pgvector · AWS ECS Fargate
 
-A production-grade **multi-agent AI system** that helps European SMEs navigate GDPR and EU AI Act obligations. Built as a flagship portfolio project demonstrating commercially relevant AI engineering skills for the 2025–2026 EU market.
+## Why this exists
+
+EU AI Act and GDPR compliance is a growing burden for European SMEs — the regulations are complex, multilingual, and change frequently, yet most small businesses have no dedicated legal or compliance resource. This system automates the first and most time-consuming step: understanding what specific obligations apply to a given AI use case, cited to the actual regulatory articles, in plain language. It was built as a production portfolio project by an MSc AI & Automation student at University West, Sweden, targeting AI Engineer roles and research internships at Swedish and European organisations for autumn 2026.
+
+---
+
+A production-grade **multi-agent AI system** that helps European SMEs navigate GDPR and EU AI Act obligations. Six specialised LangGraph agents classify risk, retrieve obligations across English, Swedish, and German regulatory documents, cross-verify with GPT-4o, and produce a structured compliance report in minutes.
 
 ---
 
@@ -320,6 +326,30 @@ aws ecs update-service --cluster eu-reg-agent --service eu-reg-agent-service --f
 
 ---
 
+## Future Development
+
+Features planned for future iterations, roughly in priority order:
+
+**User document upload** — Allow users to optionally upload their own documents (PDF, DOCX) describing how they use AI in their organisation. The researcher agent would incorporate this alongside the regulatory corpus to produce compliance analysis grounded in the user's specific context, not just a generic business scenario. This is the highest-value UX improvement for real SME users.
+
+**Cleaner EUR-Lex ingestion** — Re-ingest the regulatory corpus using a proper PDF parser (pdfplumber or pymupdf) rather than the current OCR-degraded text. This is the single fix that would most improve faithfulness scores and citation quality.
+
+**Expanded corpus** — Add national AI strategies and guidance from Sweden (IMY), Germany (BfDI), and the EU AI Office. Increase corpus from 10 to 50+ documents. Add French and Dutch regulatory guidance.
+
+**Streaming agent output** — Stream each agent's output to the frontend in real time rather than polling every 2 seconds. Significantly improves perceived latency for the 3–6 minute run time.
+
+**Saved compliance profiles** — Allow users to save their organisation profile (industry, size, country, AI use cases) so they don't need to re-describe their context on every query. Pre-fills the research goal with context automatically.
+
+**Obligation tracking** — Let users mark obligations as "acknowledged", "in progress", or "completed" and track their compliance posture over time across multiple queries.
+
+**Citation pinpointing** — Pin citations to exact article paragraphs rather than article-level references. Requires cleaner ingestion and chunk-level metadata improvements.
+
+**Multi-jurisdiction support** — Extend beyond Sweden and Germany to cover French, Dutch, and Polish national implementation of the EU AI Act.
+
+**API access tier** — Expose the research pipeline as a public REST API for developers and compliance tools to integrate directly.
+
+---
+
 ## Author
 
 **Rishi Bethi** — MSc AI & Automation, University West (Trollhättan, Sweden)
@@ -328,3 +358,4 @@ Built as a production portfolio project targeting AI Engineer roles and research
 
 - GitHub: [Rishi-Bethi-007](https://github.com/Rishi-Bethi-007)
 - Live: [reguliq.eu](https://www.reguliq.eu)
+- LinkedIn: [linkedin.com/in/rishi-kumar-bethi](https://www.linkedin.com/in/rishi-kumar-bethi)
