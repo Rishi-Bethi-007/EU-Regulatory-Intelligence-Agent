@@ -25,7 +25,7 @@ export default function Layout() {
   const mainML  = collapsed ? 'md:ml-14' : 'md:ml-56'
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-transparent">
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
@@ -133,7 +133,7 @@ export default function Layout() {
       </div>
 
       {/* Main content */}
-      <main className={`flex-1 min-h-screen bg-gray-50 transition-all duration-200 ${mainML} pt-12 md:pt-0`}>
+      <main className={`flex-1 min-h-screen bg-transparent transition-all duration-200 ${mainML} pt-12 md:pt-0`}>
         <Outlet />
       </main>
     </div>

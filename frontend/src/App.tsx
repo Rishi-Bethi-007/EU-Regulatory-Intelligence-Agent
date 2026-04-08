@@ -14,7 +14,7 @@ import AdminPage from './pages/AdminPage'
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center min-h-screen bg-transparent">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
         <div className="text-gray-700 text-sm">Loading...</div>
@@ -28,7 +28,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, loading, adminLoading } = useAuth()
   if (loading || adminLoading) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center min-h-screen bg-transparent">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
         <div className="text-gray-700 text-xs">Verifying access...</div>
@@ -70,7 +70,7 @@ export default function App() {
 function RootRedirect() {
   const { user, loading } = useAuth()
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center min-h-screen bg-transparent">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
         <div className="text-gray-700 text-sm">Loading...</div>
@@ -83,7 +83,7 @@ function RootRedirect() {
 function AuthPageWrapper() {
   const { user, loading } = useAuth()
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center min-h-screen bg-transparent">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
         <div className="text-gray-700 text-sm">Signing you in...</div>

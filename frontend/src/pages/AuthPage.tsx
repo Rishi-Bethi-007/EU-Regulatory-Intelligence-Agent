@@ -79,7 +79,7 @@ export default function AuthPage() {
   }
 
   if (needsVerify) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white border border-gray-200 rounded-xl p-8 shadow-sm text-center">
         <div className="text-5xl mb-4">📧</div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Check your email</h2>
@@ -104,7 +104,7 @@ export default function AuthPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
       <div className="w-full max-w-md">
 
         {/* Header */}

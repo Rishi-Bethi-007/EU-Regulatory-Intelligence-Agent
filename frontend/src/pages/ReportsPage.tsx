@@ -229,7 +229,7 @@ export default function ReportsPage() {
   ]
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-transparent">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 p-4 shrink-0">
         <h2 className="text-sm font-semibold text-gray-700 mb-3">📂 Recent Runs</h2>

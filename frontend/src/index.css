@@ -2,9 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --canvas-base: #f5f1e8;
+  --canvas-warm: #ece2d0;
+  --canvas-ink: rgba(111, 89, 51, 0.08);
+  --canvas-dot: rgba(123, 99, 63, 0.08);
+}
+
 @layer base {
+  html, body, #root {
+    min-height: 100%;
+  }
+
+  #root {
+    position: relative;
+    isolation: isolate;
+  }
+
+  #root::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 18% 14%, rgba(255, 252, 246, 0.92) 0, rgba(255, 252, 246, 0) 24%),
+      radial-gradient(circle at 82% 18%, rgba(232, 220, 197, 0.72) 0, rgba(232, 220, 197, 0) 22%),
+      radial-gradient(circle at 50% 100%, rgba(247, 240, 227, 0.9) 0, rgba(247, 240, 227, 0) 36%),
+      linear-gradient(180deg, #f8f4ec 0%, var(--canvas-base) 54%, var(--canvas-warm) 100%);
+  }
+
+  #root::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.65;
+    background-image:
+      radial-gradient(var(--canvas-dot) 1px, transparent 1px),
+      linear-gradient(var(--canvas-ink) 1px, transparent 1px),
+      linear-gradient(90deg, var(--canvas-ink) 1px, transparent 1px);
+    background-size: 26px 26px, 180px 180px, 180px 180px;
+    background-position: 0 0, -1px -1px, -1px -1px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.45));
+  }
+
   body {
-    @apply bg-gray-50 text-gray-950 antialiased;
+    background-color: var(--canvas-base);
+    @apply text-gray-950 antialiased;
   }
 
   /* Scrollbar */
@@ -16,7 +62,11 @@
 
 @layer components {
   .card {
-    @apply bg-white border border-gray-200 rounded-xl p-6 shadow-sm text-gray-900;
+    @apply rounded-xl p-6 text-gray-900;
+    background: rgba(255, 252, 247, 0.88);
+    border: 1px solid rgba(196, 180, 150, 0.55);
+    box-shadow: 0 1px 2px rgba(88, 68, 32, 0.05), 0 10px 30px rgba(131, 109, 72, 0.08);
+    backdrop-filter: blur(6px);
   }
   .btn-primary {
     @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg
@@ -39,7 +89,11 @@
     @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
   .metric-card {
-    @apply bg-white border border-gray-200 rounded-xl p-4 text-center shadow-sm text-gray-900;
+    @apply rounded-xl p-4 text-center text-gray-900;
+    background: rgba(255, 252, 247, 0.86);
+    border: 1px solid rgba(196, 180, 150, 0.5);
+    box-shadow: 0 1px 2px rgba(88, 68, 32, 0.04), 0 8px 24px rgba(131, 109, 72, 0.06);
+    backdrop-filter: blur(6px);
   }
 }
 

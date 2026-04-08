@@ -218,7 +218,7 @@ export default function LandingPage() {
 
         .lr {
           min-height: 100vh;
-          background: #ffffff;
+          background: transparent;
           color: #111827;
           font-family: 'Inter', sans-serif;
           -webkit-font-smoothing: antialiased;
@@ -231,10 +231,10 @@ export default function LandingPage() {
           justify-content: space-between;
           padding: 0 2.5rem;
           height: 64px;
-          border-bottom: 1px solid #f0f0f0;
+          border-bottom: 1px solid rgba(193, 174, 143, 0.45);
           position: sticky;
           top: 0;
-          background: rgba(255,255,255,0.96);
+          background: rgba(248, 243, 234, 0.88);
           backdrop-filter: blur(8px);
           z-index: 100;
         }
@@ -383,7 +383,7 @@ export default function LandingPage() {
 
         /* SECTIONS */
         .lr-section { padding: 5rem 2rem; }
-        .lr-section-gray { background: #f9fafb; }
+        .lr-section-gray { background: rgba(255, 251, 243, 0.42); }
         .lr-inner { max-width: 900px; margin: 0 auto; }
         .lr-eyebrow {
           font-family: 'JetBrains Mono', monospace;
@@ -406,17 +406,18 @@ export default function LandingPage() {
 
         /* REPORT CARD */
         .lr-report {
-          background: #fff;
-          border: 1.5px solid #e5e7eb;
+          background: rgba(255, 252, 247, 0.9);
+          border: 1.5px solid rgba(196, 180, 150, 0.52);
           border-radius: 12px;
           overflow: hidden;
           position: relative;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+          box-shadow: 0 1px 2px rgba(88, 68, 32, 0.05), 0 14px 40px rgba(131, 109, 72, 0.1);
+          backdrop-filter: blur(8px);
         }
         .lr-report-query {
           padding: 1.25rem 1.5rem;
-          border-bottom: 1px solid #f3f4f6;
-          background: #fafafa;
+          border-bottom: 1px solid rgba(214, 198, 166, 0.5);
+          background: rgba(250, 245, 236, 0.92);
         }
         .lr-report-query-lbl {
           font-family: 'JetBrains Mono', monospace;
@@ -490,10 +491,10 @@ export default function LandingPage() {
           grid-template-columns: 170px 1fr;
           gap: 1rem;
           padding: 0.6rem 0.75rem;
-          border: 1px solid #f3f4f6;
+          border: 1px solid rgba(214, 198, 166, 0.5);
           border-radius: 6px;
           margin-bottom: 0.4rem;
-          background: #fafafa;
+          background: rgba(250, 245, 236, 0.9);
           font-size: 0.83rem;
           align-items: start;
         }
@@ -523,7 +524,7 @@ export default function LandingPage() {
         .lr-report-fade {
           position: absolute;
           bottom: 0; left: 0; right: 0;
-          background: linear-gradient(to bottom, transparent, rgba(249,250,251,0.97) 35%);
+          background: linear-gradient(to bottom, transparent, rgba(248, 243, 234, 0.97) 35%);
           padding: 3.5rem 1.5rem 2rem;
           text-align: center;
         }
@@ -536,15 +537,17 @@ export default function LandingPage() {
           gap: 1rem;
         }
         .lr-agent-card {
-          background: #fff;
-          border: 1.5px solid #e5e7eb;
+          background: rgba(255, 252, 247, 0.88);
+          border: 1.5px solid rgba(196, 180, 150, 0.52);
           border-radius: 10px;
           padding: 1.25rem;
-          transition: border-color 0.15s, box-shadow 0.15s;
+          transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+          backdrop-filter: blur(8px);
         }
         .lr-agent-card:hover {
-          border-color: #93c5fd;
-          box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+          border-color: #c9b48d;
+          box-shadow: 0 12px 28px rgba(131, 109, 72, 0.12);
+          transform: translateY(-1px);
         }
         .lr-agent-num {
           font-family: 'JetBrains Mono', monospace;
@@ -558,7 +561,7 @@ export default function LandingPage() {
         .lr-agent-desc { color: #6b7280; font-size: 0.8rem; line-height: 1.45; }
 
         /* STACK */
-        .lr-stack { background: #fff; border: 1.5px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+        .lr-stack { background: rgba(255, 252, 247, 0.88); border: 1.5px solid rgba(196, 180, 150, 0.52); border-radius: 10px; overflow: hidden; backdrop-filter: blur(8px); }
         .lr-stack-row {
           display: grid;
           grid-template-columns: 140px 200px 1fr;
@@ -570,7 +573,7 @@ export default function LandingPage() {
           transition: background 0.12s;
         }
         .lr-stack-row:last-child { border-bottom: none; }
-        .lr-stack-row:hover { background: #f9fafb; }
+        .lr-stack-row:hover { background: rgba(250, 245, 236, 0.9); }
         .lr-stack-layer {
           font-family: 'JetBrains Mono', monospace;
           font-size: 0.7rem;
@@ -583,8 +586,8 @@ export default function LandingPage() {
 
         /* CTA SECTION */
         .lr-cta-section {
-          background: #eff6ff;
-          border-top: 1px solid #dbeafe;
+          background: rgba(244, 237, 225, 0.72);
+          border-top: 1px solid rgba(196, 180, 150, 0.42);
           padding: 5rem 2rem;
         }
         .lr-cta-inner { text-align: center; }
@@ -613,7 +616,7 @@ export default function LandingPage() {
 
         /* FOOTER */
         .lr-footer {
-          border-top: 1px solid #f3f4f6;
+          border-top: 1px solid rgba(196, 180, 150, 0.42);
           padding: 1.75rem 2rem;
           display: flex;
           justify-content: center;
@@ -621,7 +624,8 @@ export default function LandingPage() {
           flex-wrap: wrap;
           color: #9ca3af;
           font-size: 0.78rem;
-          background: #fff;
+          background: rgba(255, 252, 247, 0.74);
+          backdrop-filter: blur(8px);
         }
         .lr-footer-link { color: #6b7280; text-decoration: none; }
         .lr-footer-link:hover { color: #2563eb; }
