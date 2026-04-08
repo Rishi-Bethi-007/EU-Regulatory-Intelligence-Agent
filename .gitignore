@@ -30,7 +30,6 @@ data/test_reports/
 *.pdf
 *.apk
 *.docx
-*.png
 *.jpg
 *.jpeg
 RAGAS_PAHSE2.png
