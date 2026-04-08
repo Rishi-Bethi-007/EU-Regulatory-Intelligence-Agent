@@ -1,5 +1,5 @@
 """
-scripts/run_ragas_baseline.pycd "C:\Users\rishi\LU\AI Engg\PROJECTS\eu-regulatory-intelligence-agent"
+scripts/run_ragas_baseline.py
 Computes RAG evaluation metrics without using RAGAS's internal threading.
 
 Why not use RAGAS evaluate() directly:
@@ -16,7 +16,7 @@ What we compute (same definitions as RAGAS):
                         answering the question? (LLM judges each chunk)
 
 Cost: ~$0.02-0.05 total using Claude Haiku as judge.
-Cache: answers are cached — Claude Sonnet is never called again.
+Cache: answers are cached - Claude Sonnet is never called again.
 
 Usage:
     uv run python scripts/run_ragas_baseline.py
@@ -50,44 +50,36 @@ from db.client import async_insert
 from config.settings import ANTHROPIC_API_KEY
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 # CONFIG
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 QA_PATH      = Path(__file__).parent.parent / "data/evals/qa_pairs_manual.json"
 RESULTS_PATH = Path(__file__).parent.parent / "data/evals/baseline_results.json"
 CACHE_PATH   = Path(__file__).parent.parent / "data/evals/ragas_dataset_cache.json"
 
-# Haiku for judging — cheap and fast
+# Haiku for judging - cheap and fast
 JUDGE = ChatAnthropic(
     model="claude-haiku-4-5",
     api_key=ANTHROPIC_API_KEY,
 )
 
 MAX_PAIRS           = 20
-DELAY_BETWEEN_CALLS = 0.5   # seconds between LLM calls — avoids rate limits
+DELAY_BETWEEN_CALLS = 0.5   # seconds between LLM calls - avoids rate limits
 
 # Retrieval settings tuned for evaluation recall, not production latency.
-# EUR-Lex PDF OCR artifacts depress similarity scores for article body chunks,
-# so we cast a wider net here than in production.
 EVAL_TOP_K           = 15
 EVAL_MATCH_THRESHOLD = 0.55
 EVAL_MATCH_COUNT     = 30
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 # ARTICLE KEYWORD EXTRACTION
-# Extracts explicit article references from the question so we can do a
-# targeted FTS pass to find the actual article body chunk, which may score
-# below match_threshold due to OCR-degraded text in the EUR-Lex PDF.
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 def _extract_article_queries(question: str) -> list[str]:
     """
     If the question asks about a specific article (e.g. 'Article 13'),
     return that as an additional keyword query for the FTS retriever.
-    This supplements the semantic query and catches article body chunks
-    that score low due to OCR noise in the source PDF.
     """
-    # Match "Article 13", "Art. 13", "Artikel 13", "Artikel 6", "Annex III"
     patterns = [
         r'Article\s+(\d+)',
         r'Art\.\s+(\d+)',
@@ -101,28 +93,17 @@ def _extract_article_queries(question: str) -> list[str]:
         matches = re.findall(pattern, question, re.IGNORECASE)
         for match in matches:
             queries.append(f"Article {match}")
-    return list(set(queries))  # deduplicate
+    return list(set(queries))
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 # RETRIEVAL WITH KEYWORD AUGMENTATION
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 async def retrieve_with_augmentation(
     retriever: HybridRetriever,
     question: str,
     top_k: int = EVAL_TOP_K,
 ) -> list[str]:
-    """
-    Retrieve chunks for a question, augmented with article-specific keyword queries.
-
-    Strategy:
-    1. Semantic retrieval on the full question (top_k chunks)
-    2. For article-specific questions: additional FTS-biased retrieval using
-       just the article reference as the query (e.g. "Article 13")
-    3. Merge and deduplicate, preserving order (semantic results first)
-    4. Return up to top_k unique chunk texts
-    """
-    # Primary semantic retrieval
     docs = await retriever._aget_relevant_documents(question)
     seen_content = set()
     chunks = []
@@ -132,7 +113,6 @@ async def retrieve_with_augmentation(
             seen_content.add(key)
             chunks.append(doc.page_content)
 
-    # Supplementary keyword retrieval for article-specific questions
     article_queries = _extract_article_queries(question)
     for art_query in article_queries:
         art_docs = await retriever._aget_relevant_documents(art_query)
@@ -145,16 +125,15 @@ async def retrieve_with_augmentation(
     return chunks[:top_k]
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 # CACHE
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 def load_cache() -> dict | None:
     if not CACHE_PATH.exists():
         return None
     try:
         with open(CACHE_PATH, encoding="utf-8") as f:
             data = json.load(f)
-        # Reject empty or invalid cache
         if not data or not data.get("questions"):
             return None
         return data
@@ -163,10 +142,6 @@ def load_cache() -> dict | None:
 
 
 async def build_cache(qa_pairs: list[dict]) -> dict:
-    """
-    Build answer cache using Claude Sonnet with augmented retrieval.
-    Runs only if no valid cache exists.
-    """
     retriever = HybridRetriever(
         top_k=EVAL_TOP_K,
         match_threshold=EVAL_MATCH_THRESHOLD,
@@ -178,9 +153,7 @@ async def build_cache(qa_pairs: list[dict]) -> dict:
     contexts_list = []
     ground_truths = []
 
-    print("\nBuilding answer cache (Claude Sonnet — runs once)...")
-    print(f"Retriever: top_k={EVAL_TOP_K}, threshold={EVAL_MATCH_THRESHOLD}, match_count={EVAL_MATCH_COUNT}")
-    print("Article keyword augmentation: enabled\n")
+    print("\nBuilding answer cache (Claude Sonnet - runs once)...")
 
     for i, pair in enumerate(qa_pairs[:MAX_PAIRS], 1):
         question = pair["question"]
@@ -193,7 +166,7 @@ async def build_cache(qa_pairs: list[dict]) -> dict:
             try:
                 chunk_texts = await retrieve_with_augmentation(retriever, question)
                 if not chunk_texts:
-                    print("  ✗ No chunks retrieved")
+                    print("  x No chunks retrieved")
                     break
 
                 context_str = "\n\n---\n\n".join(
@@ -206,7 +179,6 @@ async def build_cache(qa_pairs: list[dict]) -> dict:
                         "Answer based strictly on the provided excerpts. "
                         "Be precise and cite specific article numbers and requirements only if they appear in the excerpts. "
                         "Do not add information from general knowledge. "
-                        "If an excerpt says 'Article 13 requires X', you may cite that. "
                         "Answer in the same language as the question."
                     )),
                     HumanMessage(content=(
@@ -221,14 +193,14 @@ async def build_cache(qa_pairs: list[dict]) -> dict:
                 contexts_list.append(chunk_texts)
                 ground_truths.append(pair["ground_truth"])
                 total_chars = sum(len(c) for c in chunk_texts)
-                print(f"  ✓ {len(chunk_texts)} chunks, {total_chars:,} chars")
+                print(f"  ok {len(chunk_texts)} chunks, {total_chars:,} chars")
                 break
 
             except Exception as e:
                 if attempt < 2:
                     await asyncio.sleep(3 * (attempt + 1))
                 else:
-                    print(f"  ✗ Failed after 3 attempts: {e}")
+                    print(f"  x Failed after 3 attempts: {e}")
 
         if i < MAX_PAIRS:
             await asyncio.sleep(1.0)
@@ -256,11 +228,11 @@ async def build_cache(qa_pairs: list[dict]) -> dict:
     return cache
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# METRIC 1 — FAITHFULNESS
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# METRIC 1 - FAITHFULNESS
+# ---------------------------------------------------------------------------
 async def compute_faithfulness_score(answer: str, contexts: list[str]) -> float:
-    context_str = "\n\n".join(contexts[:8])  # use more context now
+    context_str = "\n\n".join(contexts[:8])
 
     extract_prompt = f"""Extract all factual statements from this answer as a JSON array of strings.
 Only include specific factual claims, not general statements.
@@ -305,9 +277,9 @@ Answer (yes/no):"""
     return supported / len(statements) if statements else 0.0
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# METRIC 2 — CONTEXT PRECISION
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# METRIC 2 - CONTEXT PRECISION
+# ---------------------------------------------------------------------------
 async def compute_context_precision_score(question: str, contexts: list[str]) -> float:
     relevant = 0
     for chunk in contexts[:6]:
@@ -331,9 +303,9 @@ Relevant (yes/no):"""
     return relevant / min(len(contexts), 6) if contexts else 0.0
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# METRIC 3 — ANSWER RELEVANCY
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# METRIC 3 - ANSWER RELEVANCY
+# ---------------------------------------------------------------------------
 async def compute_answer_relevancy_score(question: str, answer: str) -> float:
     prompt = f"""Score how well this answer addresses the question on a scale of 0 to 10.
 Return ONLY a single integer number (0-10), nothing else.
@@ -353,9 +325,9 @@ Score (0-10):"""
         return 0.0
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 # MAIN EVALUATION LOOP
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 async def evaluate_all(data: dict) -> dict:
     questions     = data["questions"]
     answers       = data["answers"]
@@ -418,21 +390,17 @@ async def save_to_supabase(output: dict, scores: dict):
                 "augmentation":    True,
             },
         })
-        print("Scores written to ragas_eval_scores table ✓")
+        print("Scores written to ragas_eval_scores table")
     except Exception as e:
-        print(f"⚠ Supabase write failed: {e}")
+        print(f"Supabase write failed: {e}")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 # ENTRY POINT
-# ─────────────────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
 async def main():
     print("\n" + "=" * 65)
-    print("EU Regulatory Intelligence Agent — RAG Evaluation")
-    print("=" * 65)
-    print("Method: Direct evaluation with Claude Haiku judge")
-    print(f"Retrieval: top_k={EVAL_TOP_K}, threshold={EVAL_MATCH_THRESHOLD}")
-    print("Article keyword augmentation: ON")
+    print("EU Regulatory Intelligence Agent - RAG Evaluation")
     print("=" * 65)
 
     with open(QA_PATH, encoding="utf-8") as f:
@@ -443,29 +411,23 @@ async def main():
         lang = pair.get("language", "?")
         lang_counts[lang] = lang_counts.get(lang, 0) + 1
 
-    # Load cache or build fresh
     cached = load_cache()
     if cached:
         cfg = cached.get("retriever_config", {})
         if cfg.get("augmentation") and cfg.get("top_k", 0) >= EVAL_TOP_K:
-            print(f"\nLoaded valid cache — built: {cached['built_at']}")
-            print(f"Config: top_k={cfg.get('top_k')}, threshold={cfg.get('match_threshold')}, augmentation={cfg.get('augmentation')}")
-            print(f"Pairs: {cached['pairs_count']} | No Sonnet calls needed.")
+            print(f"\nLoaded valid cache - built: {cached['built_at']}")
             data = cached
         else:
-            print(f"\nCache found but uses old config (top_k={cfg.get('top_k', 8)}, augmentation={cfg.get('augmentation', False)}).")
-            print("Rebuilding with improved retrieval settings...")
+            print("\nCache outdated - rebuilding...")
             data = await build_cache(qa_pairs)
     else:
-        print("\nNo cache found. Building answers with Claude Sonnet...")
+        print("\nNo cache found - building answers with Claude Sonnet...")
         data = await build_cache(qa_pairs)
 
-    # Evaluate
     start   = time.time()
     scores  = await evaluate_all(data)
     elapsed = round(time.time() - start, 1)
 
-    # Print results
     print("\n" + "=" * 65)
     print("EVALUATION RESULTS")
     print("=" * 65)
@@ -480,15 +442,12 @@ async def main():
     target = 0.75
     faith  = scores["faithfulness"]
     if faith is None:
-        print("\n⚠ Could not compute faithfulness.")
+        print("\nWarning: Could not compute faithfulness.")
     elif faith >= target:
-        print(f"\n✓ Faithfulness {faith:.4f} >= {target} — PASS")
+        print(f"\nFaithfulness {faith:.4f} >= {target} - PASS")
     else:
-        print(f"\n⚠ Faithfulness {faith:.4f} < {target}")
-        print("  The OCR-degraded EUR-Lex PDF limits the ceiling for this metric.")
-        print("  This score reflects real retrieval quality on scanned legal PDFs.")
+        print(f"\nFaithfulness {faith:.4f} < {target}")
 
-    # Save results
     experiment_label = f"augmented_top{EVAL_TOP_K}_threshold{str(EVAL_MATCH_THRESHOLD).replace('.','')}"
     output = {
         "run_date":            datetime.now(timezone.utc).isoformat(),
@@ -511,10 +470,6 @@ async def main():
     print(f"\nResults saved to: {RESULTS_PATH}")
 
     await save_to_supabase(output, scores)
-
-    print("\n" + "=" * 65)
-    print("SCREENSHOT THESE NUMBERS — README and blog post")
-    print("=" * 65)
 
 
 if __name__ == "__main__":
