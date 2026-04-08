@@ -5,7 +5,7 @@ import { ResearchRun, AgentTask } from '../lib/types'
 import RiskBadge from '../components/RiskBadge'
 import AgentPipeline from '../components/AgentPipeline'
 
-const AGENT_PIPELINE = ['risk_classifier','planner','researcher','analyst','critic','synthesizer']
+const AGENT_PIPELINE = ['risk_classifier', 'planner', 'researcher', 'analyst', 'critic', 'synthesizer']
 
 const AGENT_INFO: Record<string, { icon: string; label: string; desc: string }> = {
   risk_classifier: { icon: '🛡️', label: 'Risk Classifier',  desc: 'EU AI Act risk classification — fires before any agents' },
@@ -17,10 +17,10 @@ const AGENT_INFO: Record<string, { icon: string; label: string; desc: string }> 
 }
 
 const STATUS_STYLES = {
-  pending:   'text-gray-500 bg-gray-800',
-  running:   'text-blue-400 bg-blue-950 border-blue-700',
-  completed: 'text-green-400 bg-green-950 border-green-800',
-  failed:    'text-red-400 bg-red-950 border-red-800',
+  pending:   'text-gray-400 bg-gray-50 border-gray-200',
+  running:   'text-blue-700 bg-blue-50 border-blue-200',
+  completed: 'text-green-700 bg-green-50 border-green-200',
+  failed:    'text-red-700 bg-red-50 border-red-200',
 }
 
 const STATUS_LABEL = {
@@ -35,13 +35,9 @@ function elapsedStr(task: AgentTask | undefined, status: string): string {
   try {
     const start = new Date(task.started_at).getTime()
     if (status === 'completed' && task.completed_at) {
-      const end = new Date(task.completed_at).getTime()
-      return `⏱ ${Math.round((end - start) / 1000)}s`
+      return `⏱ ${Math.round((new Date(task.completed_at).getTime() - start) / 1000)}s`
     }
-    if (status === 'running') {
-      const secs = Math.round((Date.now() - start) / 1000)
-      return `⏱ ${secs}s`
-    }
+    if (status === 'running') return `⏱ ${Math.round((Date.now() - start) / 1000)}s`
   } catch {}
   return ''
 }
@@ -53,34 +49,26 @@ export default function ProgressPage() {
   const [tasks,    setTasks]    = useState<AgentTask[]>([])
   const [complete, setComplete] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const [tick, setTick] = useState(0)  // forces elapsed time re-render
+  const [, setTick] = useState(0)
 
-  // Build deduplicated task map (handles retries)
   const taskMap: Record<string, AgentTask> = {}
   for (const t of tasks) {
     const existing = taskMap[t.agent_name]
-    if (!existing || t.status === 'running' ||
-        (t.started_at ?? '') > (existing.started_at ?? '')) {
+    if (!existing || t.status === 'running' || (t.started_at ?? '') > (existing.started_at ?? '')) {
       taskMap[t.agent_name] = t
     }
   }
 
   function inferRCStatus(): 'pending' | 'running' | 'completed' | 'failed' {
-    if (run?.risk_level || taskMap['planner'] || run?.status === 'completed' || run?.status === 'failed')
-      return 'completed'
+    if (run?.risk_level || taskMap['planner'] || run?.status === 'completed' || run?.status === 'failed') return 'completed'
     return 'running'
-  }
-
-  function isTrulyComplete() {
-    return run?.status === 'completed' && taskMap['synthesizer']?.status === 'completed'
   }
 
   async function poll() {
     if (!runId) return
     try {
       const [status, agentsRes] = await Promise.all([getRunStatus(runId), getAgentTasks(runId)])
-      setRun(status)
-      setTasks(agentsRes.agents ?? [])
+      setRun(status); setTasks(agentsRes.agents ?? [])
       if (status.status === 'completed' && agentsRes.agents?.find((t: AgentTask) => t.agent_name === 'synthesizer' && t.status === 'completed')) {
         setComplete(true)
         if (intervalRef.current) clearInterval(intervalRef.current)
@@ -92,10 +80,7 @@ export default function ProgressPage() {
     poll()
     intervalRef.current = setInterval(poll, 2000)
     const tickInterval = setInterval(() => setTick(t => t + 1), 1000)
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-      clearInterval(tickInterval)
-    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); clearInterval(tickInterval) }
   }, [runId])
 
   const rcStatus = inferRCStatus()
@@ -106,54 +91,33 @@ export default function ProgressPage() {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <h1 className="text-2xl font-bold text-white">⚡ Live Agent Progress</h1>
-        {complete && (
-          <span className="badge bg-green-900 text-green-300 border border-green-700">Complete</span>
-        )}
+        <h1 className="text-2xl font-bold text-gray-900">⚡ Live Agent Progress</h1>
+        {complete && <span className="badge bg-green-100 text-green-700 border border-green-200">Complete</span>}
       </div>
 
-      {run && (
-        <div className="text-xs text-gray-500 mb-1">Run ID: <span className="font-mono">{runId}</span></div>
-      )}
-      {run?.goal && (
-        <p className="text-gray-300 mb-4 text-sm line-clamp-2">{run.goal}</p>
-      )}
+      {run && <div className="text-xs text-gray-400 mb-1">Run ID: <span className="font-mono">{runId}</span></div>}
+      {run?.goal && <p className="text-gray-600 mb-4 text-sm line-clamp-2">{run.goal}</p>}
+      {run?.risk_level && <div className="mb-4"><RiskBadge level={run.risk_level} size="md" /></div>}
 
-      {/* Risk badge */}
-      {run?.risk_level && (
-        <div className="mb-4">
-          <RiskBadge level={run.risk_level} size="md" />
-        </div>
-      )}
+      <div className="mb-4"><AgentPipeline taskMap={taskMap} rcStatus={rcStatus} /></div>
 
-      {/* Pipeline flow */}
-      <div className="mb-4">
-        <AgentPipeline taskMap={taskMap} rcStatus={rcStatus} />
-      </div>
-
-      {/* Progress bar */}
       <div className="mb-6">
         <div className="flex justify-between text-xs text-gray-400 mb-1">
           <span>{completedCount}/{AGENT_PIPELINE.length} stages complete</span>
           <span>{Math.round(progress * 100)}%</span>
         </div>
-        <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-blue-600 rounded-full transition-all duration-500"
-            style={{ width: `${progress * 100}%` }}
-          />
+        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-full bg-blue-600 rounded-full transition-all duration-500" style={{ width: `${progress * 100}%` }} />
         </div>
       </div>
 
-      {/* Agent cards */}
       <div className="space-y-3 mb-6">
         {AGENT_PIPELINE.map(name => {
-          const task   = taskMap[name]
-          const status = name === 'risk_classifier' ? rcStatus : (task?.status ?? 'pending')
-          const info   = AGENT_INFO[name]
-          const styles = STATUS_STYLES[status] ?? STATUS_STYLES.pending
+          const task    = taskMap[name]
+          const status  = name === 'risk_classifier' ? rcStatus : (task?.status ?? 'pending')
+          const info    = AGENT_INFO[name]
+          const styles  = STATUS_STYLES[status] ?? STATUS_STYLES.pending
           const elapsed = elapsedStr(task, status)
-
           return (
             <div key={name} className={`border rounded-xl p-4 transition-all ${styles}`}>
               <div className="flex items-start justify-between">
@@ -170,41 +134,34 @@ export default function ProgressPage() {
                 </div>
               </div>
               {task?.status === 'failed' && task.error && (
-                <div className="mt-2 text-xs text-red-300 bg-red-900/50 rounded p-2">{task.error}</div>
+                <div className="mt-2 text-xs text-red-600 bg-red-50 border border-red-100 rounded p-2">{task.error}</div>
               )}
             </div>
           )
         })}
       </div>
 
-      {/* Completion */}
       {complete && (
-        <div className="card border-green-800 bg-green-950">
-          <div className="text-green-400 font-semibold mb-3">✅ Research complete! Your compliance report is ready.</div>
+        <div className="card border-green-200 bg-green-50">
+          <div className="text-green-700 font-semibold mb-3">✅ Research complete! Your compliance report is ready.</div>
           <div className="flex gap-3">
-            <button className="btn-primary" onClick={() => navigate(`/reports/${runId}`)}>
-              📋 View Report
-            </button>
-            <button className="btn-secondary" onClick={() => navigate(`/compliance/${runId}`)}>
-              🇪🇺 Compliance View
-            </button>
-            <button className="btn-secondary" onClick={() => navigate('/')}>
-              🆕 New Research
-            </button>
+            <button className="btn-primary" onClick={() => navigate(`/app/reports/${runId}`)}>📋 View Report</button>
+            <button className="btn-secondary" onClick={() => navigate(`/app/compliance/${runId}`)}>🇪🇺 Compliance View</button>
+            <button className="btn-secondary" onClick={() => navigate('/app')}>🆕 New Research</button>
           </div>
         </div>
       )}
 
       {run?.status === 'failed' && !complete && (
-        <div className="card border-red-800 bg-red-950">
-          <div className="text-red-400 font-semibold mb-2">❌ Research failed</div>
-          {run.error && <p className="text-red-300 text-sm mb-3">{run.error}</p>}
-          <button className="btn-secondary" onClick={() => navigate('/')}>← Try Again</button>
+        <div className="card border-red-200 bg-red-50">
+          <div className="text-red-700 font-semibold mb-2">❌ Research failed</div>
+          {run.error && <p className="text-red-600 text-sm mb-3">{run.error}</p>}
+          <button className="btn-secondary" onClick={() => navigate('/app')}>← Try Again</button>
         </div>
       )}
 
       {!complete && run?.status !== 'failed' && (
-        <p className="text-xs text-gray-500 text-center animate-pulse">🔄 Auto-refreshing every 2s...</p>
+        <p className="text-xs text-gray-400 text-center animate-pulse">🔄 Auto-refreshing every 2s...</p>
       )}
     </div>
   )
