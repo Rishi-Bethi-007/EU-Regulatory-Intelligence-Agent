@@ -51,14 +51,14 @@ export default function Layout() {
               <span className="text-2xl flex-shrink-0">🇪🇺</span>
               <div className="min-w-0">
                 <div className="text-xs font-bold text-gray-900 leading-tight truncate">RegulIQ</div>
-                <div className="text-xs text-gray-400 leading-tight truncate">Intelligence Agent</div>
+                <div className="text-xs text-gray-600 leading-tight truncate">Intelligence Agent</div>
               </div>
             </div>
           )}
           {collapsed && <span className="text-2xl mx-auto">🇪🇺</span>}
           <button
             onClick={() => setCollapsed(c => !c)}
-            className="hidden md:flex ml-auto flex-shrink-0 p-1 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            className="hidden md:flex ml-auto flex-shrink-0 p-1 rounded text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {collapsed ? '▶' : '◀'}
@@ -107,12 +107,12 @@ export default function Layout() {
         {/* User + sign out */}
         <div className="p-2 border-t border-gray-100">
           {!collapsed && (
-            <div className="text-xs text-gray-400 truncate mb-2 px-1">{user?.email}</div>
+            <div className="text-xs text-gray-600 truncate mb-2 px-1">{user?.email}</div>
           )}
           <button
             onClick={handleSignOut}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm
-                       text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                       text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors"
             title="Sign out"
           >
             <span className="flex-shrink-0">→</span>
@@ -125,7 +125,7 @@ export default function Layout() {
       <div className="md:hidden fixed top-0 left-0 right-0 z-20 bg-white border-b border-gray-200 flex items-center px-3 py-2 gap-3">
         <button
           onClick={() => setMobileOpen(o => !o)}
-          className="p-2 rounded text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          className="p-2 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors"
         >
           ☰
         </button>

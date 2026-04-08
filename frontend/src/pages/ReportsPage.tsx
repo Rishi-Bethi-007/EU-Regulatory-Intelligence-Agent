@@ -37,7 +37,7 @@ function TableOfContents({ text }: { text: string }) {
   if (headings.length < 3) return null
   return (
     <details className="mb-6 bg-gray-50 rounded-xl border border-gray-200">
-      <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-gray-600 hover:text-gray-900">
+      <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
         📑 Table of Contents ({headings.length} sections)
       </summary>
       <div className="px-4 pb-3 space-y-1">
@@ -68,7 +68,7 @@ function TraceCard({ name, trace }: { name: string; trace: DecisionTrace }) {
         <span className="text-sm font-medium text-gray-800">{LABELS[name] ?? name}</span>
         <div className="flex items-center gap-3">
           <span className="text-xs font-medium" style={{ color }}>{label} ({pct}%)</span>
-          <span className="text-gray-400 text-xs">{open ? '▲' : '▼'}</span>
+          <span className="text-gray-500 text-xs">{open ? '▲' : '▼'}</span>
         </div>
       </button>
       {open && (
@@ -78,17 +78,17 @@ function TraceCard({ name, trace }: { name: string; trace: DecisionTrace }) {
               <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
             </div>
             <span className="text-xs font-medium" style={{ color }}>{label} confidence — {pct}%</span>
-            {trace.duration_ms > 0 && <span className="text-xs text-gray-400 ml-3">⏱ {trace.duration_ms}ms</span>}
+            {trace.duration_ms > 0 && <span className="text-xs text-gray-500 ml-3">⏱ {trace.duration_ms}ms</span>}
           </div>
           {trace.reasoning_steps?.length > 0 && (
             <div>
-              <div className="text-xs text-gray-500 font-medium mb-1">Reasoning:</div>
+              <div className="text-xs text-gray-600 font-medium mb-1">Reasoning:</div>
               <ul className="space-y-1">{trace.reasoning_steps.map((s, i) => <li key={i} className="text-xs text-gray-600">• {s}</li>)}</ul>
             </div>
           )}
           {trace.sources_used?.length > 0 && (
             <div>
-              <div className="text-xs text-gray-500 font-medium mb-1">Sources used:</div>
+              <div className="text-xs text-gray-600 font-medium mb-1">Sources used:</div>
               {trace.sources_used.slice(0, 5).map((s, i) => (
                 <div key={i} className="text-xs text-blue-600 truncate">
                   {s.startsWith('http') ? <a href={s} target="_blank" rel="noreferrer">{s.slice(0, 80)}</a> : s}
@@ -232,7 +232,7 @@ export default function ReportsPage() {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 p-4 shrink-0">
-        <h2 className="text-sm font-semibold text-gray-500 mb-3">📂 Recent Runs</h2>
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">📂 Recent Runs</h2>
         <div className="space-y-2">
           {recentRuns.map(r => {
             const isActive = r.id === activeRunId
@@ -241,10 +241,10 @@ export default function ReportsPage() {
               <button key={r.id}
                 onClick={() => { setActiveRunId(r.id); navigate(`/app/reports/${r.id}`) }}
                 className={`w-full text-left rounded-lg p-2.5 text-xs transition-colors border ${
-                  isActive ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                  isActive ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                 }`}>
                 <div className="truncate mb-1 font-medium">{(r.goal ?? '').slice(0, 40)}...</div>
-                <div className="flex items-center gap-1.5 text-gray-400">
+                <div className="flex items-center gap-1.5 text-gray-600">
                   <span>{EMOJI[r.risk_level ?? ''] ?? '⚪'}</span>
                   <span>📊 {r.transparency_score ?? 0}/100</span>
                   <span>{r.created_at?.slice(0, 10)}</span>
@@ -258,12 +258,12 @@ export default function ReportsPage() {
       {/* Main */}
       <div className="flex-1 p-8 overflow-auto">
         {!activeRunId ? (
-          <div className="text-center text-gray-400 mt-20">
+          <div className="text-center text-gray-600 mt-20">
             <div className="text-5xl mb-4">📋</div>
             <p>No run selected. <button className="text-blue-600 hover:text-blue-700" onClick={() => navigate('/app')}>Start a research query</button> or select from the sidebar.</p>
           </div>
         ) : !run ? (
-          <div className="text-gray-400 text-center mt-20">Loading report...</div>
+          <div className="text-gray-600 text-center mt-20">Loading report...</div>
         ) : (
           <>
             <div className="grid grid-cols-4 gap-4 mb-6">
@@ -277,7 +277,7 @@ export default function ReportsPage() {
               {TABS.map(t => (
                 <button key={t.key} onClick={() => setTab(t.key as any)}
                   className={`whitespace-nowrap px-3 py-2 rounded-md text-xs font-medium transition-colors ${
-                    tab === t.key ? 'bg-white text-gray-900 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'
+                    tab === t.key ? 'bg-white text-gray-900 shadow-sm border border-gray-200' : 'text-gray-700 hover:text-gray-900'
                   }`}>
                   {t.label}
                 </button>
@@ -303,7 +303,7 @@ export default function ReportsPage() {
             {tab === 'traces' && (
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold text-gray-900">EU AI Act Art. 13 — Explainability Traces</h3>
-                <p className="text-sm text-gray-500 mb-4">Every agent produced a decision trace recording reasoning steps, sources, confidence level, and counterfactual explanation.</p>
+                <p className="text-sm text-gray-700 mb-4">Every agent produced a decision trace recording reasoning steps, sources, confidence level, and counterfactual explanation.</p>
                 {['risk_classifier', 'planner', 'researcher', 'analyst', 'critic', 'synthesizer'].map(name => {
                   const task = taskMap[name]
                   if (!task?.decision_trace) return null
@@ -315,12 +315,12 @@ export default function ReportsPage() {
             {tab === 'download' && (
               <div className="max-w-lg space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Download Report</h3>
-                <p className="text-sm text-gray-500">Export the full compliance report in your preferred format.</p>
+                <p className="text-sm text-gray-700">Export the full compliance report in your preferred format.</p>
                 <div className="card flex items-start gap-4">
                   <div className="text-3xl">📝</div>
                   <div className="flex-1">
                     <div className="text-sm font-semibold text-gray-900 mb-1">Markdown (.md)</div>
-                    <div className="text-xs text-gray-500 mb-3">Raw report with headings, tables, and Mermaid diagrams. Best for Notion / Confluence.</div>
+                    <div className="text-xs text-gray-700 mb-3">Raw report with headings, tables, and Mermaid diagrams. Best for Notion / Confluence.</div>
                     <a href={`data:text/markdown;charset=utf-8,${encodeURIComponent(reportText)}`}
                       download={`eu_compliance_report_${activeRunId?.slice(0, 8)}.md`}
                       className="btn-secondary text-xs inline-block">⬇ Download .md</a>
@@ -333,7 +333,7 @@ export default function ReportsPage() {
                       PDF Report
                       <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-normal border border-blue-200">Recommended</span>
                     </div>
-                    <div className="text-xs text-gray-500 mb-3">
+                    <div className="text-xs text-gray-700 mb-3">
                       Professionally formatted PDF with cover page and EU AI Act risk badge.
                       Opens in new tab — use <kbd className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-xs border border-gray-200">Ctrl+P</kbd> → Save as PDF.
                     </div>
@@ -342,7 +342,7 @@ export default function ReportsPage() {
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-gray-400 mt-2 font-mono">Run ID: {activeRunId} · {charCount.toLocaleString()} chars</p>
+                <p className="text-xs text-gray-600 mt-2 font-mono">Run ID: {activeRunId} · {charCount.toLocaleString()} chars</p>
               </div>
             )}
           </>

@@ -72,7 +72,7 @@ export default function EvalsPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">📊 Evaluation Dashboard</h1>
-      <p className="text-gray-500 text-sm mb-6">RAGAS scores · Cost & latency · Transparency scoring · Run history</p>
+      <p className="text-gray-700 text-sm mb-6">RAGAS scores · Cost & latency · Transparency scoring · Run history</p>
 
       {!loading && (
         <div className="grid grid-cols-5 gap-4 mb-8">
@@ -86,12 +86,12 @@ export default function EvalsPage() {
 
       {Object.keys(riskCounts).length > 0 && (
         <div className="card mb-6">
-          <div className="text-sm text-gray-500 mb-3 font-medium">Risk level distribution</div>
+          <div className="text-sm text-gray-700 mb-3 font-medium">Risk level distribution</div>
           <div className="flex flex-wrap gap-3">
             {Object.entries(riskCounts).map(([k, v]) => (
               <div key={k} className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-center min-w-[80px]">
                 <div className="text-lg">{RISK_EMOJI[k] ?? '⚪'}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{k.replace('_', ' ')}</div>
+                <div className="text-xs text-gray-600 mt-0.5">{k.replace('_', ' ')}</div>
                 <div className="text-lg font-bold text-gray-900">{v}</div>
               </div>
             ))}
@@ -103,7 +103,7 @@ export default function EvalsPage() {
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key as any)}
             className={`flex-1 py-2 rounded-md text-xs font-medium transition-colors ${
-              tab === t.key ? 'bg-white text-gray-900 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'
+              tab === t.key ? 'bg-white text-gray-900 shadow-sm border border-gray-200' : 'text-gray-700 hover:text-gray-900'
             }`}>
             {t.label}
           </button>
@@ -116,10 +116,10 @@ export default function EvalsPage() {
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <h3 className="text-gray-900 font-semibold mb-3">What is RAGAS?</h3>
-                <p className="text-sm text-gray-500 mb-4">RAGAS (Retrieval Augmented Generation Assessment) measures RAG quality across 3 dimensions:</p>
+                <p className="text-sm text-gray-700 mb-4">RAGAS (Retrieval Augmented Generation Assessment) measures RAG quality across 3 dimensions:</p>
                 <table className="text-sm w-full">
                   <thead>
-                    <tr className="text-gray-400 border-b border-gray-200">
+                    <tr className="text-gray-700 border-b border-gray-200">
                       <th className="text-left pb-2">Metric</th>
                       <th className="text-left pb-2">What it measures</th>
                       <th className="text-left pb-2">Target</th>
@@ -145,7 +145,7 @@ export default function EvalsPage() {
                 <code className="block bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm text-blue-700 font-mono mb-3">
                   uv run python scripts/run_ragas_baseline.py
                 </code>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-700">
                   Evaluates 20 Q&A pairs across EN/SV/DE languages. Uses Claude Haiku as judge.
                   Writes scores to <code className="text-blue-600">ragas_eval_scores</code> table. Takes ~5 minutes.
                 </p>
@@ -168,11 +168,11 @@ export default function EvalsPage() {
                   { label: 'Context Precision', val: latestEval.context_precision, target: 0.70 },
                 ].map(({ label, val, target }) => (
                   <div key={label} className="card text-center">
-                    <div className="text-xs text-gray-500 mb-1">{label}</div>
+                    <div className="text-xs text-gray-600 mb-1">{label}</div>
                     <div className={`text-3xl font-bold ${(val ?? 0) >= target ? 'text-green-600' : 'text-amber-600'}`}>
                       {val != null ? val.toFixed(2) : 'N/A'}
                     </div>
-                    <div className="text-xs text-gray-400 mt-1">target ≥ {target}</div>
+                    <div className="text-xs text-gray-600 mt-1">target ≥ {target}</div>
                     <div className="text-xs mt-1">{(val ?? 0) >= target ? '✅ Pass' : '⚠️ Below target'}</div>
                   </div>
                 ))}
@@ -180,8 +180,8 @@ export default function EvalsPage() {
             )}
             {ragasChartData.length > 1 && (
               <div className="card">
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Score trend across evaluation runs</h3>
-                <p className="text-xs text-gray-400 mb-3">Run baseline after each corpus or pipeline change to track improvements</p>
+                <h3 className="text-sm font-medium text-gray-700 mb-1">Score trend across evaluation runs</h3>
+                <p className="text-xs text-gray-600 mb-3">Run baseline after each corpus or pipeline change to track improvements</p>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={ragasChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -197,7 +197,7 @@ export default function EvalsPage() {
               </div>
             )}
             <div className="card">
-              <h3 className="text-sm font-medium text-gray-500 mb-3">Evaluation run history</h3>
+              <h3 className="text-sm font-medium text-gray-700 mb-3">Evaluation run history</h3>
               <div className="space-y-2">
                 {[...evals].reverse().map(e => (
                   <div key={e.id} className="flex items-center gap-4 py-2 border-b border-gray-100 last:border-0 text-xs">
@@ -206,8 +206,8 @@ export default function EvalsPage() {
                     <span className="text-blue-600">F: {e.faithfulness?.toFixed(3) ?? 'N/A'}</span>
                     <span className="text-purple-600">AR: {e.answer_relevancy?.toFixed(3) ?? 'N/A'}</span>
                     <span className="text-green-600">CP: {e.context_precision?.toFixed(3) ?? 'N/A'}</span>
-                    <span className="text-gray-400">{e.pairs_evaluated} pairs</span>
-                    <span className="text-gray-300">{(e.evaluated_at ?? e.created_at)?.slice(0, 10)}</span>
+                    <span className="text-gray-600">{e.pairs_evaluated} pairs</span>
+                    <span className="text-gray-500">{(e.evaluated_at ?? e.created_at)?.slice(0, 10)}</span>
                   </div>
                 ))}
               </div>
@@ -219,7 +219,7 @@ export default function EvalsPage() {
       {tab === 'cost' && (
         <div className="grid grid-cols-2 gap-4">
           <div className="card">
-            <h3 className="text-sm font-medium text-gray-500 mb-3">Cost per run (USD)</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Cost per run (USD)</h3>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={costData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -231,7 +231,7 @@ export default function EvalsPage() {
             </ResponsiveContainer>
           </div>
           <div className="card">
-            <h3 className="text-sm font-medium text-gray-500 mb-3">Latency per run (seconds)</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Latency per run (seconds)</h3>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={latData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -247,10 +247,10 @@ export default function EvalsPage() {
 
       {tab === 'transparency' && (
         scored.length === 0 ? (
-          <div className="card text-center text-gray-400">No scored runs yet. Run a research query to see transparency scores.</div>
+          <div className="card text-center text-gray-600">No scored runs yet. Run a research query to see transparency scores.</div>
         ) : (
           <div className="card">
-            <h3 className="text-sm font-medium text-gray-500 mb-3">Transparency score over time (target: ≥80/100)</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Transparency score over time (target: ≥80/100)</h3>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={scoreData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -275,10 +275,10 @@ export default function EvalsPage() {
                 <div key={r.id} className="flex items-center gap-4 py-2 border-b border-gray-100 last:border-0 text-xs">
                   <span className="text-lg shrink-0">{RISK_EMOJI[r.risk_level ?? ''] ?? '⚪'}</span>
                   <span className="flex-1 text-gray-600 truncate">{goal.slice(0, 60)}...</span>
-                  <span className="text-gray-400 shrink-0">📊 {r.transparency_score ?? 0}/100</span>
-                  <span className="text-gray-400 shrink-0">💰 ${Number(r.cost_usd ?? 0).toFixed(4)}</span>
-                  <span className="text-gray-400 shrink-0">⏱ {(Number(r.duration_ms ?? 0) / 1000).toFixed(1)}s</span>
-                  <span className="text-gray-300 shrink-0">{r.created_at?.slice(0, 10)}</span>
+                  <span className="text-gray-600 shrink-0">📊 {r.transparency_score ?? 0}/100</span>
+                  <span className="text-gray-600 shrink-0">💰 ${Number(r.cost_usd ?? 0).toFixed(4)}</span>
+                  <span className="text-gray-600 shrink-0">⏱ {(Number(r.duration_ms ?? 0) / 1000).toFixed(1)}s</span>
+                  <span className="text-gray-500 shrink-0">{r.created_at?.slice(0, 10)}</span>
                 </div>
               )
             })}

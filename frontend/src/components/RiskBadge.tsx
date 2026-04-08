@@ -7,7 +7,7 @@ interface Props {
 
 export default function RiskBadge({ level, size = 'md' }: Props) {
   if (!level) return (
-    <span className="badge bg-gray-800 text-gray-400">⚪ Not classified</span>
+    <span className="badge bg-gray-100 text-gray-700 border border-gray-200">⚪ Not classified</span>
   )
 
   const cfg = RISK_CONFIG[level]

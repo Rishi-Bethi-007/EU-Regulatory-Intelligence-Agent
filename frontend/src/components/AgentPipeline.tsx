@@ -10,7 +10,7 @@ const PIPELINE = [
 ]
 
 const STATUS_STYLES = {
-  pending:   { ring: 'border-gray-700',  bg: 'bg-gray-800',  text: 'text-gray-500'  },
+  pending:   { ring: 'border-gray-300',  bg: 'bg-white',     text: 'text-gray-700'  },
   running:   { ring: 'border-blue-500',  bg: 'bg-blue-950',  text: 'text-blue-400'  },
   completed: { ring: 'border-green-600', bg: 'bg-green-950', text: 'text-green-400' },
   failed:    { ring: 'border-red-700',   bg: 'bg-red-950',   text: 'text-red-400'   },
@@ -28,7 +28,7 @@ export default function AgentPipeline({ taskMap, rcStatus }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-1 flex-wrap bg-gray-900 border border-gray-800 rounded-xl p-4">
+    <div className="flex items-center gap-1 flex-wrap bg-gray-50 border border-gray-200 rounded-xl p-4">
       {PIPELINE.map(({ key, icon, label }, i) => {
         const status = getStatus(key)
         const s = STATUS_STYLES[status] ?? STATUS_STYLES.pending
@@ -46,7 +46,7 @@ export default function AgentPipeline({ taskMap, rcStatus }: Props) {
               <span className="text-[10px] font-medium mt-1 leading-tight">{label}</span>
             </div>
             {i < PIPELINE.length - 1 && (
-              <span className="text-gray-600 text-sm">→</span>
+              <span className="text-gray-500 text-sm">→</span>
             )}
           </div>
         )

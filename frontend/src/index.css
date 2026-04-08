@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-gray-50 text-gray-950 antialiased;
   }
 
   /* Scrollbar */
@@ -16,7 +16,7 @@
 
 @layer components {
   .card {
-    @apply bg-white border border-gray-200 rounded-xl p-6 shadow-sm;
+    @apply bg-white border border-gray-200 rounded-xl p-6 shadow-sm text-gray-900;
   }
   .btn-primary {
     @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg
@@ -32,14 +32,14 @@
   }
   .input {
     @apply w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900
-           placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1
+           placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1
            focus:ring-blue-500 transition-colors;
   }
   .badge {
     @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
   .metric-card {
-    @apply bg-white border border-gray-200 rounded-xl p-4 text-center shadow-sm;
+    @apply bg-white border border-gray-200 rounded-xl p-4 text-center shadow-sm text-gray-900;
   }
 }
 
@@ -62,8 +62,8 @@
 .report-content pre  { @apply bg-gray-100 rounded-lg p-4 overflow-x-auto mb-4; }
 .report-content pre code { @apply bg-transparent p-0; }
 .report-content table { @apply w-full border-collapse mb-4 text-sm; }
-.report-content th { @apply text-left text-gray-500 font-medium border-b border-gray-200 pb-2 px-3; }
+.report-content th { @apply text-left text-gray-700 font-medium border-b border-gray-200 pb-2 px-3; }
 .report-content td { @apply text-gray-700 border-b border-gray-100 py-2 px-3; }
-.report-content blockquote { @apply border-l-4 border-blue-500 pl-4 text-gray-500 italic my-4; }
+.report-content blockquote { @apply border-l-4 border-blue-500 pl-4 text-gray-700 italic my-4; }
 .report-content hr { @apply border-gray-200 my-6; }
 .report-content a  { @apply text-blue-600 hover:text-blue-700 underline; }

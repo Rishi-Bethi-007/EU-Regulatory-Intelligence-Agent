@@ -89,23 +89,23 @@ export default function AdminPage() {
     <div className="p-8 max-w-6xl mx-auto">
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl">⚙️</span>
-        <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
-        <span className="ml-2 text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded-full font-medium">ADMIN ONLY</span>
+        <h1 className="text-2xl font-bold text-gray-950">Admin Panel</h1>
+        <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium border border-red-200">ADMIN ONLY</span>
       </div>
-      <p className="text-gray-500 text-sm mb-6">
-        Signed in as <span className="text-gray-300 font-mono">{user?.email}</span>
+      <p className="text-gray-700 text-sm mb-6">
+        Signed in as <span className="text-gray-900 font-mono">{user?.email}</span>
       </p>
 
-      <div className="flex gap-1 bg-gray-800 rounded-lg p-1 mb-6">
+      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-6">
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key as any)}
             className={`flex-1 py-2 rounded-md text-xs font-medium transition-colors ${
-              tab === t.key ? 'bg-red-900 text-white' : 'text-gray-400 hover:text-white'
+              tab === t.key ? 'bg-red-600 text-white shadow-sm' : 'text-gray-700 hover:text-gray-900'
             }`}>{t.label}</button>
         ))}
       </div>
 
-      {loading ? <div className="text-gray-400 text-center py-20">Loading...</div> : <>
+      {loading ? <div className="text-gray-600 text-center py-20">Loading...</div> : <>
 
         {tab === 'overview' && (
           <div className="space-y-6">
@@ -117,30 +117,30 @@ export default function AdminPage() {
                 { label: 'Total Cost',   value: `$${(stats?.total_cost ?? 0).toFixed(3)}` },
                 { label: 'Avg Latency', value: `${(stats?.avg_latency ?? 0).toFixed(1)}s` },
               ].map(m => (
-                <div key={m.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-                  <div className="text-xs text-gray-500 mb-1">{m.label}</div>
-                  <div className="text-xl font-bold text-white">{m.value}</div>
+                <div key={m.label} className="metric-card">
+                  <div className="text-xs text-gray-600 mb-1">{m.label}</div>
+                  <div className="text-xl font-bold text-gray-900">{m.value}</div>
                 </div>
               ))}
             </div>
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <div className="text-xs text-gray-500 mb-1">Completed</div>
-                <div className="text-2xl font-bold text-green-400">{completedRuns.length}</div>
+              <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                <div className="text-xs text-gray-600 mb-1">Completed</div>
+                <div className="text-2xl font-bold text-green-600">{completedRuns.length}</div>
               </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <div className="text-xs text-gray-500 mb-1">Failed</div>
-                <div className="text-2xl font-bold text-red-400">{failedRuns.length}</div>
+              <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                <div className="text-xs text-gray-600 mb-1">Failed</div>
+                <div className="text-2xl font-bold text-red-600">{failedRuns.length}</div>
               </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <div className="text-xs text-gray-500 mb-1">Success Rate</div>
-                <div className="text-2xl font-bold text-white">
+              <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                <div className="text-xs text-gray-600 mb-1">Success Rate</div>
+                <div className="text-2xl font-bold text-gray-900">
                   {runs.length ? Math.round(completedRuns.length / runs.length * 100) : 0}%
                 </div>
               </div>
             </div>
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Risk distribution — all users</h3>
+            <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Risk distribution — all users</h3>
               <div className="flex flex-wrap gap-3">
                 {Object.entries(
                   runs.reduce((acc, r) => {
@@ -149,10 +149,10 @@ export default function AdminPage() {
                     return acc
                   }, {} as Record<string, number>)
                 ).map(([k, v]) => (
-                  <div key={k} className="bg-gray-800 rounded-lg px-4 py-2 text-center">
+                  <div key={k} className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-center">
                     <div>{RISK_EMOJI[k] ?? '⚪'}</div>
-                    <div className="text-xs text-gray-400">{k.replace('_', ' ')}</div>
-                    <div className="text-lg font-bold text-white">{v}</div>
+                    <div className="text-xs text-gray-600">{k.replace('_', ' ')}</div>
+                    <div className="text-lg font-bold text-gray-900">{v}</div>
                   </div>
                 ))}
               </div>
@@ -161,25 +161,25 @@ export default function AdminPage() {
         )}
 
         {tab === 'runs' && (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl divide-y divide-gray-800">
+          <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-200 shadow-sm">
             {runs.map(r => {
               const goal = r.goal ?? ''
               if (goal.startsWith('[ERASED')) return null
               return (
-                <div key={r.id} className="flex items-center gap-3 px-4 py-3 text-xs hover:bg-gray-800 transition-colors">
+                <div key={r.id} className="flex items-center gap-3 px-4 py-3 text-xs hover:bg-gray-50 transition-colors">
                   <span className="text-lg shrink-0">{RISK_EMOJI[r.risk_level ?? ''] ?? '⚪'}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-gray-200 truncate">{goal.slice(0, 70)}...</div>
+                    <div className="text-gray-800 truncate">{goal.slice(0, 70)}...</div>
                     <div className="text-gray-500 font-mono mt-0.5">{r.user_id?.slice(0, 8) ?? 'anon'} · {r.id.slice(0, 8)}</div>
                   </div>
                   <span className={`shrink-0 px-2 py-0.5 rounded-full font-medium ${
-                    r.status === 'completed' ? 'bg-green-900 text-green-300'
-                    : r.status === 'failed'  ? 'bg-red-900 text-red-300'
-                    : 'bg-gray-700 text-gray-300'
+                    r.status === 'completed' ? 'bg-green-100 text-green-700'
+                    : r.status === 'failed'  ? 'bg-red-100 text-red-700'
+                    : 'bg-gray-100 text-gray-700'
                   }`}>{r.status}</span>
-                  <span className="text-gray-500 shrink-0">${Number(r.cost_usd ?? 0).toFixed(4)}</span>
-                  <span className="text-gray-500 shrink-0">{((r.duration_ms ?? 0)/1000).toFixed(1)}s</span>
-                  <span className="text-gray-600 shrink-0">{r.created_at?.slice(0, 10)}</span>
+                  <span className="text-gray-600 shrink-0">${Number(r.cost_usd ?? 0).toFixed(4)}</span>
+                  <span className="text-gray-600 shrink-0">{((r.duration_ms ?? 0)/1000).toFixed(1)}s</span>
+                  <span className="text-gray-500 shrink-0">{r.created_at?.slice(0, 10)}</span>
                 </div>
               )
             })}
@@ -190,24 +190,24 @@ export default function AdminPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <button onClick={verifyAuditChain}
-                className="bg-blue-800 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-lg transition-colors">
+                className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-lg transition-colors">
                 🔍 Verify SHA-256 Chain
               </button>
               {auditValid !== null && (
-                <span className={`text-sm font-medium ${auditValid ? 'text-green-400' : 'text-red-400'}`}>
+                <span className={`text-sm font-medium ${auditValid ? 'text-green-700' : 'text-red-700'}`}>
                   {auditValid ? '✅ Chain intact' : '❌ Chain broken — tampering detected'}
                 </span>
               )}
             </div>
-            <div className="bg-gray-900 border border-gray-800 rounded-xl divide-y divide-gray-800">
+            <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-200 shadow-sm">
               {auditEvents.map(e => (
                 <div key={e.id} className="px-4 py-3 text-xs">
                   <div className="flex items-center gap-3 mb-1">
-                    <span className="font-mono text-blue-400">{e.event_type}</span>
+                    <span className="font-mono text-blue-600">{e.event_type}</span>
                     <span className="text-gray-600">{e.created_at?.slice(0, 19).replace('T', ' ')}</span>
                     <span className="text-gray-700 font-mono truncate ml-auto">{e.event_hash?.slice(0, 16)}…</span>
                   </div>
-                  <pre className="text-gray-500 overflow-x-auto">{JSON.stringify(e.payload, null, 2).slice(0, 200)}</pre>
+                  <pre className="text-gray-700 bg-gray-50 border border-gray-200 rounded-lg p-3 overflow-x-auto">{JSON.stringify(e.payload, null, 2).slice(0, 200)}</pre>
                 </div>
               ))}
             </div>
@@ -216,9 +216,9 @@ export default function AdminPage() {
 
         {tab === 'corpus' && (
           <div className="space-y-4">
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-              <h3 className="text-white font-semibold mb-2">Corpus Management</h3>
-              <p className="text-sm text-gray-400 mb-4">Run locally to update the knowledge base.</p>
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <h3 className="text-gray-900 font-semibold mb-2">Corpus Management</h3>
+              <p className="text-sm text-gray-700 mb-4">Run locally to update the knowledge base.</p>
               {[
                 { label: 'Ingest demo corpus', cmd: 'uv run python scripts/ingest_demo_corpus.py' },
                 { label: 'Rebuild FTS index',  cmd: 'uv run python scripts/migrate_fts_multilingual.py' },
@@ -226,13 +226,13 @@ export default function AdminPage() {
                 { label: 'Run LLM-as-judge',   cmd: 'uv run python evals/judge.py' },
               ].map(({ label, cmd }) => (
                 <div key={cmd} className="mb-3">
-                  <div className="text-xs text-gray-500 mb-1">{label}</div>
-                  <code className="block bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-blue-300 font-mono">{cmd}</code>
+                  <div className="text-xs text-gray-600 mb-1">{label}</div>
+                  <code className="block bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-blue-700 font-mono">{cmd}</code>
                 </div>
               ))}
             </div>
-            <div className="bg-yellow-950 border border-yellow-800 rounded-xl p-4">
-              <p className="text-yellow-300 text-xs">⚠️ Ingestion uses the service role key and must be run locally. Never expose it to the frontend.</p>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+              <p className="text-yellow-800 text-xs">⚠️ Ingestion uses the service role key and must be run locally. Never expose it to the frontend.</p>
             </div>
           </div>
         )}

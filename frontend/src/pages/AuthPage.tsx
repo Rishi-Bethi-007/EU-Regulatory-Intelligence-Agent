@@ -83,7 +83,7 @@ export default function AuthPage() {
       <div className="w-full max-w-md bg-white border border-gray-200 rounded-xl p-8 shadow-sm text-center">
         <div className="text-5xl mb-4">📧</div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Check your email</h2>
-        <p className="text-gray-500 mb-1">A verification link has been sent to:</p>
+        <p className="text-gray-700 mb-1">A verification link has been sent to:</p>
         <p className="text-gray-900 font-semibold text-lg mb-6">{verifyEmail}</p>
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-600 text-left mb-6">
           <strong className="text-gray-900">Click the link in the email</strong> to verify your account,
@@ -111,7 +111,7 @@ export default function AuthPage() {
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🇪🇺</div>
           <h1 className="text-2xl font-bold text-gray-900">RegulIQ</h1>
-          <p className="text-gray-500 mt-1 text-sm">EU AI Act &amp; GDPR compliance research</p>
+          <p className="text-gray-700 mt-1 text-sm">EU AI Act &amp; GDPR compliance research</p>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
@@ -135,7 +135,7 @@ export default function AuthPage() {
           {/* Divider */}
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400">or use email</span>
+            <span className="text-xs text-gray-600">or use email</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
@@ -148,7 +148,7 @@ export default function AuthPage() {
                 className={`flex-1 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   tab === t
                     ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
-                    : 'text-gray-500 hover:text-gray-700'
+                    : 'text-gray-700 hover:text-gray-900'
                 }`}
               >
                 {t === 'signin' ? '🔑 Sign in' : '✨ Create account'}
@@ -173,7 +173,7 @@ export default function AuthPage() {
                 <label className="flex items-start gap-2 cursor-pointer">
                   <input type="checkbox" checked={siConsent}
                     onChange={e => setSiConsent(e.target.checked)} className="mt-0.5 rounded" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-gray-700">
                     <strong className="text-gray-800">Data processing consent (GDPR Art. 6)</strong><br />
                     I consent to this system processing my queries and storing results to provide compliance guidance.
                   </span>
@@ -189,7 +189,7 @@ export default function AuthPage() {
           {/* Sign up form */}
           {tab === 'signup' && (
             <form onSubmit={handleSignUp} className="space-y-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-700">
                 Create a free account to start researching EU compliance obligations.
               </p>
               <div>
@@ -211,7 +211,7 @@ export default function AuthPage() {
                 <label className="flex items-start gap-2 cursor-pointer">
                   <input type="checkbox" checked={suConsent}
                     onChange={e => setSuConsent(e.target.checked)} className="mt-0.5 rounded" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-gray-700">
                     <strong className="text-gray-800">Data processing consent (GDPR Art. 6)</strong><br />
                     I consent to this system processing my queries and storing results to provide compliance guidance.
                   </span>
@@ -224,14 +224,14 @@ export default function AuthPage() {
             </form>
           )}
 
-          <p className="text-center text-xs text-gray-400 mt-4">
+          <p className="text-center text-xs text-gray-600 mt-4">
             Your data is processed under GDPR. Use the <strong className="text-gray-600">Compliance</strong> page
             to access or erase your data at any time.
           </p>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">
-          <button onClick={() => navigate('/landing')} className="hover:text-gray-600 underline">
+        <p className="text-center text-xs text-gray-600 mt-4">
+          <button onClick={() => navigate('/landing')} className="hover:text-gray-900 underline">
             ← Back to home
           </button>
         </p>

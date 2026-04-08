@@ -56,14 +56,14 @@ export default function HomePage() {
     <div className="p-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">🇪🇺 EU Regulatory Intelligence Agent</h1>
-        <p className="text-gray-400">Multi-agent EU AI Act and GDPR compliance research for Swedish and German SMEs</p>
+        <h1 className="text-3xl font-bold text-gray-950 mb-2">🇪🇺 EU Regulatory Intelligence Agent</h1>
+        <p className="text-gray-700">Multi-agent EU AI Act and GDPR compliance research for Swedish and German SMEs</p>
       </div>
 
       {/* Research input */}
       <div className="card mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">New Research Query</h2>
-        <p className="text-sm text-gray-400 mb-4">
+        <h2 className="text-lg font-semibold text-gray-950 mb-4">New Research Query</h2>
+        <p className="text-sm text-gray-700 mb-4">
           Ask anything about EU AI Act or GDPR compliance. The system classifies risk,
           researches obligations across the regulatory corpus, and generates a full compliance report.
         </p>
@@ -82,17 +82,17 @@ export default function HomePage() {
           <button onClick={handleRun} disabled={loading} className="btn-primary px-8">
             {loading ? 'Starting...' : '🚀 Run Research'}
           </button>
-          <span className="text-xs text-gray-500">Takes 3–6 minutes</span>
+          <span className="text-xs text-gray-600">Takes 3–6 minutes</span>
         </div>
 
         {/* Example queries */}
         <div className="mt-4">
-          <p className="text-xs text-gray-500 mb-2">💡 Example queries:</p>
+          <p className="text-xs text-gray-700 mb-2">💡 Example queries:</p>
           <div className="space-y-1">
             {EXAMPLES.map(ex => (
               <button key={ex} onClick={() => setGoal(ex)}
-                className="block w-full text-left text-xs text-gray-400 hover:text-blue-400
-                           hover:bg-gray-800 px-2 py-1.5 rounded transition-colors">
+                className="block w-full text-left text-xs text-gray-700 hover:text-blue-700
+                           hover:bg-blue-50 px-2 py-1.5 rounded transition-colors">
                 {ex}
               </button>
             ))}
@@ -103,28 +103,28 @@ export default function HomePage() {
       {/* Recent runs */}
       {recentRuns.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Recent Runs</h2>
+          <h2 className="text-lg font-semibold text-gray-950 mb-4">Recent Runs</h2>
           <div className="space-y-3">
             {recentRuns.map(run => (
               <div key={run.id}
-                className="card hover:border-gray-700 cursor-pointer transition-colors"
+                className="card hover:border-blue-200 hover:shadow-md cursor-pointer transition-colors"
                 onClick={() => navigate(`/app/reports/${run.id}`)}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-200 truncate">{run.goal}</p>
+                    <p className="text-sm text-gray-800 truncate">{run.goal}</p>
                     <div className="flex items-center gap-3 mt-2">
                       <RiskBadge level={run.risk_level} size="sm" />
                       {run.transparency_score != null && (
-                        <span className="text-xs text-gray-500">📊 {run.transparency_score}/100</span>
+                        <span className="text-xs text-gray-600">📊 {run.transparency_score}/100</span>
                       )}
                       {run.token_count && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-600">
                           ~{Math.max(1, run.token_count / 800)}m read
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="text-right text-xs text-gray-500 shrink-0">
+                  <div className="text-right text-xs text-gray-600 shrink-0">
                     <div>{run.created_at?.slice(0, 10)}</div>
                     {run.cost_usd && <div>${Number(run.cost_usd).toFixed(4)}</div>}
                   </div>

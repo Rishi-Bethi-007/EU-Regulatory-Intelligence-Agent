@@ -17,7 +17,7 @@ const AGENT_INFO: Record<string, { icon: string; label: string; desc: string }> 
 }
 
 const STATUS_STYLES = {
-  pending:   'text-gray-400 bg-gray-50 border-gray-200',
+  pending:   'text-gray-700 bg-white border-gray-300',
   running:   'text-blue-700 bg-blue-50 border-blue-200',
   completed: 'text-green-700 bg-green-50 border-green-200',
   failed:    'text-red-700 bg-red-50 border-red-200',
@@ -95,14 +95,14 @@ export default function ProgressPage() {
         {complete && <span className="badge bg-green-100 text-green-700 border border-green-200">Complete</span>}
       </div>
 
-      {run && <div className="text-xs text-gray-400 mb-1">Run ID: <span className="font-mono">{runId}</span></div>}
+      {run && <div className="text-xs text-gray-600 mb-1">Run ID: <span className="font-mono text-gray-800">{runId}</span></div>}
       {run?.goal && <p className="text-gray-600 mb-4 text-sm line-clamp-2">{run.goal}</p>}
       {run?.risk_level && <div className="mb-4"><RiskBadge level={run.risk_level} size="md" /></div>}
 
       <div className="mb-4"><AgentPipeline taskMap={taskMap} rcStatus={rcStatus} /></div>
 
       <div className="mb-6">
-        <div className="flex justify-between text-xs text-gray-400 mb-1">
+        <div className="flex justify-between text-xs text-gray-600 mb-1">
           <span>{completedCount}/{AGENT_PIPELINE.length} stages complete</span>
           <span>{Math.round(progress * 100)}%</span>
         </div>
@@ -125,12 +125,12 @@ export default function ProgressPage() {
                   <span className="text-xl mt-0.5">{info.icon}</span>
                   <div>
                     <div className="font-semibold text-sm">{info.label}</div>
-                    <div className="text-xs opacity-60 mt-0.5">{info.desc}</div>
+                    <div className="text-xs opacity-80 mt-0.5">{info.desc}</div>
                   </div>
                 </div>
                 <div className="text-right shrink-0 ml-4">
                   <div className="text-xs font-medium">{STATUS_LABEL[status]}</div>
-                  {elapsed && <div className="text-xs opacity-60 mt-0.5">{elapsed}</div>}
+                  {elapsed && <div className="text-xs opacity-80 mt-0.5">{elapsed}</div>}
                 </div>
               </div>
               {task?.status === 'failed' && task.error && (
@@ -161,7 +161,7 @@ export default function ProgressPage() {
       )}
 
       {!complete && run?.status !== 'failed' && (
-        <p className="text-xs text-gray-400 text-center animate-pulse">🔄 Auto-refreshing every 2s...</p>
+        <p className="text-xs text-gray-600 text-center animate-pulse">🔄 Auto-refreshing every 2s...</p>
       )}
     </div>
   )

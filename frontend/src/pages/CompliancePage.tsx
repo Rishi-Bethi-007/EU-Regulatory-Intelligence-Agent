@@ -19,7 +19,7 @@ function TransparencyGauge({ score }: { score: number }) {
   return (
     <div className="text-center py-4">
       <div className="text-5xl font-black mb-1" style={{ color }}>{score}</div>
-      <div className="text-sm text-gray-400 mb-3">out of 100</div>
+      <div className="text-sm text-gray-600 mb-3">out of 100</div>
       <div className="h-3 bg-gray-100 rounded-full overflow-hidden max-w-xs mx-auto">
         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${score}%`, background: color }} />
       </div>
@@ -98,7 +98,7 @@ export default function CompliancePage() {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 p-4 shrink-0">
-        <h2 className="text-sm font-semibold text-gray-500 mb-3">Select Run</h2>
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">Select Run</h2>
         <div className="space-y-2">
           {recentRuns.map(r => {
             const isActive = r.id === activeRunId
@@ -106,10 +106,10 @@ export default function CompliancePage() {
               <button key={r.id}
                 onClick={() => { setActiveRunId(r.id); navigate(`/app/compliance/${r.id}`) }}
                 className={`w-full text-left rounded-lg p-2.5 text-xs transition-colors border ${
-                  isActive ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                  isActive ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                 }`}>
                 <div className="truncate mb-1 font-medium">{(r.goal ?? '').slice(0, 40)}...</div>
-                <div className="flex items-center gap-1.5 text-gray-400">
+                <div className="flex items-center gap-1.5 text-gray-600">
                   <span>{EMOJI[r.risk_level ?? ''] ?? '⚪'}</span>
                   <span>📊 {r.transparency_score ?? 0}/100</span>
                 </div>
@@ -122,10 +122,10 @@ export default function CompliancePage() {
       {/* Main */}
       <div className="flex-1 p-8 overflow-auto">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">🇪🇺 EU Compliance Dashboard</h1>
-        <p className="text-gray-500 text-sm mb-6">EU AI Act risk classification · Transparency scoring · GDPR rights</p>
+        <p className="text-gray-700 text-sm mb-6">EU AI Act risk classification · Transparency scoring · GDPR rights</p>
 
         {!activeRunId ? (
-          <div className="text-center text-gray-400 mt-20">
+          <div className="text-center text-gray-600 mt-20">
             <div className="text-5xl mb-4">🇪🇺</div>
             <p>No run selected. <button className="text-blue-600 hover:text-blue-700" onClick={() => navigate('/app')}>Start a research query.</button></p>
           </div>
@@ -139,7 +139,7 @@ export default function CompliancePage() {
               {TABS.map(t => (
                 <button key={t.key} onClick={() => setTab(t.key as any)}
                   className={`flex-1 py-2 rounded-md text-xs font-medium transition-colors ${
-                    tab === t.key ? 'bg-white text-gray-900 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'
+                    tab === t.key ? 'bg-white text-gray-900 shadow-sm border border-gray-200' : 'text-gray-700 hover:text-gray-900'
                   }`}>
                   {t.label}
                 </button>
@@ -149,14 +149,14 @@ export default function CompliancePage() {
             {tab === 'risk' && (
               <div className="grid grid-cols-2 gap-6">
                 <div className="card">
-                  <h3 className="text-sm font-semibold text-gray-500 mb-4">EU AI Act Risk Classification</h3>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-4">EU AI Act Risk Classification</h3>
                   <RiskBadge level={run?.risk_level} size="lg" />
                   {run?.risk_justification && (
-                    <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm text-gray-600">{run.risk_justification}</div>
+                    <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm text-gray-700">{run.risk_justification}</div>
                   )}
                 </div>
                 <div className="card">
-                  <h3 className="text-sm font-semibold text-gray-500 mb-2">Transparency Score</h3>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Transparency Score</h3>
                   <TransparencyGauge score={score} />
                   <div className="space-y-2 mt-2">
                     {SCORE_DIMENSIONS.map(({ key, label, desc }, i) => {
@@ -166,9 +166,9 @@ export default function CompliancePage() {
                           <span className="text-sm mt-0.5">{passed ? '✅' : '❌'}</span>
                           <div>
                             <div className="text-xs font-medium text-gray-700">{label}</div>
-                            <div className="text-xs text-gray-400">{desc}</div>
+                            <div className="text-xs text-gray-600">{desc}</div>
                           </div>
-                          <span className="ml-auto text-xs text-gray-400">+20</span>
+                          <span className="ml-auto text-xs text-gray-600">+20</span>
                         </div>
                       )
                     })}
@@ -179,8 +179,8 @@ export default function CompliancePage() {
 
             {tab === 'obligations' && (
               <div className="card">
-                <h3 className="text-sm font-semibold text-gray-500 mb-4">EU AI Act + GDPR Obligations Checklist</h3>
-                <p className="text-xs text-gray-400 mb-4">Auto-ticked based on run metadata. All ticked items are verifiable in the audit log.</p>
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">EU AI Act + GDPR Obligations Checklist</h3>
+                <p className="text-xs text-gray-600 mb-4">Auto-ticked based on run metadata. All ticked items are verifiable in the audit log.</p>
                 <div className="space-y-3">
                   {[
                     ['Risk classification performed',  !!run?.risk_level],
@@ -192,7 +192,7 @@ export default function CompliancePage() {
                   ].map(([label, ticked]) => (
                     <div key={String(label)} className="flex items-center gap-3">
                       <span className="text-lg">{ticked ? '☑️' : '⬜'}</span>
-                      <span className={`text-sm ${ticked ? 'text-gray-700' : 'text-gray-400'}`}>{label as string}</span>
+                      <span className={`text-sm ${ticked ? 'text-gray-800' : 'text-gray-500'}`}>{label as string}</span>
                     </div>
                   ))}
                 </div>
@@ -201,17 +201,17 @@ export default function CompliancePage() {
 
             {tab === 'notice' && (
               <div className="card">
-                <h3 className="text-sm font-semibold text-gray-500 mb-3">EU AI Act Art. 13 — Transparency Notice</h3>
-                <p className="text-xs text-gray-400 mb-4">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">EU AI Act Art. 13 — Transparency Notice</h3>
+                <p className="text-xs text-gray-600 mb-4">
                   Every run generates a transparency notice disclosing which AI models were used, sources retrieved,
                   confidence level, and known limitations. Required for high-risk AI systems under EU AI Act Article 13.
                 </p>
                 {run?.transparency_notice ? (
-                  <pre className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-xs text-gray-600 overflow-auto whitespace-pre-wrap max-h-[500px]">
+                  <pre className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-xs text-gray-700 overflow-auto whitespace-pre-wrap max-h-[500px]">
                     {run.transparency_notice}
                   </pre>
                 ) : (
-                  <div className="text-gray-400 text-sm">No transparency notice for this run.</div>
+                  <div className="text-gray-600 text-sm">No transparency notice for this run.</div>
                 )}
               </div>
             )}
@@ -220,16 +220,16 @@ export default function CompliancePage() {
               <div className="grid grid-cols-2 gap-6">
                 <div className="card">
                   <h3 className="text-sm font-semibold text-gray-900 mb-1">📋 Art. 15 — Right of Access</h3>
-                  <p className="text-xs text-gray-500 mb-4">See all data held about you: research runs and audit events.</p>
+                  <p className="text-xs text-gray-600 mb-4">See all data held about you: research runs and audit events.</p>
                   <button onClick={handleAccessData} disabled={gdprLoading} className="btn-secondary text-sm">
                     {gdprLoading ? 'Loading...' : 'Request My Data'}
                   </button>
                   {gdprData && (
-                    <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-600">
+                    <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-700">
                       <div className="text-green-600 font-medium mb-2">Found {gdprData.total_records} records</div>
                       <div className="mb-1"><strong className="text-gray-900">Research runs:</strong> {gdprData.research_runs?.length}</div>
                       {gdprData.research_runs?.slice(0, 3).map((r: any) => (
-                        <div key={r.id} className="text-gray-500 truncate pl-2">• {(r.goal ?? '').slice(0, 50)}...</div>
+                        <div key={r.id} className="text-gray-600 truncate pl-2">• {(r.goal ?? '').slice(0, 50)}...</div>
                       ))}
                       <div className="mt-1"><strong className="text-gray-900">Audit events:</strong> {gdprData.audit_events?.length}</div>
                     </div>
@@ -243,7 +243,7 @@ export default function CompliancePage() {
                   </div>
                   <label className="flex items-center gap-2 mb-4 cursor-pointer">
                     <input type="checkbox" checked={eraseConfirm} onChange={e => setEraseConfirm(e.target.checked)} className="rounded" />
-                    <span className="text-xs text-gray-600">I understand this is permanent</span>
+                    <span className="text-xs text-gray-700">I understand this is permanent</span>
                   </label>
                   <button onClick={handleEraseData} disabled={!eraseConfirm || gdprLoading} className="btn-danger text-sm">
                     {gdprLoading ? 'Erasing...' : 'Erase My Data'}
@@ -251,7 +251,7 @@ export default function CompliancePage() {
                 </div>
 
                 {gdprMsg && (
-                  <div className="col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm text-gray-600">{gdprMsg}</div>
+                  <div className="col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm text-gray-700">{gdprMsg}</div>
                 )}
               </div>
             )}
